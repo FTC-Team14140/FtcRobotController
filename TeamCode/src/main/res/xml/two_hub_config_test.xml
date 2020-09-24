@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <Webcam serialNumber="CCB77690" name="Webcam 1"/>
+    <LynxUsbDevice serialNumber="DQ2F3DNX" name="Expansion Hub Portal 1" parentModuleAddress="2"/>
+    <LynxUsbDevice name="Expansion Hub Portal 1" serialNumber="DQ2F3DNX" parentModuleAddress="2">
+
+        <LynxModule name="Expansion Hub 2" port="2">
+            <goBILDA5202SeriesMotor name="liftBase" port="0" />
+            <NeveRest20Gearmotor name="lSpindle" port="3"/>
+            <NeveRest20Gearmotor name="rSpindle" port="2"/>
+            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <LynxColorSensor name="frontColorSensor" port="0" bus="3" />
+            <REV_VL53L0X_RANGE_SENSOR name="frontRightDistance" port="0" bus="1" />
+            <REV_VL53L0X_RANGE_SENSOR name="leftDistance" port="0" bus="2"/>
+            <LynxColorSensor name="bottomColorSensor" port="0" bus="0" />
+            <DigitalDevice name="liftUpMagSwitch1" port="1"/>
+            <DigitalDevice name="liftUpMagSwitch2" port="5"/>
+
+        </LynxModule>
+
+        <LynxModule name="Expansion Hub 3" port="3">
+            <goBILDA5202SeriesMotor name="fRightMotor" port="0" />
+            <goBILDA5202SeriesMotor name="bRightMotor" port="1" />
+            <goBILDA5202SeriesMotor name="fLeftMotor" port="2" />
+            <goBILDA5202SeriesMotor name="bLeftMotor" port="3" />
+            <Servo name="latchOne" port="0" />
+            <Servo name="latchTwo" port="1" />
+            <Servo name="grabberOne" port="2" /> <!--grabberOne/>-->
+            <Servo name="grabberTwo" port="3" /> <!--grabberTwo/>-->
+            <Servo name="rotateServo" port="4"/>
+            <RevBlinkinLedDriver name="blinkin" port="5"/>
+            <RevTouchSensor name="liftDownLimitSwitch" port="1"/>
+            <REV_VL53L0X_RANGE_SENSOR name="frontLeftDistance" port="0" bus="3" />
+            <REV_VL53L0X_RANGE_SENSOR name="backDistance" port="0" bus="2"/>
+            <REV_VL53L0X_RANGE_SENSOR name="rightDistance" port="0" bus="1"/>
+
+            <LynxEmbeddedIMU name="imu 1" port="0" bus="0" />
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>
