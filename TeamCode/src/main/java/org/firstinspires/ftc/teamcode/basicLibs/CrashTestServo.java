@@ -85,6 +85,12 @@ public class CrashTestServo {
         this(teamUtil.theOpMode.hardwareMap, name);
     }
 
+
+    public CrashTestServo(String name, double maxUnloadSpeedFor60deg) {
+        this(teamUtil.theOpMode.hardwareMap, name);
+        this.maxUnloadSpeedFor60deg = maxUnloadSpeedFor60deg;
+    }
+
     public CrashTestServo(String name, boolean isDigitalServo) {
         this(name);
 
