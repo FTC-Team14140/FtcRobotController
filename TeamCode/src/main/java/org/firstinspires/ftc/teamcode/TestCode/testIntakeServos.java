@@ -24,8 +24,11 @@ public class testIntakeServos extends LinearOpMode {
 
         waitForStart();
 
-        while(opModeIsActive() && !this.isStopRequested()){
+        servo1.setPower(-FULL_POWER);
+        servo2.setPower(FULL_POWER);
 
+        while(opModeIsActive() && !this.isStopRequested()){
+/*
             if (gamepad1.y) {
                 servo1.setPower(-FULL_POWER);
                 servo2.setPower(FULL_POWER);
@@ -40,6 +43,7 @@ public class testIntakeServos extends LinearOpMode {
                 servo1.setPower(STOP);
                 servo2.setPower(STOP);
             }
+ */
         }
     }
 }

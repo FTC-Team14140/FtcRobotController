@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @TeleOp(name="TestShooter")
 public class TestShooter extends LinearOpMode {
     DcMotor m1, m2;
-    double FULL_POWER = .8;
+    double FULL_POWER = .9;
     double HALF_POWER = .4;
     double SLOW = .2;
 
@@ -21,7 +21,7 @@ public class TestShooter extends LinearOpMode {
 
         while(opModeIsActive() && !this.isStopRequested()){
 
-            /*
+
             // Code for the 2 wheel shooter
             if (gamepad1.y) {
                 m1.setPower(FULL_POWER);
@@ -38,7 +38,7 @@ public class TestShooter extends LinearOpMode {
                 m2.setPower(0);
             }
 
-            */
+            
 
             /*
             //Code for the 1 wheel shooter
@@ -54,22 +54,23 @@ public class TestShooter extends LinearOpMode {
             }
             */
 
+            /*
             //Code for the 2 stage shooter
             if (gamepad1.y) {
-                m1.setPower(FULL_POWER);
-                m2.setPower(-FULL_POWER);
+                m1.setPower(-FULL_POWER);
+                m2.setPower(FULL_POWER);
             } else if (gamepad1.b) {
-                m1.setPower(HALF_POWER);
-                m2.setPower(-HALF_POWER);
+                m1.setPower(-HALF_POWER);
+                m2.setPower(HALF_POWER);
             } else if (gamepad1.a) {
-                m1.setPower(SLOW);
-                m2.setPower(-SLOW);
+                m1.setPower(-SLOW);
+                m2.setPower(SLOW);
             }
             if (gamepad1.x) {
                 m1.setPower(0);
                 m2.setPower(0);
             }
-
+*/
         }
     }
 }
