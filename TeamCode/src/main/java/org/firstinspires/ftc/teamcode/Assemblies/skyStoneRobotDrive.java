@@ -1,44 +1,56 @@
 package org.firstinspires.ftc.teamcode.Assemblies;
 
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.basicLibs.DistanceSensors;
 import org.firstinspires.ftc.teamcode.basicLibs.revHubIMUGyro;
+import org.firstinspires.ftc.teamcode.basicLibs.teamColorSensor;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
-public class RobotDrive {
+public class skyStoneRobotDrive {
 
+
+    //move forward, backward, move left/right(strafe basically, maybe using distance sensor), turn left, right, rotate(certain amount of degrees),
+    // move(either forward, left, or right) for a certain amount of time(timeout thingie)
+
+    public static final double STARTING_ANGLE = 0;
     public static final double FULL_POWER = 1;
-    public static final double MAX_MOTOR_VELOCITY = 1000; // tics/sec  TODO: Update for the Ultimate Goal Robot
-
     public static final double DEAD_ZONE_THRESHOLD = 0.03;
-    public static final double MIN_ROTATING_POWER = 0.25;  // TODO: Update for the Ultimate Goal Robot
+    public static final double TRIGGER_DIALATION = 0.6;
+    public static final double MIN_ROTATING_POWER = 0.25;
+    public static final double TEST_POWER = 0.25;
+    public static final double ROTATIONAL_DRIFT_CORRECTION = 0.94;
 
-    private double COUNTS_PER_INCH = 62.24;  // TODO: Update for the Ultimate Goal Robot
-    private double COUNTS_PER_INCH_SIDEWAYS = 67.82;  // TODO: Update for the Ultimate Goal Robot
+    float currentHeading; //This variable is the current heading of the robot
+    Orientation angle; //This variable keeps track of the current heading
 
+    private double COUNTS_PER_INCH = 62.24;  // 89.7158 is the orriginal number
+    private double COUNTS_PER_INCH_SIDEWAYS = 67.82;  // 89.7158 is the orriginal number
+    private boolean frontSensorsOnly = false;
 
+    public static final double NEVERREST40_ENCODER_CLICKS = 1120;
     public static double INITIAL_HEADING;
 
 
     HardwareMap hardwareMap;
+    //Telemetry telemetry;
     boolean timedOut = false;
-
-    revHubIMUGyro revImu;
-
     DcMotorEx fLeftMotor;
     DcMotorEx bLeftMotor;
     DcMotorEx fRightMotor;
     DcMotorEx bRightMotor;
-
-    /* Sensors from SkyStone
     public DistanceSensors frontLeftDistance;
     public DistanceSensors frontRightDistance;
     public DistanceSensors leftDistanceSensor;
@@ -48,7 +60,18 @@ public class RobotDrive {
     public ColorSensor frontmiddleColor;
     public ColorSensor bottomColorSensor;
     public teamColorSensor bottomColor;
-     */
+
+
+    //    Servo latchOne;
+//    Servo latchTwo;
+    revHubIMUGyro revImu;
+
+
+
+
+
+
+
 
 
 
@@ -57,12 +80,20 @@ public class RobotDrive {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Constructors, Initialization
-    //
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Constructors, Initialization, and Telemetry
+    // Your class (and all classes representing functional parts of the robot) should have a constructor
+    // to set themselves up as well as an "initialize" method that would be called during the robot initialization and
+    // possibly a "start" method that would be called just after start and maybe some "shutdown" methods as well.
+    // In other words, they should look a bit like a standard OpMode class.
+    // We should figure out what our "standard" approach is going to be for acquiring things from the FTC hardwareMap and initialization.
+    // For example, should each class representing a particular assembly on the robot (like the drive)
+    // reach into the hardwareMap and get the needed objects (and thus encapsulate the names of those things
+    // in the configuration file) or should the overall "robot" class do all that work and pass the needed
+    // objects down into the assembly level classes?  Or maybe a hybrid approach where all the "names" in the
+    // config file are in one place but the assembly classes do the initialization work...Getting a bit ahead here!
 
-    public RobotDrive(HardwareMap theHardwareMap, Telemetry theTelemetry) {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public skyStoneRobotDrive(HardwareMap theHardwareMap, Telemetry theTelemetry) {
         hardwareMap = theHardwareMap;
         //telemetry = theTelemetry;
     }
@@ -93,7 +124,6 @@ public class RobotDrive {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void initSensors(boolean frontOnly) {
-    /*  TODO: rewrite when we add sensors to this year's robot
         frontSensorsOnly = frontOnly;
         frontLeftDistance = new DistanceSensors(hardwareMap.get(Rev2mDistanceSensor.class, "frontLeftDistance"));
         frontRightDistance = new DistanceSensors(hardwareMap.get(Rev2mDistanceSensor.class, "frontRightDistance"));
@@ -114,33 +144,14 @@ public class RobotDrive {
             rightDistanceSensor.setOffset((float) (0.0));
             backDistanceSensor.setOffset((float) (0.0));
         }
-    */
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void start() {
     }
 
-
-
-
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Telemetry
-    //
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void distanceTelemetry() {
-    /*  TODO: Rewrite when we add sensors to the robot
         teamUtil.telemetry.addData("frontLeftDistance:", "%.1f %b", getDistanceInches(frontLeftDistance),frontLeftDistance.didTimeOut());
         teamUtil.telemetry.addData("frontMiddleDistance:", "%.1f", frontmiddleDistance.getDistance(DistanceUnit.CM));
         teamUtil.telemetry.addData("frontRightDistance:", "%.1f %b", getDistanceInches(frontRightDistance),frontRightDistance.didTimeOut());
@@ -150,7 +161,6 @@ public class RobotDrive {
             teamUtil.telemetry.addData("backDistance:", "%.1f %b", getDistanceInches(backDistanceSensor),backDistanceSensor.didTimeOut());
         }
         teamUtil.telemetry.addLine("front color:" + frontmiddleColor.alpha() + ":" + frontmiddleColor.red() + ":" + frontmiddleColor.green() + ":" + frontmiddleColor.blue());
-    */
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,19 +207,6 @@ public class RobotDrive {
         return fLeftMotor.getCurrentPosition();
     }
 
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Low level helper functions
-    //
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Adjust readings from Distance Sensors to make sure we are not relying on bad data.
@@ -262,21 +259,11 @@ public class RobotDrive {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void setMotorVelocities(double fl, double fr, double bl, double br) {
-        fLeftMotor.setVelocity(fl);
-        fRightMotor.setVelocity(fr);
-        bLeftMotor.setVelocity(bl);
-        bRightMotor.setVelocity(br);
-    }
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // IMU and Angle related methods
-    // TODO: the team IMU class needs to be rewritten to hold all the methods below
+    // the team IMU class needs to be rewritten to hold all the methods below
     // WARNING!! Our IMUs are currently mounted upside down.  So counter clockwise is positive.  An adjustment for that could be added to
     // the IMU class.  meanwhile, all the code below presumes an upside down rev Hub...
 
@@ -338,19 +325,18 @@ public class RobotDrive {
         return revImu.correctHeading(adjustAngle(pseudoHeading + getHeading()));
     }
 
-
-
-
-
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Motor Power Methods
     // THESE ALL USE setPower() instead of setVelocity()!!
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public double clip(double power) {
+        power = Range.clip(power, -FULL_POWER, FULL_POWER);
+        return power;
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void stopMotors() {
@@ -369,31 +355,24 @@ public class RobotDrive {
         bRightMotor.setPower(br);
     }
 
-    /* The following methods should all be deprecated...use or enhance the ones with acceleration curves instead
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public double clip(double power) {
-        power = Range.clip(power, -FULL_POWER, FULL_POWER);
-        return power;
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void driveForward(double power) {
         power = clip(power);
         setAllMotorsWithEncoder();
-        fLeftMotor.setPower(power);
-        fRightMotor.setPower(power * .875); //   TODO: revisit these constants
-        bLeftMotor.setPower(power);
-        bRightMotor.setPower(power * .875);
+        fLeftMotor.setPower(power); //neg for F og
+        fRightMotor.setPower(power * .875); // pos for F og
+        bLeftMotor.setPower(power);  //neg for F og
+        bRightMotor.setPower(power * .875); //pos for F og  }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void driveBackward(double power) {
         power = clip(power);
         setAllMotorsWithEncoder();
-        fLeftMotor.setPower(-power);
-        fRightMotor.setPower(-power * .875); //  TODO: revisit these constants
-        bLeftMotor.setPower(-power);
-        bRightMotor.setPower(-power * .875);
+        fLeftMotor.setPower(-power); //neg for F
+        fRightMotor.setPower(-power * .875); // pos for F
+        bLeftMotor.setPower(-power);  //neg for F
+        bRightMotor.setPower(-power * .875); //pos for F
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -401,7 +380,7 @@ public class RobotDrive {
         power = clip(power);
         setAllMotorsWithEncoder();
         fLeftMotor.setPower(power);
-        fRightMotor.setPower(-power * 0.8015384615);  //TODO: revisit these constants
+        fRightMotor.setPower(-power * 0.8015384615);
         bLeftMotor.setPower(-power * 0.7361538462);
         bRightMotor.setPower(power * 0.8346153846);
     }
@@ -411,8 +390,8 @@ public class RobotDrive {
         power = clip(power);
         setAllMotorsWithEncoder();
         fLeftMotor.setPower(-power);
-        fRightMotor.setPower(power * 0.9215384615); // TODO: revisit these constants
-        bLeftMotor.setPower(power * 0.8061538462);
+        fRightMotor.setPower(power * 0.9215384615); //0.9615384615
+        bLeftMotor.setPower(power * 0.8061538462); //0.8461538462
         bRightMotor.setPower(-power * 0.8846153846);
     }
 
@@ -434,16 +413,6 @@ public class RobotDrive {
         bRightMotor.setPower(-power);
     }
 
-     */
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Methods for holding a heading using the gyroscope while moving
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // return the difference between the current heading and a target heading.  Returns -180 to 180
     public double getHeadingError(double targetAngle) {
@@ -459,7 +428,6 @@ public class RobotDrive {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Run the robot forward/or backward maintaining the specified heading by turning proportionally as needed (P = .1)
-    // TODO: We need a universal drive version of this that takes a drive heading and an attitude heading
     public void followHeading(double Heading, double ticsPerSecond) {
         double velocityAdjust = getHeadingError(Heading) * .1 * ticsPerSecond;
         if (ticsPerSecond > 0) {
@@ -477,21 +445,120 @@ public class RobotDrive {
         //teamUtil.log("targetHeading: " + Heading + " Heading:" + getHeading() + " Adjust" + velocityAdjust);
     }
 
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Movement methods using Distance Sensors
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Move the robot straight forward or straight backward until the sensor gets to the desired reading
+    public void moveToDistance(DistanceSensors sensor, double desiredDistance, double power, long timeOut) {
+        teamUtil.log("Moving to Distance");
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+        double currentReading = getDistanceInches(sensor);
+
+        // Need to move backwards
+        if (currentReading < desiredDistance) {
+            while ((getDistanceInches(sensor) < desiredDistance) && teamUtil.keepGoing(timeOutTime)) {
+                driveBackward(power);
+            }
+            // need to move forwards
+        } else if (currentReading > desiredDistance) {
+            while ((getDistanceInches(sensor) > desiredDistance) && teamUtil.keepGoing(timeOutTime)) {
+                driveForward(power);
+            }
+        }
+        stopMotors();
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("Moving to Distance - TIMED OUT!");
+        }
+        teamUtil.log("Moving to Distance - Finished");
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void closeToDistanceOr(DistanceSensors frontLeft, DistanceSensors frontRight, double desiredDistance, double power, long timeOut) {
+        teamUtil.log("Moving to Distance");
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+        double currentReadingLeft = getDistanceInches(frontLeft);
+        double currentReadingRight = getDistanceInches(frontRight);
+
+        // Need to move backwards
+//        if (currentReading < desiredDistance) {
+//            while ((getDistanceInches(sensor) < desiredDistance) && teamUtil.keepGoing(timeOutTime)) {
+//                driveBackward(power);
+//            }
+        // need to move forwards
+//        } else
+        if (currentReadingLeft > desiredDistance && currentReadingRight > desiredDistance) {
+            while (((getDistanceInches(frontLeft) > desiredDistance) && (getDistanceInches(frontRight) > desiredDistance)) && teamUtil.keepGoing(timeOutTime)) {
+                driveForward(power);
+            }
+        }
+        stopMotors();
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("Moving to Distance - TIMED OUT!");
+        }
+        teamUtil.log("Moving to Distance - Finished");
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void moveToPickUpDistance(long timeOut) {
+        teamUtil.log("Moving to Distance");
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+        double currentReading = frontmiddleDistance.getDistance(DistanceUnit.CM);
+
+        // Need to move backwards
+        if (currentReading < 5.46) {
+            while ((frontmiddleDistance.getDistance(DistanceUnit.CM) < 5.46) && teamUtil.keepGoing(timeOutTime)) {
+                driveBackward(0.17);
+            }
+            // need to move forwards
+        } else {
+            while ((frontmiddleDistance.getDistance(DistanceUnit.CM) > 5.46) && teamUtil.keepGoing(timeOutTime)) {
+                driveForward(0.17);
+            }
+        }
+        stopMotors();
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("Moving to Distance - TIMED OUT!");
+        }
+        teamUtil.log("Moving to Distance - Finished");
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Enhanced multi-stage Move to Distance
     // Uses a 3 stage deceleration path and the IMU to hold the given heading.  initialTicsPerSecond should always be positive.
     // robot will move forward or backward as needed to gain the target distance reading on the supplied Distance Sensor
     // Currently this assumes distance sensors are on the front of the robot and postive power moves the robot forward.
-    // TODO: Consider an acceleration phase from current velocity (could be 0) to avoid wheel slip at the beginning of the movement
+    // TODO: Enhance to work with distance sensors on front or back
 
-    public void moveToDistance(DistanceSensors sensor, double distance, double initialTicsPerSecond, double heading, boolean moveBackIfNeeded, long timeOut) {
+    public void moveToDistanceFailover(double distance, double initialTicsPerSecond, double heading, boolean moveBackIfNeeded, long timeOut) {
+        double frontLeft = frontLeftDistance.getDistance();
+        double frontRight = frontRightDistance.getDistance();
+        teamUtil.log("FL:" + frontLeft + " FR:" + frontRight);
+
+        if (frontLeft > 0 && frontLeft < 50) {
+            newMoveToDistance(frontLeftDistance, distance, initialTicsPerSecond, heading, moveBackIfNeeded, timeOut);
+        } else if (frontRight > 0 && frontRight < 50) {
+            teamUtil.log("FAILING OVER TO FRONT RIGHT DISTANCE SENSOR");
+            newMoveToDistance(frontRightDistance, distance, initialTicsPerSecond, heading, moveBackIfNeeded, timeOut);
+        } else {
+            teamUtil.log("BOTH FRONT DISTANCE SENSORS FAILED");
+        }
+    }
+
+
+    public void newMoveToDistance(DistanceSensors sensor, double distance, double initialTicsPerSecond, double heading, boolean moveBackIfNeeded, long timeOut) {
         boolean details = true;
         teamUtil.log("Moving to Distance: " + distance + " Velocity: " + initialTicsPerSecond);
         long timeOutTime = System.currentTimeMillis() + timeOut;
@@ -543,6 +610,7 @@ public class RobotDrive {
             final double preDriftTarget = distance - .5;
             final double slowThreshold = distance - 5;
             final double decelThreshold = slowThreshold - 10;
+//            final double slope = (maxPower-minPower)/(decelThreshold-slowThreshold); // slope for the decel phase
             final double slope = (minPower - maxPower) / (slowThreshold - decelThreshold); // slope for the decel phase
             // Cruise at max speed
             while (currentDistance < decelThreshold && teamUtil.keepGoing(timeOutTime)) {
@@ -553,6 +621,7 @@ public class RobotDrive {
             }
             // Decelerate to min speed
             while (currentDistance < slowThreshold && teamUtil.keepGoing(timeOutTime)) {
+//                velocity = (slowThreshold - currentDistance) * slope + minPower; // decelerate proportionally down to min
                 velocity = (currentDistance - decelThreshold) * slope + maxPower; // decelerate proportionally down to min
                 followHeading(heading, -velocity);
                 if (details)
@@ -575,17 +644,14 @@ public class RobotDrive {
         teamUtil.log("Finished Move to Distance");
     }
 
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Movement methods for inches or time
+    // These need to be calibrated for actual inches
     // Use at lower speeds or wheel slippage may compromise accuracy
 
-    /* The following methods should all be deprecated...use or enhance the ones with acceleration curves instead
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Move forward for a specified amouunt of time and then stop
     public void driveForward(double power, double timeInMilliseconds) {
@@ -690,6 +756,13 @@ public class RobotDrive {
         } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
         //runs to the set number of inches at the desired speed
 
+
+        /* This is not valid code unless you are in RUN_TO_POSITION
+        while (fLeftMotor.isBusy() && fRightMotor.isBusy()) {
+            encoderTelemetry();
+        }
+         */
+
         //turns off both motors
         stopMotors();
 
@@ -727,6 +800,13 @@ public class RobotDrive {
 
         } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
         //runs to the set number of inches at the desired speed
+
+
+        /* This is not valid code unless you are in RUN_TO_POSITION
+        while (fLeftMotor.isBusy() && fRightMotor.isBusy()) {
+            encoderTelemetry();
+        }
+         */
 
         //turns off both motors
         stopMotors();
@@ -767,6 +847,12 @@ public class RobotDrive {
         //runs to the set number of inches at the desired speed
 
 
+        /* This is not valid code unless you are in RUN_TO_POSITION
+        while (fLeftMotor.isBusy() && fRightMotor.isBusy()) {
+            encoderTelemetry();
+        }
+         */
+
         //turns off both motors
         stopMotors();
 
@@ -780,174 +866,346 @@ public class RobotDrive {
         teamUtil.log("Moving Inches Right - Finished");
     }
 
-    */
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Methods for moving specific distances using acceleration/deceleration
-    // The LATEST AND GREATEST versions that were used in Autonomous in SkyStone
-    // TODO: create left and right movement versions of these
-    // TODO: Better yet, create a version that works for any direction like this:
-    //      moveInches(double maxVelocity, double inches, double driveHeading, double robotHeading, long timeOut)
-
-    public int inchesToEncoderTics(double inches) {
-        return (int) (inches * COUNTS_PER_INCH);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Ramp the motors smoothly from start velocity to end velocity use maximum acceleration/deceleration rates
-    // This will work if both Velocities are positive or negative but not if one is positive and the other negative
-    public void rampMotors(double startVelocity, double endVelocity, double heading, long timeOut) {
-        boolean details = false;
-        teamUtil.log("New Ramp Motors: Start:" + startVelocity + " End:" + endVelocity + " heading:" + heading);
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
-
-        final double MAX_ACCEL_PER_INCH = 440; // max velocity acceleration per inch without skidding
-        final double MAX_DECEL_PER_INCH = 200; // max power deceleration per inch without skidding
-
-        // Figure out the distance we need to ramp in encoder tics
-        int encoderCount; // always +
-        double speedChange = Math.abs(endVelocity) - Math.abs(startVelocity); // + if accelerating or - if decelerating
-        if (Math.abs(endVelocity) > Math.abs(startVelocity)) {
-            encoderCount = inchesToEncoderTics(Math.abs(speedChange) / MAX_ACCEL_PER_INCH);
-        } else {
-            encoderCount = inchesToEncoderTics(Math.abs(speedChange) / MAX_DECEL_PER_INCH);
-
-        }
-        double slope = speedChange / encoderCount; // slope for the velocity ramp.  + or -
-
-        setAllMotorsWithEncoder();
-        int initialPosition = fRightMotor.getCurrentPosition();
-
-        // Ramp the motors from one speed to the other
-        int distanceTraveled = Math.abs(fRightMotor.getCurrentPosition() - initialPosition); // Always +
-        while (distanceTraveled < encoderCount && teamUtil.keepGoing(timeOutTime)) {
-            double velocity = slope * ((startVelocity > 0) ? distanceTraveled : -distanceTraveled) + startVelocity;
-            followHeading(heading, velocity);
-            if (details)
-                teamUtil.log("Distance Traveled: " + distanceTraveled + " Velocity: " + velocity);
-            distanceTraveled = Math.abs(fRightMotor.getCurrentPosition() - initialPosition); // Always +
-        }
-
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("newRampMotors - TIMED OUT!");
-        }
-        teamUtil.log("newRampMotors - Finished");
-
-    }
-
+    // Advanced Movement methods that handle acceleration and deceleration to enable accurate encoder based movement at higher speeds
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Attempt to cover the specified distance at up to the specified speed using smooth acceleration at the start and deceleration at the end
-    // this methods assumes the robot is at rest when it starts and will leave the robot at rest. Works for forward or backwards motion
-    // This version uses setVelocity instead of setPower and also attempts to hold the specified heading
-    public void accelerateInchesBackward(double maxVelocity, double inches, double heading, long timeOut) {
-        accelerateInchesForward(-maxVelocity, inches, heading, timeOut);
-    }
+    // this methods assumes the robot is at rest when it starts and will leave the robot at rest.
+    public void accelerateInchesForward(double speed, double inches, long timeOut) {
 
-    public void accelerateInchesForward(double maxVelocity, double inches, double heading, long timeOut) {
-        boolean details = false;
-        teamUtil.log("newAccelerateInchesForward: velocity:" + maxVelocity + " Inches:" + inches + " heading:" + heading);
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
+        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
+        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
+        final double COUNTS_PER_INCH =
+                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
-        double MAX_ACCEL_PER_INCH = 440; // max velocity acceleration per inch without skidding (slope with x=inches)
-        double MAX_DECEL_PER_INCH = 175; // max power deceleration per inch without skidding (slope with x=inches)
-        double START_SPEED = 440;
-        double END_SPEED = 300;
-        boolean forward = true;
+        final double MIN_SPEED = .2;    // NeverRest 40 at 1:1
+        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
+        final double MAX_DECEL_PER_INCH = .075; // max power deceleration per inch without skidding
 
-        if (maxVelocity < 0) {
-            //    maxVelocity = maxVelocity *-1;
-            //    forward = false;
-            START_SPEED = START_SPEED * -1;
-            END_SPEED = END_SPEED * -1;
-        }
+        int accelerationEncoderCount;
+        int decelerationEncoderCount;
+        double targetPositionRightMotor = inches * COUNTS_PER_INCH;
 
-        // Figure out the distances for each phase in encoder tics.  These are all + numbers
-        int totalEncoderCount = inchesToEncoderTics(inches);
-        int accelerationEncoderCount = Math.abs(inchesToEncoderTics((maxVelocity - START_SPEED) / MAX_ACCEL_PER_INCH));
-        int decelerationEncoderCount = Math.abs(inchesToEncoderTics((maxVelocity - END_SPEED) / MAX_DECEL_PER_INCH));
 
-        // figure out slopes for acceleration and deceleration phases.  Each could be + or -
-        double accelerationSlope = (maxVelocity - START_SPEED) / accelerationEncoderCount;
-        double decelerationSlope = (maxVelocity - END_SPEED) / decelerationEncoderCount * -1;
+        double maxSpeed;
+        double speedChange = speed - MIN_SPEED;
 
-        int initialPosition = fRightMotor.getCurrentPosition();
-        int target = initialPosition + ((maxVelocity > 0) ? totalEncoderCount : -totalEncoderCount);
-        int cruiseStart, decelerationStart;
-        if (accelerationEncoderCount + decelerationEncoderCount < totalEncoderCount) {
-            // Enough distance to reach maxVelocity
-            cruiseStart = initialPosition + ((maxVelocity > 0) ? accelerationEncoderCount : -accelerationEncoderCount);
-            decelerationStart = target - ((maxVelocity > 0) ? decelerationEncoderCount : -decelerationEncoderCount);
+        resetAllDriveEncoders();
+
+
+        if (inches < speedChange / MAX_ACCEL_PER_INCH + speed / MAX_DECEL_PER_INCH) {
+            //not enough distance
+            moveInchesForward(0.3, inches, timeOut);
+
         } else {
-            // we don't have enough space to ramp up to full speed so calculate the actual maximum velocity
-            // by finding the y value of the two ramp lines where they intersect given the maximum distance
-            maxVelocity = (-decelerationSlope * totalEncoderCount * accelerationSlope - START_SPEED * decelerationSlope) / (accelerationSlope - decelerationSlope);
-            teamUtil.log("Adjusted Max Velocity to:" + maxVelocity);
+            teamUtil.log("S: " + speedChange);
 
-            // recompute shortened ramp phases
-            accelerationEncoderCount = Math.abs(inchesToEncoderTics((maxVelocity - START_SPEED) / MAX_ACCEL_PER_INCH));
-            decelerationEncoderCount = Math.abs(inchesToEncoderTics((maxVelocity - END_SPEED) / MAX_DECEL_PER_INCH));
-            cruiseStart = initialPosition + ((maxVelocity > 0) ? accelerationEncoderCount : -accelerationEncoderCount);
-            decelerationStart = target - ((maxVelocity > 0) ? decelerationEncoderCount : -decelerationEncoderCount);
-        }
-        teamUtil.log("accelerationSlope:" + accelerationSlope + " decelerationSlope:" + decelerationSlope + " totalEncoderCount:" + totalEncoderCount);
-        teamUtil.log("accelerationEncoderCount:" + accelerationEncoderCount + " decelerationEncoderCount:" + decelerationEncoderCount + " decelerationStart:" + decelerationStart + " totalEncoderCount:" + totalEncoderCount);
 
-        // ramp up
-        rampMotors(START_SPEED, maxVelocity, heading, timeOut);
+            //enough distance to do weird accel curve thingie
+            accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
+            decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
+            double decelerationPoint = targetPositionRightMotor - decelerationEncoderCount;
+            maxSpeed = speed;
 
-        // Cruise at Max Velocity
-        int currentPosition = fRightMotor.getCurrentPosition();
-        if (maxVelocity > 0) { // driving forward
-            while (currentPosition < decelerationStart && teamUtil.keepGoing(timeOutTime)) {
-                followHeading(heading, maxVelocity);
-                if (details)
-                    teamUtil.log("Distance Traveled: " + (currentPosition - initialPosition) + "Velocity: " + maxVelocity);
-                currentPosition = fRightMotor.getCurrentPosition();
-            }
-        } else {
-            while (currentPosition > decelerationStart && teamUtil.keepGoing(timeOutTime)) {
-                followHeading(heading, maxVelocity);
-                if (details)
-                    teamUtil.log("Distance Traveled: " + (currentPosition - initialPosition) + "Velocity: " + maxVelocity);
-                currentPosition = fRightMotor.getCurrentPosition();
+            teamUtil.log("acceleration distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("cruising distance: " + (inches - (accelerationEncoderCount + decelerationEncoderCount) * 1 / COUNTS_PER_INCH));
+            teamUtil.log("deceleration distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
+
+            setAllMotorsWithEncoder();
+            setBrakeAllDriveMotors();
+
+
+            while (fRightMotor.getCurrentPosition() < accelerationEncoderCount) {
+                //ACCELERATING
+                double accelSpeed = (MIN_SPEED + (fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
+                teamUtil.log("Acceleration speed: " + accelSpeed);
+                driveForward(accelSpeed);
             }
 
+            teamUtil.log("start cruising");
+
+            while (fRightMotor.getCurrentPosition() < decelerationPoint) {
+                //CRUISING
+                driveForward(maxSpeed);
+                teamUtil.log("Cruising speed: " + maxSpeed);
+            }
+
+            teamUtil.log("start decelerating");
+
+            double initialPosition = fRightMotor.getCurrentPosition();
+            while (fRightMotor.getCurrentPosition() - initialPosition < decelerationEncoderCount) {
+                //DECELERATING
+                double decelSpeed = Range.clip((maxSpeed - ((fRightMotor.getCurrentPosition() - initialPosition) / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH), 0.3, 1);
+                teamUtil.log("Deceleration speed: " + decelSpeed);
+                teamUtil.log("decelDistanceTraveled: " + (fRightMotor.getCurrentPosition() - initialPosition));
+                teamUtil.log("DecelDistance: " + decelerationEncoderCount);
+
+                driveForward(decelSpeed);
+            }
+
+            teamUtil.log("stopping motors!!!!");
+            stopMotors();
         }
-
-        // ramp down
-        rampMotors(maxVelocity, END_SPEED, heading, timeOutTime - System.currentTimeMillis());
-
-        stopMotors();
-
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("newRampMotors - TIMED OUT!");
-        }
-        teamUtil.log("newRampMotors - Finished");
-
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Attempt to cover the specified distance at up to the specified speed using smooth acceleration at the start and deceleration at the end
+    // this methods assumes the robot is at rest when it starts and will leave the robot at rest.
+    public void accelerateInchesBackward(double speed, double inches, long timeOut) {
+
+        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
+        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
+        final double COUNTS_PER_INCH =
+                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+
+        final double MIN_SPEED = .2;    // NeverRest 40 at 1:1
+        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
+        final double MAX_DECEL_PER_INCH = .075; // max power deceleration per inch without skidding
+
+        int accelerationEncoderCount;
+        int decelerationEncoderCount;
+        double targetPositionRightMotor = inches * COUNTS_PER_INCH;
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Methods to move a specific distance with acceleration/deceleration but with non zero start or end speeds
-    // These presume the caller will handle needed movement before or after
-    // TODO: If we are going to use these methods, we should modify them to use SetVelocity() instead of setPower() on the motors
+        double maxSpeed;
+        double speedChange = speed - MIN_SPEED;
 
-/*
+        resetAllDriveEncoders();
+
+
+        if (inches < speedChange / MAX_ACCEL_PER_INCH + speed / MAX_DECEL_PER_INCH) {
+            //not enough distance
+            moveInchesBackward(0.3, inches, timeOut);
+
+        } else {
+            teamUtil.log("S: " + speedChange);
+
+
+            //enough distance to do weird accel curve thingie
+            accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
+            decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
+            double decelerationPoint = targetPositionRightMotor - decelerationEncoderCount;
+            maxSpeed = speed;
+
+            teamUtil.log("acceleration distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("cruising distance: " + (inches - (accelerationEncoderCount + decelerationEncoderCount) * 1 / COUNTS_PER_INCH));
+            teamUtil.log("deceleration distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
+
+            setAllMotorsWithEncoder();
+            setBrakeAllDriveMotors();
+
+
+            while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
+                //ACCELERATING
+                double accelSpeed = (MIN_SPEED + (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
+                teamUtil.log("Acceleration speed: " + accelSpeed);
+                driveBackward(accelSpeed);
+            }
+
+            teamUtil.log("start cruising");
+
+            while (Math.abs(fRightMotor.getCurrentPosition()) < decelerationPoint) {
+                //CRUISING
+                driveBackward(maxSpeed);
+                teamUtil.log("Cruising speed: " + maxSpeed);
+            }
+
+            teamUtil.log("start decelerating");
+
+            double initialPosition = Math.abs(fRightMotor.getCurrentPosition());
+            while (Math.abs(fRightMotor.getCurrentPosition()) - initialPosition < decelerationEncoderCount) {
+                //DECELERATING
+                double decelSpeed = Range.clip((maxSpeed - ((Math.abs(fRightMotor.getCurrentPosition()) - initialPosition) / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH), 0.3, 1);
+                teamUtil.log("Deceleration speed: " + decelSpeed);
+                teamUtil.log("decelDistanceTraveled: " + (Math.abs(fRightMotor.getCurrentPosition()) - initialPosition));
+                teamUtil.log("DecelDistance: " + decelerationEncoderCount);
+
+                driveBackward(decelSpeed);
+            }
+
+            teamUtil.log("stopping motors!!!!");
+            stopMotors();
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Attempt to cover the specified distance at up to the specified speed using smooth acceleration at the start and deceleration at the end
+    // this methods assumes the robot is at rest when it starts and will leave the robot at rest.
+    public void accelerateInchesLeft(double speed, double inches, long timeOut) {
+
+        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
+        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
+        final double COUNTS_PER_INCH =
+                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+
+        final double MIN_SPEED = .35;    // NeverRest 40 at 1:1
+        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
+        final double MAX_DECEL_PER_INCH = .075; // max power deceleration per inch without skidding
+
+        int accelerationEncoderCount;
+        int decelerationEncoderCount;
+        double targetPositionRightMotor = inches * COUNTS_PER_INCH;
+
+
+        double maxSpeed;
+        double speedChange = speed - MIN_SPEED;
+
+        resetAllDriveEncoders();
+
+
+        if (inches < speedChange / MAX_ACCEL_PER_INCH + speed / MAX_DECEL_PER_INCH) {
+            //not enough distance
+            moveInchesLeft(0.3, inches, timeOut);
+
+        } else {
+            teamUtil.log("S: " + speedChange);
+
+
+            //enough distance to do weird accel curve thingie
+            accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
+            decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
+            double decelerationPoint = targetPositionRightMotor - decelerationEncoderCount;
+            maxSpeed = speed;
+
+            teamUtil.log("acceleration distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("cruising distance: " + (inches - (accelerationEncoderCount + decelerationEncoderCount) * 1 / COUNTS_PER_INCH));
+            teamUtil.log("deceleration distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
+
+            setAllMotorsWithEncoder();
+            setBrakeAllDriveMotors();
+
+
+            while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
+                //ACCELERATING
+                double accelSpeed = (MIN_SPEED - (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
+                teamUtil.log("Acceleration speed: " + accelSpeed);
+                driveLeft(accelSpeed);
+            }
+
+            teamUtil.log("start cruising");
+
+            while (Math.abs(fRightMotor.getCurrentPosition()) < decelerationPoint) {
+                //CRUISING
+                driveLeft(maxSpeed);
+                teamUtil.log("Cruising speed: " + maxSpeed);
+            }
+
+            teamUtil.log("start decelerating");
+
+            double initialPosition = Math.abs(fRightMotor.getCurrentPosition());
+            while (Math.abs(fRightMotor.getCurrentPosition()) - initialPosition < decelerationEncoderCount) {
+                //DECELERATING
+                double decelSpeed = Range.clip((maxSpeed - ((Math.abs(fRightMotor.getCurrentPosition()) - initialPosition) / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH), 0.3, 1);
+                teamUtil.log("Deceleration speed: " + decelSpeed);
+                teamUtil.log("decelDistanceTraveled: " + (Math.abs(fRightMotor.getCurrentPosition()) - initialPosition));
+                teamUtil.log("DecelDistance: " + decelerationEncoderCount);
+
+                driveLeft(decelSpeed);
+            }
+
+            teamUtil.log("stopping motors!!!!");
+            stopMotors();
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Attempt to cover the specified distance at up to the specified speed using smooth acceleration at the start and deceleration at the end
+    // this methods assumes the robot is at rest when it starts and will leave the robot at rest.
+    public void accelerateInchesRight(double speed, double inches, long timeOut) {
+
+        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
+        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
+        final double COUNTS_PER_INCH =
+                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+
+        final double MIN_SPEED = .35;    // NeverRest 40 at 1:1
+        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
+        final double MAX_DECEL_PER_INCH = .075; // max power deceleration per inch without skidding
+
+        int accelerationEncoderCount;
+        int decelerationEncoderCount;
+        double targetPositionRightMotor = inches * COUNTS_PER_INCH;
+
+
+        double maxSpeed;
+        double speedChange = speed - MIN_SPEED;
+
+        resetAllDriveEncoders();
+
+
+        if (inches < speedChange / MAX_ACCEL_PER_INCH + speed / MAX_DECEL_PER_INCH) {
+            //not enough distance
+            moveInchesRight(0.3, inches, timeOut);
+
+        } else {
+            teamUtil.log("S: " + speedChange);
+
+
+            //enough distance to do weird accel curve thingie
+            accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
+            decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
+            double decelerationPoint = targetPositionRightMotor - decelerationEncoderCount;
+            maxSpeed = speed;
+
+            teamUtil.log("acceleration distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("cruising distance: " + (inches - (accelerationEncoderCount + decelerationEncoderCount) * 1 / COUNTS_PER_INCH));
+            teamUtil.log("deceleration distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
+            teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
+
+            setAllMotorsWithEncoder();
+            setBrakeAllDriveMotors();
+
+
+            while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
+                //ACCELERATING
+                double accelSpeed = (MIN_SPEED + (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
+                teamUtil.log("Acceleration speed: " + accelSpeed);
+                driveRight(accelSpeed);
+            }
+
+            teamUtil.log("start cruising");
+
+            while (Math.abs(fRightMotor.getCurrentPosition()) < decelerationPoint) {
+                //CRUISING
+                driveRight(maxSpeed);
+                teamUtil.log("Cruising speed: " + maxSpeed);
+            }
+
+            teamUtil.log("start decelerating");
+
+            double initialPosition = Math.abs(fRightMotor.getCurrentPosition());
+            while (Math.abs(fRightMotor.getCurrentPosition()) - initialPosition < decelerationEncoderCount) {
+                //DECELERATING
+                double decelSpeed = Range.clip((maxSpeed - ((Math.abs(fRightMotor.getCurrentPosition()) - initialPosition) / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH), 0.3, 1);
+                teamUtil.log("Deceleration speed: " + decelSpeed);
+                teamUtil.log("decelDistanceTraveled: " + (Math.abs(fRightMotor.getCurrentPosition()) - initialPosition));
+                teamUtil.log("DecelDistance: " + decelerationEncoderCount);
+
+                driveRight(decelSpeed);
+            }
+
+            teamUtil.log("stopping motors!!!!");
+            stopMotors();
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Advanced movement methods that handle acceleration or deceleration but presume the caller will handle what comes before or after
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // accelerate from the startSpeed to the endSpeed trying not to slip the wheels.
     // This will leave the robot moving when the method exits
@@ -970,7 +1228,7 @@ public class RobotDrive {
         setAllMotorsWithEncoder();
         resetAllDriveEncoders();
 
-        teamUtil.log("About to accelerate right");
+        teamUtil.log("Abbouta accelerate right");
         teamUtil.log("Accel Distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
         teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
         while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
@@ -1271,7 +1529,6 @@ public class RobotDrive {
     }
 
 
- */
 
 
 
@@ -1279,43 +1536,509 @@ public class RobotDrive {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Methods for rotating the robot
+    //
+    // The LATEST AND GREATEST versions of smooth acceleration methods that were used in Autonomous in SkyStone
+
+    final double NEW_COUNTS_PER_INCH = 60; // encoder counts per inch on fRightMotor when moving forward or backwards
+
+    public int newInchesToEncoderTics(double inches) {
+        return (int) (inches * NEW_COUNTS_PER_INCH);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Ramp the motors smoothly from start velocity to end velocity use maximum acceleration/deceleration rates
+    // This will work if both Velocities are positive or negative but not if one is postive and the other negative
+    public void newRampMotors(double startVelocity, double endVelocity, double heading, long timeOut) {
+        boolean details = false;
+        teamUtil.log("New Ramp Motors: Start:" + startVelocity + " End:" + endVelocity + " heading:" + heading);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        final double MAX_ACCEL_PER_INCH = 440; // max velocity acceleration per inch without skidding
+        final double MAX_DECEL_PER_INCH = 200; // max power deceleration per inch without skidding
+
+        // Figure out the distance we need to ramp in encoder tics
+        int encoderCount; // always +
+        double speedChange = Math.abs(endVelocity) - Math.abs(startVelocity); // + if accelerating or - if decelerating
+        if (Math.abs(endVelocity) > Math.abs(startVelocity)) {
+            encoderCount = newInchesToEncoderTics(Math.abs(speedChange) / MAX_ACCEL_PER_INCH);
+        } else {
+            encoderCount = newInchesToEncoderTics(Math.abs(speedChange) / MAX_DECEL_PER_INCH);
+
+        }
+        double slope = speedChange / encoderCount; // slope for the velocity ramp.  + or -
+
+        setAllMotorsWithEncoder();
+        int initialPosition = fRightMotor.getCurrentPosition();
+
+        // Ramp the motors from one speed to the other
+        int distanceTraveled = Math.abs(fRightMotor.getCurrentPosition() - initialPosition); // Always +
+        while (distanceTraveled < encoderCount && teamUtil.keepGoing(timeOutTime)) {
+            double velocity = slope * ((startVelocity > 0) ? distanceTraveled : -distanceTraveled) + startVelocity;
+            followHeading(heading, velocity);
+            if (details)
+                teamUtil.log("Distance Traveled: " + distanceTraveled + " Velocity: " + velocity);
+            distanceTraveled = Math.abs(fRightMotor.getCurrentPosition() - initialPosition); // Always +
+        }
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("newRampMotors - TIMED OUT!");
+        }
+        teamUtil.log("newRampMotors - Finished");
+
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Attempt to cover the specified distance at up to the specified speed using smooth acceleration at the start and deceleration at the end
+    // this methods assumes the robot is at rest when it starts and will leave the robot at rest. Works for forward or backwards motion
+    // This version uses setVelocity instead of setPower and also attempts to hold the specified heading
+    public void newAccelerateInchesBackward(double maxVelocity, double inches, double heading, long timeOut) {
+        newAccelerateInchesForward(-maxVelocity, inches, heading, timeOut);
+    }
+
+    public void newAccelerateInchesForward(double maxVelocity, double inches, double heading, long timeOut) {
+        boolean details = false;
+        teamUtil.log("newAccelerateInchesForward: velocity:" + maxVelocity + " Inches:" + inches + " heading:" + heading);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        double MAX_ACCEL_PER_INCH = 440; // max velocity acceleration per inch without skidding (slope with x=inches)
+        double MAX_DECEL_PER_INCH = 175; // max power deceleration per inch without skidding (slope with x=inches)
+        double START_SPEED = 440;
+        double END_SPEED = 300;
+        boolean forward = true;
+
+        if (maxVelocity < 0) {
+            //    maxVelocity = maxVelocity *-1;
+            //    forward = false;
+            START_SPEED = START_SPEED * -1;
+            END_SPEED = END_SPEED * -1;
+        }
+
+        // Figure out the distances for each phase in encoder tics.  These are all + numbers
+        int totalEncoderCount = newInchesToEncoderTics(inches);
+        int accelerationEncoderCount = Math.abs(newInchesToEncoderTics((maxVelocity - START_SPEED) / MAX_ACCEL_PER_INCH));
+        int decelerationEncoderCount = Math.abs(newInchesToEncoderTics((maxVelocity - END_SPEED) / MAX_DECEL_PER_INCH));
+
+        // figure out slopes for acceleration and deceleration phases.  Each could be + or -
+        double accelerationSlope = (maxVelocity - START_SPEED) / accelerationEncoderCount;
+        double decelerationSlope = (maxVelocity - END_SPEED) / decelerationEncoderCount * -1;
+
+        int initialPosition = fRightMotor.getCurrentPosition();
+        int target = initialPosition + ((maxVelocity > 0) ? totalEncoderCount : -totalEncoderCount);
+        int cruiseStart, decelerationStart;
+        if (accelerationEncoderCount + decelerationEncoderCount < totalEncoderCount) {
+            // Enough distance to reach maxVelocity
+            cruiseStart = initialPosition + ((maxVelocity > 0) ? accelerationEncoderCount : -accelerationEncoderCount);
+            decelerationStart = target - ((maxVelocity > 0) ? decelerationEncoderCount : -decelerationEncoderCount);
+        } else {
+            // we don't have enough space to ramp up to full speed so calculate the actual maximum velocity
+            // by finding the y value of the two ramp lines where they intersect given the maximum distance
+            maxVelocity = (-decelerationSlope * totalEncoderCount * accelerationSlope - START_SPEED * decelerationSlope) / (accelerationSlope - decelerationSlope);
+            teamUtil.log("Adjusted Max Velocity to:" + maxVelocity);
+
+            // recompute shortened ramp phases
+            accelerationEncoderCount = Math.abs(newInchesToEncoderTics((maxVelocity - START_SPEED) / MAX_ACCEL_PER_INCH));
+            decelerationEncoderCount = Math.abs(newInchesToEncoderTics((maxVelocity - END_SPEED) / MAX_DECEL_PER_INCH));
+            cruiseStart = initialPosition + ((maxVelocity > 0) ? accelerationEncoderCount : -accelerationEncoderCount);
+            decelerationStart = target - ((maxVelocity > 0) ? decelerationEncoderCount : -decelerationEncoderCount);
+        }
+        teamUtil.log("accelerationSlope:" + accelerationSlope + " decelerationSlope:" + decelerationSlope + " totalEncoderCount:" + totalEncoderCount);
+        teamUtil.log("accelerationEncoderCount:" + accelerationEncoderCount + " decelerationEncoderCount:" + decelerationEncoderCount + " decelerationStart:" + decelerationStart + " totalEncoderCount:" + totalEncoderCount);
+
+        // ramp up
+        newRampMotors(START_SPEED, maxVelocity, heading, timeOut);
+
+        // Cruise at Max Velocity
+        int currentPosition = fRightMotor.getCurrentPosition();
+        if (maxVelocity > 0) { // driving forward
+            while (currentPosition < decelerationStart && teamUtil.keepGoing(timeOutTime)) {
+                followHeading(heading, maxVelocity);
+                if (details)
+                    teamUtil.log("Distance Traveled: " + (currentPosition - initialPosition) + "Velocity: " + maxVelocity);
+                currentPosition = fRightMotor.getCurrentPosition();
+            }
+        } else {
+            while (currentPosition > decelerationStart && teamUtil.keepGoing(timeOutTime)) {
+                followHeading(heading, maxVelocity);
+                if (details)
+                    teamUtil.log("Distance Traveled: " + (currentPosition - initialPosition) + "Velocity: " + maxVelocity);
+                currentPosition = fRightMotor.getCurrentPosition();
+            }
+
+        }
+
+        // ramp down
+        newRampMotors(maxVelocity, END_SPEED, heading, timeOutTime - System.currentTimeMillis());
+
+        stopMotors();
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("newRampMotors - TIMED OUT!");
+        }
+        teamUtil.log("newRampMotors - Finished");
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Move the robot at a constant speed in the direction of the desired heading.  DOES THIS WORK?
+    // TODO: COACH-To do a wall follow, you will need a version of this that just powers the motors
+    // appropriately and doesn't bother with the encoders.  That would be called from within a loop
+    // that is checking the distance to the followed wall and adjusting the desiredHeading
+    // proportionally.
+    // However, since you have this method, I think you could refactor the implementation of 4 of your MoveInches
+    // methods to rely on this instead...but maybe a little later...
+//    public void driveToHeading(double speed, double inches, double desiredHeading, long timeOut) {
+//        teamUtil.log("Moving Inches at Heading: Inches: " + inches + " Heading: " + desiredHeading);
+//        long timeOutTime = System.currentTimeMillis() + timeOut;
+//        timedOut = false;
+//
+//        //resets the motors
+//        fRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        fRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//
+//
+//        setBrakeAllDriveMotors();
+//        //sets the number of desired inches on both motors
+//
+//        int encoderCounts = (int) (COUNTS_PER_INCH * inches);
+//        float driveSpeed = (float) (clip(speed));
+//
+//        do {
+////            double driveSpeed = Range.clip( Math.abs(fRightMotor.getCurrentPosition()-encoderCounts)/700, 0.2, 1);
+//            universalJoystick(0, driveSpeed, 0, 1, desiredHeading, );
+//
+//            teamUtil.log("difference: " + Math.abs(fRightMotor.getCurrentPosition() - encoderCounts));
+//            teamUtil.log("rightMotorPower: " + fRightMotor.getPower());
+//            teamUtil.log("fRightMotor: " + getBackLeftMotorPos());
+//            encoderTelemetry();
+//
+//
+//        } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
+//        //runs to the set number of inches at the desired speed
+//
+//
+//        while (fLeftMotor.isBusy() && fRightMotor.isBusy() && teamUtil.keepGoing(timeOutTime)) {
+//            encoderTelemetry();
+//        }
+//
+//        //turns off both motors
+//        stopMotors();
+//
+//        //sets it back to normal
+//        setAllMotorsWithoutEncoder();
+//
+//        timedOut = (System.currentTimeMillis() > timeOutTime);
+//        if (timedOut) {
+//            teamUtil.log("Moving Inches at Heading - TIMED OUT!");
+//        }
+//        teamUtil.log("Moving Inches at Heading - Finished");
+//    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Methods for rotating the robot
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TODO: DOES THIS WORK?
+    // TODO: COACH-This method needs a "speed" parameter that will provide an upper bound
+    //  on the rotation speed so that it can be tuned by the caller
+    public void rotateToHeading(double desiredHeading) {
+
+        double startHeading = getHeading();
+
+        teamUtil.log("startAngle: " + startHeading);
+
+        int rotateDirection;
+        double rotatePower;
+        double tolerance = 1;
+        boolean completedRotating;
+
+        double rawChangeInAngle = desiredHeading - getHeading();
+        double changeInAngle = Math.abs(adjustAngle(rawChangeInAngle));
+
+
+        if (changeInAngle <= 180) {
+            rotateDirection = 1;
+        } else {
+            rotateDirection = -1;
+        }
+
+        do {
+            rotatePower = Range.clip(Math.abs((desiredHeading - getHeading())) / 130, MIN_ROTATING_POWER, 0.5);
+            teamUtil.log("rotatePower: " + fLeftMotor.getPower());
+            teamUtil.log("difference: " + Math.abs((desiredHeading - getHeading())));
+            teamUtil.log("heading : " + getHeading());
+//            teamUtil.log("completedRotating: " + completedRotating);
+
+
+            rotateLeft(rotatePower * rotateDirection);
+
+            if (Math.abs(adjustAngle(desiredHeading - getHeading())) > tolerance) {
+                completedRotating = false;
+            } else {
+                completedRotating = true;
+                teamUtil.telemetry.addData("I'm done rotating now", "");
+                teamUtil.log("done rotating");
+            }
+
+//            teamUtil.telemetry.addData("startHeading", startHeading);
+//            teamUtil.telemetry.addData("desiredHeading", desiredHeading);
+//
+//            teamUtil.telemetry.addData("changeInAngle", changeInAngle);
+//            teamUtil.telemetry.addData("rotatingPower", rotatePower);
+//            teamUtil.telemetry.addData("direction", rotateDirection);
+//            teamUtil.telemetry.update();
+
+        } while (!completedRotating);
+        stopMotors();
+
+        teamUtil.log("Rotating - Finished");
+
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void rotateTo180() {
+        if (getHeading() > 180) {
+            teamUtil.log("GONNA SPIN RIGHT");
+            rotateToHeading180Right();
+
+        } else if (getHeading() < 180) {
+            teamUtil.log("GONNA SPIN LEFT");
+            rotateToHeading180Left();
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void rotateToHeading180Left() {
+
+        double startHeading = getHeading();
+        double rotatePower;
+
+        do {
+            rotatePower = Range.clip(Math.abs(180 - getHeading()) / 130, MIN_ROTATING_POWER, 0.5);
+
+            rotateLeft(rotatePower);
+
+            teamUtil.log("startHeading: " + startHeading);
+            teamUtil.log("daHeading: " + getHeading());
+            teamUtil.log("DifferenceInAngle: " + (180 - getHeading()));
+            teamUtil.log("rotatePower: " + rotatePower);
+
+
+        } while (getHeading() < 177.5);
+
+        stopMotors();
+        teamUtil.log("I'M DONE");
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void rotateToHeading180Right() {
+
+        double startHeading = getHeading();
+        double rotatePower;
+
+        do {
+            rotatePower = Range.clip(Math.abs(180 - getHeading()) / 130, MIN_ROTATING_POWER, 0.5);
+
+            rotateRight(rotatePower);
+
+            teamUtil.log("startHeading: " + startHeading);
+            teamUtil.log("daHeading: " + getHeading());
+            teamUtil.log("DifferenceInAngle: " + (180 - getHeading()));
+            teamUtil.log("rotatePower: " + rotatePower);
+
+        } while (getHeading() > 180);
+
+        stopMotors();
+        teamUtil.log("I'M DONE");
+
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void rotateToZero() {
+        if (getRelativeHeading(180) < 179.5) {
+            teamUtil.log("ROTATING LEFT");
+            rotateToHeadingZeroLeft();
+        } else if (getRelativeHeading(180) > 180.5) {
+            teamUtil.log("ROTATING RIGHT");
+            rotateToHeadingZeroRight();
+        }
+
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void rotateToHeadingZeroLeft() {
+        double startHeading = getHeading();
+        teamUtil.log("startHeading: " + startHeading);
+        teamUtil.log("getRelativeHeading: " + getRelativeHeading(180));
+
+        double rotatePower;
+
+        do {
+            rotatePower = Range.clip(Math.abs(180 - getRelativeHeading(180)) / 120, MIN_ROTATING_POWER, 0.5);
+
+            rotateLeft(rotatePower);
+
+        } while (getRelativeHeading(180) < 177.5);
+
+        stopMotors();
+        teamUtil.log("I'M DONE");
+
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void rotateToHeadingZeroRight() {
+        double startHeading = getHeading();
+
+        double rotatePower;
+
+        do {
+            rotatePower = Range.clip(Math.abs(180 - getRelativeHeading(180)) / 130, MIN_ROTATING_POWER, 0.5);
+
+            rotateRight(rotatePower);
+
+        } while (getRelativeHeading(180) > 182.5);
+
+        stopMotors();
+        teamUtil.log("I'M DONE");
+
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TODO: DOES THIS METHOD WORK?
+    // TODO: COACH-This method needs a "speed" parameter that will provide an upper bound
+    //  on the rotation speed so that it can be tuned by the caller
+    public void turn(double angle, long timeOut) {
+        teamUtil.log("Rotating: " + angle);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        double startHeading = getHeading();
+        int rotateDirection;
+        double tolerance = 3;
+        boolean completedRotating;
+
+
+        double rawDesiredHeading = startHeading + angle;
+
+        teamUtil.log("START_HEADING: " + startHeading);
+        teamUtil.log("RAW_DESIRED_HEADING: " + rawDesiredHeading);
+
+        double changeInAngle = Math.abs(getHeading() - rawDesiredHeading);
+
+
+        //to make sure that the speed of rotation matches the amount of angle we have to our desired heading
+        double rotatePower;
+
+
+        if (angle > 0) {
+            rotateDirection = 1; //CCW
+        } else rotateDirection = -1; //CW
+
+
+        if (Math.abs(getHeading() - rawDesiredHeading) > tolerance) {
+            completedRotating = false;
+        } else {
+            completedRotating = true;
+            teamUtil.telemetry.addData("I'M DONE ROTATING", "");
+            teamUtil.log("done rotating");
+        }
+
+        teamUtil.log("CHANGE_IN_ANGLE: " + changeInAngle);
+
+        teamUtil.log("DIRECTION: " + rotateDirection);
+
+        do {
+            rotatePower = Range.clip(Math.abs(getHeading() - rawDesiredHeading) / 130, MIN_ROTATING_POWER, 0.5);
+            teamUtil.log("rotatePower: " + fLeftMotor.getPower());
+            teamUtil.log("difference: " + Math.abs(getHeading() - rawDesiredHeading));
+            teamUtil.log("heading : " + getHeading());
+            teamUtil.log("completedRotating: " + completedRotating);
+
+
+            rotateLeft(rotatePower * rotateDirection);
+
+            if (Math.abs(getHeading() - rawDesiredHeading) > tolerance) {
+                completedRotating = false;
+            } else {
+                completedRotating = true;
+                teamUtil.telemetry.addData("I'm done rotating now", "");
+                teamUtil.log("done rotating");
+            }
+
+//            teamUtil.telemetry.addData("startHeading", startHeading);
+//            teamUtil.telemetry.addData("desiredHeading", desiredHeading);
+//
+//            teamUtil.telemetry.addData("changeInAngle", changeInAngle);
+//            teamUtil.telemetry.addData("rotatingPower", rotatePower);
+//            teamUtil.telemetry.addData("direction", rotateDirection);
+//            teamUtil.telemetry.update();
+
+        } while (!completedRotating && teamUtil.keepGoing(timeOutTime));
+        stopMotors();
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("Rotating - TIMED OUT!");
+        }
+        teamUtil.log("Rotating - Finished");
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // NEW Rotation methods
     //
     // THESE ARE THE LATEST AND GREATEST THAT WERE USED IN SKYSTONE
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Rotate to the desired direction at the maximum speed
-    public enum RobotRotation {GOAL, START, OUR_SIDE, THEIR_SIDE}
+    public enum RobotRotation {TOWARDS_FIELD, TOWARDS_WALL, TOWARDS_DEPOT, TOWARDS_BUILDING}
 
-    public void rotateTo(RobotRotation attitude) {
+    public void newRotateTo(RobotRotation attitude) {
         switch (attitude) {
-            case GOAL:
-                rotateTo(0.0);
+            case TOWARDS_FIELD:
+                newRotateTo(0.0);
                 break;
-            case START:
-                rotateTo(180.0);
+            case TOWARDS_WALL:
+                newRotateTo(180.0);
                 break;
-            case OUR_SIDE:
+            case TOWARDS_DEPOT:
                 if (teamUtil.alliance == teamUtil.Alliance.RED) {
-                    rotateTo(90.0);
+                    newRotateTo(90.0);
                 } else {
-                    rotateTo(270.0);
+                    newRotateTo(270.0);
                 }
                 break;
-            case THEIR_SIDE:
+            case TOWARDS_BUILDING:
                 if (teamUtil.alliance == teamUtil.Alliance.BLUE) {
-                    rotateTo(90.0);
+                    newRotateTo(90.0);
                 } else {
-                    rotateTo(270.0);
+                    newRotateTo(270.0);
                 }
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Rotate to the desired heading at the maximum speed, slowing for accuracy at the end
-    // TODO: modify to use setVelocity() instead of setPower()
-
-    public void rotateTo(double heading) {
+    public void newRotateTo(double heading) {
         teamUtil.log("Starting to rotate to " + heading);
         final double decelThreshold = 60; // start deceleration this many degrees from the target
         final double slowThreshold = 10; // slow down to a very slow turn this far from the target
@@ -1380,15 +2103,80 @@ public class RobotDrive {
     }
 
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // NEW Auto Position Methods
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Assumes one of the two front distance sensors is within 9 inches of the foundation and the other one is NOT
+    // It will strafe right or left as needed to line up.
+
+    public void newPositionToFoundation(double heading, long timeOut) {
+        boolean details = false;
+        teamUtil.log("newPositionToFoundation: heading:" + heading);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        double MAX_DISTANCE_FOR_AUTO_DROPOFF = 9;
+        double MANEUVERING_DISTANCE = 4;
+
+        if (frontRightDistance.getDistance() < 9) { // we need to strafe right
+            newMoveToDistance(frontRightDistance, MANEUVERING_DISTANCE, 1500, heading, false, timeOutTime - System.currentTimeMillis());
+            while ((frontLeftDistance.getDistance() > MAX_DISTANCE_FOR_AUTO_DROPOFF) && teamUtil.keepGoing(timeOutTime)) {
+                driveRight(0.35);
+                if (details) teamUtil.log("Front Left Distance:" + frontLeftDistance.getDistance());
+            }
+            moveInchesRight(0.35, 1, timeOutTime - System.currentTimeMillis());
+            newRotateTo(heading);
+            newMoveToDistance(frontRightDistance, 1.5, 1500, heading, true, timeOutTime - System.currentTimeMillis());
+
+        } else { // We need to strafe left
+            newMoveToDistance(frontLeftDistance, MANEUVERING_DISTANCE, 1500, 0, false, timeOutTime - System.currentTimeMillis());
+            while ((frontRightDistance.getDistance() > MAX_DISTANCE_FOR_AUTO_DROPOFF) && teamUtil.keepGoing(timeOutTime)) {
+                driveLeft(0.35);
+                if (details)
+                    teamUtil.log("Front Right Distance:" + frontRightDistance.getDistance());
+            }
+            moveInchesLeft(0.35, 1, timeOutTime - System.currentTimeMillis());
+            newRotateTo(heading);
+            newMoveToDistance(frontLeftDistance, 1.5, 1500, heading, true, timeOutTime - System.currentTimeMillis());
+        }
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("newPositionToFoundation - TIMED OUT!");
+        }
+        teamUtil.log("newPositionToFoundation - Finished");
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public boolean checkJoyStickMovement(float leftJoyStickX, float leftJoyStickY, float rightJoyStickX, float rightJoyStickY) {
+        float left_x = Math.abs(leftJoyStickX);
+        float left_y = Math.abs(leftJoyStickY);
+        float right_x = Math.abs(rightJoyStickX);
+        float right_y = Math.abs(rightJoyStickY);
+
+        return left_x > DEAD_ZONE_THRESHOLD || left_y > DEAD_ZONE_THRESHOLD || right_x > DEAD_ZONE_THRESHOLD || right_y > DEAD_ZONE_THRESHOLD;
+
+    }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Joystick drive methods
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    public float scalePowerJoystick(float joyStickDistance) {
+//
+//        //exponential equation obtained from online curve fit with points(x is joystickDistance, y is power:
+//        //(0,0), (0.5, 0.3), (0.7, 0.5), (1,1)
+//        int sign;
+//        if (joyStickDistance > 0) {
+//            sign = 1;
+//        } else sign = -1;
+//
+//
+//        return (float) (0.9950472 * Math.pow(Math.abs(joyStickDistance), 1.82195) * sign);
+//    }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void universalJoystick(float leftJoyStickX, float leftJoyStickY, float rightJoyStickX, boolean isFast, double robotHeading, double heldHeading) {
@@ -1397,9 +2185,10 @@ public class RobotDrive {
         float leftY = leftJoyStickY;
         float rightX = rightJoyStickX;
 
-        //rotate to obtain new coordinates
         float rotatedLeftX = (float) (Math.cos(angleInRadians) * leftX - Math.sin(angleInRadians) * leftY);
         float rotatedLeftY = (float) (Math.sin(angleInRadians) * leftX + Math.cos(angleInRadians) * leftY);
+
+        //rotate to obtain new coordinates
 
         driveJoyStick(rotatedLeftX, rotatedLeftY, rightX, isFast, heldHeading);
     }
@@ -1407,9 +2196,40 @@ public class RobotDrive {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void driveJoyStick(float leftJoyStickX, float leftJoyStickY, float rightJoyStickX, boolean isFast, double heldHeading) {
 
-        float leftX ;
-        float leftY ;
-        float rotationAdjustment;
+        float leftX = leftJoyStickX;
+        float leftY = leftJoyStickY;
+        float rotationAdjustment = rightJoyStickX;
+
+        //left joystick is for moving, right stick is for rotation
+
+        //RN, for FORWARD motion
+        //front left should be negative
+        //front right should be negative
+        //back left should be negative
+        //back right should be negative
+
+//        float leftX = (float)(scalePowerJoystick(leftJoyStickX) * scaleAmount);
+//        float leftY = (float)(scalePowerJoystick(leftJoyStickY)*scaleAmount);
+
+//        float leftX = (float)((leftJoyStickX) * scaleAmount);
+//        float leftY = (float)((leftJoyStickY)*scaleAmount);
+
+
+//        if((leftJoyStickX > -0.1 && leftJoyStickX < 0.1)){
+//            leftX = 0;
+//        } else if((leftJoyStickX > -0.9 && leftJoyStickX < 0.9)) {
+//            leftX = (leftJoyStickX > 0 ? (float)(leftJoyStickX*4/8 + 0.155) : (float)(leftJoyStickX*4/8 - 0.155));
+//        } else{
+//            leftX = (float)(0.8*Math.pow(leftJoyStickX, 11)  + ((leftJoyStickX > 0) ? 0.2 : -0.2)); //0.2 is minimum driving power we intend\
+//        }
+//
+//        if((leftJoyStickY> -0.1 && leftJoyStickY < 0.1)){
+//            leftY = 0;
+//        } else if((leftJoyStickY > -0.9 && leftJoyStickY < 0.9)) {
+//            leftY = (leftJoyStickY > 0 ? (float)(leftJoyStickY*4/8 + 0.155) : (float)(leftJoyStickY*4/8 - 0.155));
+//        } else{
+//            leftY = (float)(0.8*Math.pow(leftJoyStickY, 11)  + ((leftJoyStickY > 0) ? 0.2 : -0.2)); //0.2 is minimum driving power we intend\
+//        }
 
         int scaleAmount = isFast ? 2 : 1;
 
@@ -1430,10 +2250,31 @@ public class RobotDrive {
         }
         rotationAdjustment = (float) (rightJoyStickX * 0.37 * scaleAmount);
 
-        float frontLeft = -(leftY - leftX - rotationAdjustment);
+
+//HOLDING HEADING CODE:
+//        float frontLeft = -(leftY - leftX ); //leftY - leftX - rightX(original prior to reverse)
+//        float frontRight = (-leftY - leftX );
+//        float backRight = (-leftY + leftX );
+//        float backLeft = -(leftY + leftX ); //leftY + leftX - rightX(original prior to reverse)
+
+//        teamUtil.log("LeftX: " + leftX + " LeftJoystickX: " + leftJoyStickX);
+//        teamUtil.log("LeftY: " + leftY + " LeftJoystickY: ");
+//        if(Math.abs(rightJoyStickX) > 0.1) {
+//            rotationAdjustment = (float) (rightJoyStickX * 0.6 * scaleAmount); // TODO: if rightJoyStickX  is in the dead range, we could use a passed in heading to hold instead...
+//        } else {
+//            rotationAdjustment = getHeadingError(heldHeading) * .1 * Math.max(Math.max(frontLeft, frontRight), Math.max(backRight, backLeft));
+//        }
+//
+//        frontLeft-=rotationAdjustment;
+//        frontRight+=rotationAdjustment;
+//        backRight-=rotationAdjustment;
+//        backLeft+=rotationAdjustment;
+
+
+        float frontLeft = -(leftY - leftX - rotationAdjustment); //leftY - leftX - rightX(original prior to reverse)
         float frontRight = (-leftY - leftX - rotationAdjustment);
         float backRight = (-leftY + leftX - rotationAdjustment);
-        float backLeft = -(leftY + leftX - rotationAdjustment);
+        float backLeft = -(leftY + leftX - rotationAdjustment); //leftY + leftX - rightX(original prior to reverse)
 
 //        teamUtil.telemetry.addData("RIGHTX:", rightX);
 //        teamUtil.telemetry.addData("LEFTX:", leftX);
@@ -1447,45 +2288,13 @@ public class RobotDrive {
         bRightMotor.setPower(backRight * 0.9);
         bLeftMotor.setPower(backLeft);
 
+
     }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Code for finding operating parameters
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void findMaxForwardSpeed() {
-        resetAllDriveEncoders();
-        double travelTics = COUNTS_PER_INCH * 72;
-        setMotorVelocities(10000, 10000, 10000, 10000);
-        double flmax = 0, frmax = 0, blmax = 0, brmax = 0;
-        while (fLeftMotor.getCurrentPosition() < travelTics) {
-            flmax = getFrontLeftMotorPos() > flmax ? getFrontLeftMotorPos() : flmax;
-            frmax = getFrontRightMotorPos() > frmax ? getFrontRightMotorPos() : frmax;
-            blmax = getBackLeftMotorPos() > blmax ? getBackLeftMotorPos() : blmax;
-            brmax = getBackRightMotorPos() > brmax ? getBackRightMotorPos() : brmax;
-        }
-        stopMotors();
-        teamUtil.log("Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
-    }
-
-    public void findMaxLeftSpeed() {
-        resetAllDriveEncoders();
-        double travelTics = COUNTS_PER_INCH * 72;
-        setMotorVelocities(-10000, 10000, 10000, -10000);
-        double flmax = 0, frmax = 0, blmax = 0, brmax = 0;
-        while (fLeftMotor.getCurrentPosition() < travelTics) {
-            flmax = getFrontLeftMotorPos() < flmax ? getFrontLeftMotorPos() : flmax;
-            frmax = getFrontRightMotorPos() > frmax ? getFrontRightMotorPos() : frmax;
-            blmax = getBackLeftMotorPos() > blmax ? getBackLeftMotorPos() : blmax;
-            brmax = getBackRightMotorPos() < brmax ? getBackRightMotorPos() : brmax;
-        }
-        stopMotors();
-        teamUtil.log("Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
-    }
+    //            <goBILDA5202SeriesMotor name="fRightMotor" port="0" /> //backleft
+    //            <goBILDA5202SeriesMotor name="bRightMotor" port="1" />
+    //            <goBILDA5202SeriesMotor name="fLeftMotor" port="2" />
+    //            <goBILDA5202SeriesMotor name="bLeftMotor" port="3" />
 }
 

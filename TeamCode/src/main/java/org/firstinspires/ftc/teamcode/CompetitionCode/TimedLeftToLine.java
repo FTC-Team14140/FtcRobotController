@@ -40,12 +40,12 @@ public class TimedLeftToLine extends LinearOpMode {
         waitForStart();
 
         teamUtil.pause(16000);
-
+/*
         while(!robot.drive.bottomColor.isOnTape()){
             teamUtil.theBlinkin.setSignal(Blinkin.Signals.CURIOSITY);
             robot.drive.driveLeft(0.35);
         }
         robot.drive.stopMotors();
-
+*/
     }
 }

@@ -43,7 +43,7 @@ public class AutoSkystonePathBlueShort extends LinearOpMode {
         teamUtil.telemetry.update();
         robot.latch.latchUp();
 
-        robot.foundationStone();
+        //robot.foundationStone();
 
     }
 

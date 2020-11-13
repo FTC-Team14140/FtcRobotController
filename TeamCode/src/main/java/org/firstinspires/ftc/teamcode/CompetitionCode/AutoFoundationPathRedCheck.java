@@ -37,7 +37,7 @@ public class AutoFoundationPathRedCheck extends LinearOpMode {
         teamUtil.telemetry.update();
         waitForStart();
 
-
+/*
 
         robot.drive.moveInchesLeft(0.5, 11, 4000);
 
@@ -57,7 +57,7 @@ public class AutoFoundationPathRedCheck extends LinearOpMode {
         robot.drive.moveInchesRight(0.5, 32,5000);
 
 
-
+*/
 
 
 

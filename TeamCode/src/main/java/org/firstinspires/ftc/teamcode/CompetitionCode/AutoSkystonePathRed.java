@@ -43,7 +43,7 @@ public class AutoSkystonePathRed extends LinearOpMode {
         teamUtil.telemetry.update();
         robot.latch.latchUp();
 
-        robot.doubleSkystone();
+       // robot.doubleSkystone();
 
     }
 

@@ -24,6 +24,7 @@ public class TestRobot extends LinearOpMode {
         initialize();
         waitForStart();
         teamUtil.inInitialization = false;
+        /*
         while (opModeIsActive()) {
             if (gamepad1.right_bumper) {
                 robot.autoIntake(8000);
@@ -48,6 +49,6 @@ public class TestRobot extends LinearOpMode {
 
             }
         }
-
+*/
     }
 }

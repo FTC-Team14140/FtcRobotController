@@ -43,7 +43,7 @@ public class AutoFoundationPathBlueCheck extends LinearOpMode {
         teamUtil.telemetry.update();
         waitForStart();
 
-
+/*
         robot.drive.moveInchesRight(0.5, 11, 4000);
         robot.drive.moveInchesBackward(0.5,32,5000);
         robot.latch.latchDown();
@@ -65,7 +65,7 @@ public class AutoFoundationPathBlueCheck extends LinearOpMode {
         robot.drive.moveInchesLeft(0.5, 32,5000);
 
 
-
+*/
 
 
 

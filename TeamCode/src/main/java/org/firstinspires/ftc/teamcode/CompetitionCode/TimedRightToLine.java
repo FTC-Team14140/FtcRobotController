@@ -40,11 +40,11 @@ public class TimedRightToLine extends LinearOpMode {
         waitForStart();
 
         teamUtil.pause(16000);
-
+/*
         while(!robot.drive.bottomColor.isOnTape()){
             robot.drive.driveRight(0.35);
         }
         robot.drive.stopMotors();
-
+*/
     }
 }

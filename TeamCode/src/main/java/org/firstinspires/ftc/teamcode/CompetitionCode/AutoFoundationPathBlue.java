@@ -44,7 +44,7 @@ public class AutoFoundationPathBlue extends LinearOpMode {
         waitForStart();
 
 
-        robot.foundation();
+        //robot.foundation();
 //    public void initialize() {
 //        teamUtil.init(this);
 //        teamUtil.theBlinkin.setSignal(Blinkin.Signals.INIT_BLUE);

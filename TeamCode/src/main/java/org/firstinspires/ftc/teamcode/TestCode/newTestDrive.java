@@ -34,17 +34,17 @@ public class newTestDrive extends LinearOpMode {
             drive.initSensors(false);
             drive.resetHeading();
         }
-
+/*
         public void moveToDistanceFailover (double distance, double initialTicsPerSecond, double heading, boolean moveBackIfNeeded, long timeOut) {
             double frontLeft = drive.frontLeftDistance.getDistance();
             double frontRight = drive.frontRightDistance.getDistance();
             teamUtil.log("FL:"+frontLeft+" FR:"+frontRight );
 
             if (frontLeft > 0 && frontLeft < 50) {
-                drive.newMoveToDistance(drive.frontLeftDistance, distance, initialTicsPerSecond, heading, moveBackIfNeeded, timeOut);
+                drive.moveToDistance(drive.frontLeftDistance, distance, initialTicsPerSecond, heading, moveBackIfNeeded, timeOut);
             } else if (frontRight > 0 && frontRight < 50) {
                 teamUtil.log("FAILING OVER TO FRONT RIGHT DISTANCE SENSOR");
-                drive.newMoveToDistance(drive.frontRightDistance, distance, initialTicsPerSecond, heading, moveBackIfNeeded, timeOut);
+                drive.moveToDistance(drive.frontRightDistance, distance, initialTicsPerSecond, heading, moveBackIfNeeded, timeOut);
             } else {
                 teamUtil.log("BOTH FRONT DISTANCE SENSORS FAILED");
             }
@@ -53,23 +53,23 @@ public class newTestDrive extends LinearOpMode {
         public void stressTestDistanceSensors() {
             moveToDistanceFailover( 5, 2200, 0, false, 5000);
             moveToDistanceFailover( 10, 2200, 0, true, 5000);
-            drive.newRotateTo(270);
-            drive.newAccelerateInchesForward(2200,100,268,5000);
+            drive.rotateTo(270);
+            drive.accelerateInchesForward(2200,100,268,5000);
             moveToDistanceFailover( 5, 2200, 270, false, 5000);
             moveToDistanceFailover( 10, 2200, 270, true, 5000);
-            drive.newRotateTo(0);
+            drive.rotateTo(0);
             moveToDistanceFailover(5, 2200, 0, false, 5000);
             moveToDistanceFailover( 10, 2200, 0, true, 5000);
-            drive.newRotateTo(90);
-            drive.newAccelerateInchesForward(2200,100,88,5000);
+            drive.rotateTo(90);
+            drive.accelerateInchesForward(2200,100,88,5000);
             moveToDistanceFailover(5, 2200, 90, false, 5000);
             moveToDistanceFailover(10, 2200, 90, true, 5000);
-            drive.newRotateTo(0);
+            drive.rotateTo(0);
         }
-
+*/
         @Override
         public void runOpMode() throws InterruptedException {
-            initialize();
+/*            initialize();
             waitForStart();
             drive.resetHeading();
 
@@ -102,9 +102,9 @@ public class newTestDrive extends LinearOpMode {
                     }
                 } else if (gamepad1.b) {
                     if (gamepad1.right_bumper) {
-                        drive.newAccelerateInchesForward(-2200, travelDistance, drive.getHeading() - 1.5, 5000);
+                        drive.accelerateInchesForward(-2200, travelDistance, drive.getHeading() - 1.5, 5000);
                     } else {
-                        drive.newAccelerateInchesForward(2200, travelDistance, drive.getHeading() - 2, 5000);
+                        drive.accelerateInchesForward(2200, travelDistance, drive.getHeading() - 2, 5000);
                         //drive.newAccelerateInchesForward(2200, travelDistance, 0, 5000);
                     }
                 }else if (gamepad1.x) {
@@ -116,7 +116,7 @@ public class newTestDrive extends LinearOpMode {
                         sleep(250);
                     }
                 } else if (gamepad1.y) {
-                    drive.newMoveToDistance(leftSensor ? drive.frontLeftDistance : drive.frontRightDistance, targetDistance, 1000, 0, true, 60000);
+                    drive.moveToDistance(leftSensor ? drive.frontLeftDistance : drive.frontRightDistance, targetDistance, 1000, 0, true, 60000);
                 } else
                 if (gamepad1.dpad_up) {
                     drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
@@ -195,53 +195,56 @@ public class newTestDrive extends LinearOpMode {
                 //drive.telemetryDriveEncoders();
                 telemetry.update();
             }
+            */
         }
-
+/*
         // assumes starts in usual spot for skystone auto
         void demoAutoDrive () {
-            drive.newAccelerateInchesForward(1500,25,0,3000);
+            drive.accelerateInchesForward(1500,25,0,3000);
             drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
             teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
             drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_BUILDING);
-            drive.newAccelerateInchesForward(2200,62,teamUtil.alliance==teamUtil.Alliance.RED ? 268: 88,5000);
+            drive.accelerateInchesForward(2200,62,teamUtil.alliance==teamUtil.Alliance.RED ? 268: 88,5000);
             drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
             drive.newPositionToFoundation(0, 4000);
             teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
-            drive.newAccelerateInchesForward(-2200,3,0,3000);
+            drive.accelerateInchesForward(-2200,3,0,3000);
             drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_DEPOT);
-            drive.newAccelerateInchesForward(2200,83,teamUtil.alliance==teamUtil.Alliance.RED ? 88: 268,5000);
-            drive.newMoveToDistance(drive.frontRightDistance, 10.5,1500,teamUtil.alliance==teamUtil.Alliance.RED ? 89: 271 , true,4000);
+            drive.accelerateInchesForward(2200,83,teamUtil.alliance==teamUtil.Alliance.RED ? 88: 268,5000);
+            drive.moveToDistance(drive.frontRightDistance, 10.5,1500,teamUtil.alliance==teamUtil.Alliance.RED ? 89: 271 , true,4000);
             drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
-            drive.newMoveToDistance(drive.frontLeftDistance, 6,1500,0 , true,4000);
+            drive.moveToDistance(drive.frontLeftDistance, 6,1500,0 , true,4000);
             teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
             drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_BUILDING);
-            drive.newAccelerateInchesForward(2200,70,teamUtil.alliance==teamUtil.Alliance.RED ? 269: 89,5000);
+            drive.accelerateInchesForward(2200,70,teamUtil.alliance==teamUtil.Alliance.RED ? 269: 89,5000);
             teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
-            drive.newAccelerateInchesForward(-2200,10,teamUtil.alliance==teamUtil.Alliance.RED ? 271: 91,2000);
+            drive.accelerateInchesForward(-2200,10,teamUtil.alliance==teamUtil.Alliance.RED ? 271: 91,2000);
         }
 
     void demoAutoDriveNoSensors () {
-        drive.newAccelerateInchesForward(1600,25,0,3000);
+        drive.accelerateInchesForward(1600,25,0,3000);
         drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
         teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
         drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_BUILDING);
-        drive.newAccelerateInchesForward(2200,64.5,teamUtil.alliance==teamUtil.Alliance.RED ? 268: 88,5000);
+        drive.accelerateInchesForward(2200,64.5,teamUtil.alliance==teamUtil.Alliance.RED ? 268: 88,5000);
         drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
-        drive.newAccelerateInchesForward(2200,3.5,0,3000);
+        drive.accelerateInchesForward(2200,3.5,0,3000);
         teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
-        drive.newAccelerateInchesForward(-2200,5,0,3000);
+        drive.accelerateInchesForward(-2200,5,0,3000);
         drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_DEPOT);
-        drive.newAccelerateInchesForward(2200,89.5,teamUtil.alliance==teamUtil.Alliance.RED ? 88: 268,5000);
+        drive.accelerateInchesForward(2200,89.5,teamUtil.alliance==teamUtil.Alliance.RED ? 88: 268,5000);
         drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_FIELD);
-        drive.newAccelerateInchesForward(2200,6,0,3000);
+        drive.accelerateInchesForward(2200,6,0,3000);
         teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
         teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
-        drive.newAccelerateInchesForward(-2200,3,0,3000);
+        drive.accelerateInchesForward(-2200,3,0,3000);
         drive.newRotateTo(RobotDrive.RobotRotation.TOWARDS_BUILDING);
-        drive.newAccelerateInchesForward(2200,70,teamUtil.alliance==teamUtil.Alliance.RED ? 269: 89,5000);
+        drive.accelerateInchesForward(2200,70,teamUtil.alliance==teamUtil.Alliance.RED ? 269: 89,5000);
         teamUtil.theBlinkin.flash(RevBlinkinLedDriver.BlinkinPattern.GREEN, 500);
-        drive.newAccelerateInchesForward(-2200,7,teamUtil.alliance==teamUtil.Alliance.RED ? 271: 91,2000);
+        drive.accelerateInchesForward(-2200,7,teamUtil.alliance==teamUtil.Alliance.RED ? 271: 91,2000);
     }
+
+ */
 }
 
 

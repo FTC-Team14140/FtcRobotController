@@ -37,12 +37,12 @@ public class LeftToLine extends LinearOpMode {
         teamUtil.telemetry.addLine("Ready to Start");
         teamUtil.telemetry.update();
         waitForStart();
-
+/*
         while(!robot.drive.bottomColor.isOnTape()){
             teamUtil.theBlinkin.setSignal(Blinkin.Signals.LEVEL_10);
             robot.drive.driveLeft(0.35);
         }
         robot.drive.stopMotors();
-
+*/
     }
 }

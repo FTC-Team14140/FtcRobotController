@@ -49,7 +49,7 @@ public class AutoSkystonePathBlue extends LinearOpMode {
         robot.latch.latchUp();
 
 
-        robot.doubleSkystone();
+        //robot.doubleSkystone();
 
 //    public void initialize() {
 //        teamUtil.init(this);
