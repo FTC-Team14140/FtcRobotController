@@ -89,11 +89,11 @@ public class RobotTeleop extends OpMode {
 /////////////////////////////////////////////////////////////////////
         //this code is for the lift system assembly
 
-        if (teamGamePad.gamepad2dpad_upBounced()){
+        if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)){
             level+=1;
             teamUtil.log("Level Up :D *cue final fantasy music");
         }
-        if (teamGamePad.gamepad2dpad_downBounced()){
+        if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)){
             level-=1;
             teamUtil.log("Level decreased :C");
         }

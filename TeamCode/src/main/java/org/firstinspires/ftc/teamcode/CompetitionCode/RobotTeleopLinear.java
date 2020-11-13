@@ -126,11 +126,11 @@ public class RobotTeleopLinear extends LinearOpMode {
 /////////////////////////////////////////////////////////////////////
             //this code is for the lift system assembly
 
-            if (teamGamePad.gamepad2dpad_upBounced()) {
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)){
                 level += 1;
                 teamUtil.log("Level Up :D *cue final fantasy music");
             }
-            if (teamGamePad.gamepad2dpad_downBounced()) {
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)){
                 level -= 1;
                 teamUtil.log("Level decreased :C");
             }
@@ -167,7 +167,7 @@ public class RobotTeleopLinear extends LinearOpMode {
                     robot.liftSystem.grabber.narrowOpen();
                 }
             }
-            if (teamGamePad.gamepad2ABounced()) {
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2A)){
                 robot.liftSystem.elevatorDown();
             }
             if (gamepad2.y) {

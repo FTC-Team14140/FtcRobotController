@@ -3,14 +3,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class TeamGamepad {
     private OpMode theOpMode;
-    private boolean isPressedRB_2 = false;
-    private boolean wasBouncedRB_2 = false;
-    private boolean isPressedDPD_2 = false;
-    private boolean wasBouncedDPD_2 = false;
-    private boolean isPressedDPU_2 = false;
-    private boolean wasBouncedDPU_2 = false;
-    private boolean isPressedA_2 = false;
-    private boolean wasBouncedA_2 = false;
     public enum buttons{
         GAMEPAD1RB,
         GAMEPAD1LB,
@@ -32,16 +24,26 @@ public class TeamGamepad {
         GAMEPAD2DPADDOWN,
         GAMEPAD2DPADLEFT,
         GAMEPAD2DPADRIGHT
-
     }
-    public boolean[] pressed = new boolean[buttons.values().length];
-    public boolean[] bounced = new boolean[buttons.values().length];
+    private boolean[] pressed = new boolean[buttons.values().length];
+    private boolean[] bounced = new boolean[buttons.values().length];
 
 
     public TeamGamepad(OpMode opmode){
         theOpMode = opmode;
     }
 
+    // Call this to find out if a button was pressed and released
+    public boolean wasBounced(buttons button){
+        if(bounced[button.ordinal()]){
+            bounced[button.ordinal()] = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Call this each time through your loop
     public void gamepadLoop() {
         if(theOpMode.gamepad1.right_bumper){
             pressed[buttons.GAMEPAD1RB.ordinal()] = true;
@@ -199,42 +201,5 @@ public class TeamGamepad {
 
     }
 
-    public boolean gamepad2RightBumperBounced(){
-        if(wasBouncedRB_2){
-            wasBouncedRB_2 = false;
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    public boolean gamepad2dpad_upBounced(){
-        if(wasBouncedDPD_2){
-            wasBouncedDPD_2 = false;
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-    public boolean gamepad2dpad_downBounced(){
-        if(wasBouncedDPU_2){
-            wasBouncedDPU_2 = false;
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-    public boolean gamepad2ABounced(){
-        if(wasBouncedA_2){
-            wasBouncedA_2 = false;
-            return true;
-        } else {
-            return false;
-        }
-
-    }
 
 }

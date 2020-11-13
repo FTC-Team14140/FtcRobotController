@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
 import org.firstinspires.ftc.teamcode.Assemblies.RobotDrive;
 import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
+import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
 
@@ -19,13 +20,15 @@ public class TestDriveSystem extends LinearOpMode {
     Robot robot;
     boolean wasTurning = false;
     double storedHeading;
+    TeamGamepad teamGamePad;
 
     public void initialize() {
         teamUtil.init(this);
+
         //teamUtil.theBlinkin.setSignal(Blinkin.Signals.INIT_RED);
         robot = new Robot(this);
 
-//        teamGamePad = new TeamGamepad(this);
+        teamGamePad = new TeamGamepad(this);
 
         robot.init(true);
         //teamUtil.theBlinkin.setSignal(Blinkin.Signals.READY_TO_START);
@@ -40,9 +43,10 @@ public class TestDriveSystem extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            teamGamePad.gamepadLoop();
 
             // Code to test the joystick control of the drive
-            if(Math.abs(gamepad1.right_stick_x) < 0.1 && wasTurning){
+            if (Math.abs(gamepad1.right_stick_x) < 0.1 && wasTurning) {
                 storedHeading = robot.drive.getHeading();
             }
             robot.drive.universalJoystick(gamepad1.left_stick_x,
@@ -76,19 +80,38 @@ public class TestDriveSystem extends LinearOpMode {
                 robot.drive.findMaxLeftSpeed();
             }
 
-            if (gamepad2.dpad_up) {
-                robot.drive.accelerateInchesForward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
-            } else if (gamepad2.dpad_down) {
-                robot.drive.accelerateInchesBackward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
-            } else if (gamepad2.dpad_left) {
-                //robot.drive.accelerateInchesLeft(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
-            } else if (gamepad2.dpad_right) {
-                //robot.drive.accelerateInchesRight(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
-            } else if (gamepad2.a) {
-                robot.drive.stopMotors();
+            // HOLD the GP2 Right Bumper to adjust the movement parameters
+            if (gamepad2.right_bumper) {
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
+                    robot.drive.START_SPEED = robot.drive.START_SPEED + 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
+                    robot.drive.START_SPEED = robot.drive.START_SPEED - 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
+                    robot.drive.END_SPEED = robot.drive.END_SPEED - 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+                    robot.drive.END_SPEED = robot.drive.END_SPEED + 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) {
+                    robot.drive.MAX_ACCEL_PER_INCH = robot.drive.MAX_ACCEL_PER_INCH + 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2A)) {
+                    robot.drive.MAX_ACCEL_PER_INCH = robot.drive.MAX_ACCEL_PER_INCH - 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2X)) {
+                    robot.drive.MAX_DECEL_PER_INCH = robot.drive.MAX_DECEL_PER_INCH - 10;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2B)) {
+                    robot.drive.MAX_DECEL_PER_INCH = robot.drive.MAX_DECEL_PER_INCH + 10;
+                }
+            } else {
+                if (gamepad2.dpad_up) {
+                    robot.drive.accelerateInchesForward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                } else if (gamepad2.dpad_down) {
+                    robot.drive.accelerateInchesBackward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                } else if (gamepad2.dpad_left) {
+                    //robot.drive.accelerateInchesLeft(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                } else if (gamepad2.dpad_right) {
+                    //robot.drive.accelerateInchesRight(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                } else if (gamepad2.a) {
+                    robot.drive.stopMotors();
+                }
             }
-
-            // TODO Need some code here to adjust max acceleration and deceleration parameters for testing
 
 
 //            robot.driveTelemetry();
@@ -100,6 +123,7 @@ public class TestDriveSystem extends LinearOpMode {
 
             //robot.drive.distanceTelemetry();
             robot.drive.telemetryDriveEncoders();
+            telemetry.addLine("Start:"+ robot.drive.START_SPEED+" End:"+robot.drive.END_SPEED+" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
             teamUtil.telemetry.update();
 
         }
