@@ -16,7 +16,7 @@ public class TestShooter extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         m1 = hardwareMap.get(DcMotor.class, "m1");
-        m2 = hardwareMap.get(DcMotor.class, "m2");
+//        m2 = hardwareMap.get(DcMotor.class, "m2");
         waitForStart();
 
         while(opModeIsActive() && !this.isStopRequested()){
@@ -86,11 +86,11 @@ public class TestShooter extends LinearOpMode {
 
             if (gamepad1.x) {
                 m1.setPower(0);
-                m2.setPower(0);
+//                m2.setPower(0);
             }
-            if (gamepad1.dpad_right) {
-                m2.setPower(0);
-            }
+//            if (gamepad1.dpad_right) {
+//                m2.setPower(0);
+//            }
         }
     }
 }

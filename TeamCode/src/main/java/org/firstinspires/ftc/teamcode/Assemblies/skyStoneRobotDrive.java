@@ -321,9 +321,9 @@ public class skyStoneRobotDrive {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // TODO: This one needs a comment...does it really need to call correctHeading AND adjustAngle?
-    public double getRelativeHeading(double pseudoHeading) {
-        return revImu.correctHeading(adjustAngle(pseudoHeading + getHeading()));
-    }
+//    public double getRelativeHeading(double pseudoHeading) {
+//        return revImu.correctHeading(adjustAngle(pseudoHeading + getHeading()));
+//    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1868,56 +1868,61 @@ public class skyStoneRobotDrive {
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void rotateToZero() {
-        if (getRelativeHeading(180) < 179.5) {
-            teamUtil.log("ROTATING LEFT");
-            rotateToHeadingZeroLeft();
-        } else if (getRelativeHeading(180) > 180.5) {
-            teamUtil.log("ROTATING RIGHT");
-            rotateToHeadingZeroRight();
-        }
+//TODO: Don't use
 
-    }
+//   public void rotateToZero() {
+//        if (getRelativeHeading(180) < 179.5) {
+//            teamUtil.log("ROTATING LEFT");
+//            rotateToHeadingZeroLeft();
+//        } else if (getRelativeHeading(180) > 180.5) {
+//            teamUtil.log("ROTATING RIGHT");
+//            rotateToHeadingZeroRight();
+//        }
+//
+//    }
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void rotateToHeadingZeroLeft() {
-        double startHeading = getHeading();
-        teamUtil.log("startHeading: " + startHeading);
-        teamUtil.log("getRelativeHeading: " + getRelativeHeading(180));
-
-        double rotatePower;
-
-        do {
-            rotatePower = Range.clip(Math.abs(180 - getRelativeHeading(180)) / 120, MIN_ROTATING_POWER, 0.5);
-
-            rotateLeft(rotatePower);
-
-        } while (getRelativeHeading(180) < 177.5);
-
-        stopMotors();
-        teamUtil.log("I'M DONE");
-
-
-    }
+   //TODO: Don't use
+//    public void rotateToHeadingZeroLeft() {
+//        double startHeading = getHeading();
+//        teamUtil.log("startHeading: " + startHeading);
+//        teamUtil.log("getRelativeHeading: " + getRelativeHeading(180));
+//
+//        double rotatePower;
+//
+//        do {
+//            rotatePower = Range.clip(Math.abs(180 - getRelativeHeading(180)) / 120, MIN_ROTATING_POWER, 0.5);
+//
+//            rotateLeft(rotatePower);
+//
+//        } while (getRelativeHeading(180) < 177.5);
+//
+//        stopMotors();
+//        teamUtil.log("I'M DONE");
+//
+//
+//    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void rotateToHeadingZeroRight() {
-        double startHeading = getHeading();
+   //TODO: don't use
 
-        double rotatePower;
-
-        do {
-            rotatePower = Range.clip(Math.abs(180 - getRelativeHeading(180)) / 130, MIN_ROTATING_POWER, 0.5);
-
-            rotateRight(rotatePower);
-
-        } while (getRelativeHeading(180) > 182.5);
-
-        stopMotors();
-        teamUtil.log("I'M DONE");
-
-    }
+//    public void rotateToHeadingZeroRight() {
+//        double startHeading = getHeading();
+//
+//        double rotatePower;
+//
+//        do {
+//            rotatePower = Range.clip(Math.abs(180 - getRelativeHeading(180)) / 130, MIN_ROTATING_POWER, 0.5);
+//
+//            rotateRight(rotatePower);
+//
+//        } while (getRelativeHeading(180) > 182.5);
+//
+//        stopMotors();
+//        teamUtil.log("I'M DONE");
+//
+//    }
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

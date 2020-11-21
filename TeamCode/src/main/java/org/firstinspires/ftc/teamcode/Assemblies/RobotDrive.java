@@ -16,14 +16,15 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 public class RobotDrive {
 
     public static final double FULL_POWER = 1;
-    public static final double MAX_MOTOR_VELOCITY = 1000; // tics/sec  TODO: Update for the Ultimate Goal Robot
-    public double MAX_ACCEL_PER_INCH = 440; // max velocity acceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
-    public double MAX_DECEL_PER_INCH = 175; // max power deceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
-    public double START_SPEED = 440; // MIN power to get the robot to start moving TODO: Update for the Ultimate Goal Robot
-    public double END_SPEED = 300; // Power to decelerate to before stopping completely TODO: Update for the Ultimate Goal Robot
+    public static final double MAX_MOTOR_VELOCITY = 4400; // tics/sec, for forward and backward
+    public static final double MAX_STRAFING_VELOCITY = 3600; //tics/sec, for left and right
+    public double MAX_ACCEL_PER_INCH = 50; // max velocity acceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
+    public double MAX_DECEL_PER_INCH = 105; // max power deceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
+    public double START_SPEED = 150; // MIN power to get the robot to start moving
+    public double END_SPEED = 50; // Power to decelerate to before stopping completely
 
-    private double COUNTS_PER_INCH = 62.24;  // TODO: Update for the Ultimate Goal Robot
-    private double COUNTS_PER_INCH_SIDEWAYS = 67.82;  // TODO: Update for the Ultimate Goal Robot
+    private double COUNTS_PER_INCH = 50.625;  // TODO: Update for the Ultimate Goal Robot
+    private double COUNTS_PER_INCH_SIDEWAYS = 39.1;  // TODO: Update for the Ultimate Goal Robot
 
 
     public static double INITIAL_HEADING;
@@ -333,12 +334,6 @@ public class RobotDrive {
         return revImu.getAbsoluteHeading();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // TODO: This one needs a comment...does it really need to call correctHeading AND adjustAngle?
-    public double getRelativeHeading(double pseudoHeading) {
-        return revImu.correctHeading(adjustAngle(pseudoHeading + getHeading()));
-    }
-
 
 
 
@@ -462,7 +457,8 @@ public class RobotDrive {
     // Run the robot forward/or backward maintaining the specified heading by turning proportionally as needed (P = .1)
     // TODO: We need a universal drive version of this that takes a drive heading and an attitude heading
     public void followHeading(double Heading, double ticsPerSecond) {
-        double velocityAdjust = getHeadingError(Heading) * .1 * ticsPerSecond;
+//        double velocityAdjust = getHeadingError(Heading) * .1 * ticsPerSecond;
+        double velocityAdjust = 0;
         if (ticsPerSecond > 0) {
             fRightMotor.setVelocity(ticsPerSecond * 1 + velocityAdjust); // 1 was .87
             fLeftMotor.setVelocity(ticsPerSecond - velocityAdjust);
@@ -1314,10 +1310,10 @@ public class RobotDrive {
 
     public void rotateTo(double heading) {
         teamUtil.log("Starting to rotate to " + heading);
-        final double decelThreshold = 60; // start deceleration this many degrees from the target
-        final double slowThreshold = 10; // slow down to a very slow turn this far from the target
-        final double maxPower = 1;
-        final double minPower = .15;
+        final double decelThreshold = 60; // start deceleration this many degrees from the target TODO: Re-tune for new robot
+        final double slowThreshold = 10; // slow down to a very slow turn this far from the target TODO: Re-tune for new robot
+        final double maxPower = 1; // TODO: Re-tune for new robot
+        final double minPower = .15; // TODO: Re-tune for new robot
         final double decelSlope = (maxPower - minPower) / (decelThreshold - slowThreshold); // + slope
         final double driftDegrees = 1; // cut the motors completely when we are within this many degrees of the target to allow for a little drift
         double leftRotatePower = 1; // Keep track of which way we are rotating
@@ -1385,6 +1381,7 @@ public class RobotDrive {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Joystick drive methods
+    // currently these methods are NOT using the "heldHeading" parameter to try and hold a heading... TODO: Fix this!
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1440,8 +1437,8 @@ public class RobotDrive {
 //        teamUtil.telemetry.addData("joystickY:", leftJoyStickY);
 
         fLeftMotor.setPower(frontLeft);
-        fRightMotor.setPower(frontRight * 0.9);
-        bRightMotor.setPower(backRight * 0.9);
+        fRightMotor.setPower(frontRight * 1); // 1 was .9
+        bRightMotor.setPower(backRight * 1);  // 1 was .9
         bLeftMotor.setPower(backLeft);
 
     }
@@ -1472,10 +1469,10 @@ public class RobotDrive {
 
     public void findMaxLeftSpeed() {
         resetAllDriveEncoders();
-        double travelTics = COUNTS_PER_INCH * 72;
+        double travelTics = COUNTS_PER_INCH * 60;
         setMotorVelocities(-10000, 10000, 10000, -10000);
         double flmax = 0, frmax = 0, blmax = 0, brmax = 0;
-        while (fLeftMotor.getCurrentPosition() < travelTics) {
+        while (Math.abs(fLeftMotor.getCurrentPosition()) < travelTics) {
             flmax = getFrontLeftMotorPos() < flmax ? getFrontLeftMotorPos() : flmax;
             frmax = getFrontRightMotorPos() > frmax ? getFrontRightMotorPos() : frmax;
             blmax = getBackLeftMotorPos() > blmax ? getBackLeftMotorPos() : blmax;

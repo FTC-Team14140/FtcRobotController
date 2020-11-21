@@ -22,51 +22,43 @@ public class revHubIMUGyro {
     private Telemetry telemetry; //This variable repersent the telemetry
     private HardwareMap hardwareMap;
     private BNO055IMU imu; //This variable is the imu
+    private Position imuPosition;
     Orientation angle; //This variable keeps track of the current heading
 
 
+    enum Position {
+        RIGHTSIDE_UP,
+        UPSIDE_DOWN,
+    }
 
-//OLD VARIABLES FOR OLD CODE--depended on in some files here or there--(CAN BE FOUND WAY BELOW)
+
+    //OLD VARIABLES FOR OLD CODE--depended on in some files here or there--(CAN BE FOUND WAY BELOW, so don't delete)
     Orientation anglesLast; //This variable keeps track of the current heading
     Orientation anglesCurrent;
     float currentHeading;
+    ///////////////////////////////////////////////////////////////
 
 
-    public revHubIMUGyro(HardwareMap hardwaremap, Telemetry telemetry){
+    public revHubIMUGyro(HardwareMap hardwaremap, Telemetry telemetry) {
         // set up our IMU
         //These are the parameters that the imu uses in the code to name and keep track of the data
         this.telemetry = telemetry;
         this.hardwareMap = hardwaremap;
+//        imuPosition = position;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 
+
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
 
     }
 
 
-//    public revHubIMUGyro() {
-//        telemetry = theTelemetry;
-//        hardwareMap = theHardwareMap;
-//        imu = theimu;
-//        currentDirection = 0;
-//
-//        // set up our IMU
-//        //These are the parameters that the imu uses in the code to name and keep track of the data
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-//        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//
-//
-//        imu = hardwareMap.get(BNO055IMU.class, deviceName);
-//        imu.initialize(parameters);
-//    }
-
-
-    public void resetHeading(){
+    public void resetHeading() {
         angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         currentHeading = 0;
         //ideally, you shouldnt have to reset it when moving into teleop, so you only want to do this to right itself if necessary
@@ -77,10 +69,46 @@ public class revHubIMUGyro {
         return angle.firstAngle;
     }
 
+    public double adjustAngle(double angle) {
+        //assuming imu runs from [0, 360] and angle is added/substracted, adjust it to expected reading
+        if (imuPosition == Position.RIGHTSIDE_UP) {
+            //TODO: UPdate this
+//            while (angle >= 360) {
+//                angle -= 360;
+//            }
+//            while (angle < 0) {
+//                angle += 360;
+//            }
+
+        } else if (imuPosition == Position.UPSIDE_DOWN) {
+            while (angle >= 360) {
+                angle -= 360;
+            }
+            while (angle < 0) {
+                angle += 360;
+            }
+
+
+        }
+        return angle;
+
+    }
+
+
+
+
     public double correctHeading(double angle){
-        if(angle < 0){
-            return angle+360;
-        } else return angle;
+//        if(imuPosition == Position.RIGHTSIDE_UP){
+            if(angle < 0){
+                return angle+360;
+            } else return angle;
+//        } else if(imuPosition == Position.UPSIDE_DOWN){
+//            if(angle < 0){
+//                return Math.abs(angle);
+//            } else return Math.abs(angle - 360);
+//
+//        }
+
     }
 
 
@@ -129,13 +157,10 @@ public class revHubIMUGyro {
             anglesLast = anglesCurrent;
 
             return currentHeading;
-        } else return 0;
+        }
+        else return 0;
     }
 
-//    public float getAbsoluteHeading() {
-//        anglesCurrent = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//        return anglesCurrent.firstAngle;
-//    }
 
 
 

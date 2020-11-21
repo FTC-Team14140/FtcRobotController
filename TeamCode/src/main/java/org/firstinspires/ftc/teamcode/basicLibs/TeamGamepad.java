@@ -59,13 +59,6 @@ public class TeamGamepad {
             pressed[buttons.GAMEPAD1LB.ordinal()] = false;
         }
 
-        if(theOpMode.gamepad1.right_bumper){
-            pressed[buttons.GAMEPAD1RB.ordinal()] = true;
-        }else if (pressed[buttons.GAMEPAD1RB.ordinal()] && !theOpMode.gamepad1.right_bumper){
-            bounced[buttons.GAMEPAD1RB.ordinal()] = true;
-            pressed[buttons.GAMEPAD1RB.ordinal()] = false;
-        }
-
         if(theOpMode.gamepad1.a){
             pressed[buttons.GAMEPAD1A.ordinal()] = true;
         }else if (pressed[buttons.GAMEPAD1A.ordinal()] && !theOpMode.gamepad1.a){
@@ -136,12 +129,6 @@ public class TeamGamepad {
             pressed[buttons.GAMEPAD2LB.ordinal()] = false;
         }
 
-        if(theOpMode.gamepad2.right_bumper){
-            pressed[buttons.GAMEPAD2RB.ordinal()] = true;
-        }else if (pressed[buttons.GAMEPAD2RB.ordinal()] && !theOpMode.gamepad2.right_bumper){
-            bounced[buttons.GAMEPAD2RB.ordinal()] = true;
-            pressed[buttons.GAMEPAD2RB.ordinal()] = false;
-        }
 
         if(theOpMode.gamepad2.a){
             pressed[buttons.GAMEPAD2A.ordinal()] = true;

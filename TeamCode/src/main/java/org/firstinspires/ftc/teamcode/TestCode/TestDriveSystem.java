@@ -80,8 +80,8 @@ public class TestDriveSystem extends LinearOpMode {
                 robot.drive.findMaxLeftSpeed();
             }
 
-            // HOLD the GP2 Right Bumper to adjust the movement parameters
-            if (gamepad2.right_bumper) {
+            // HOLD the GP2 left TRIGGER to adjust the movement parameters
+            if (gamepad2.left_trigger > 0.5) {
                 if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
                     robot.drive.START_SPEED = robot.drive.START_SPEED + 10;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
@@ -99,7 +99,8 @@ public class TestDriveSystem extends LinearOpMode {
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2B)) {
                     robot.drive.MAX_DECEL_PER_INCH = robot.drive.MAX_DECEL_PER_INCH + 10;
                 }
-            } else {
+                // HOLD the GP2 Right TRIGGER to adjust the movement parameters
+            } else if(gamepad2.right_trigger > 0.5){
                 if (gamepad2.dpad_up) {
                     robot.drive.accelerateInchesForward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_down) {
