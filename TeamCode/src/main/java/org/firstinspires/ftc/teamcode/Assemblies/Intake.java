@@ -13,6 +13,8 @@ public class Intake {
     HardwareMap hardwareMap;
     Telemetry telemetry;
     CRServo conveyorServo, rollerServo;
+    double FULL_POWER = 1;
+    double STOP = 0;
 
     void Intake() {
         teamUtil.log("Constructing Intake");
@@ -28,12 +30,14 @@ public class Intake {
 
     // Starts the mechanisms at full speed
     void start() {
-
+        conveyorServo.setPower(FULL_POWER);
+        rollerServo.setPower(FULL_POWER);
     }
 
     // Stops the mechanisms
     void stop() {
-
+        conveyorServo.setPower(STOP);
+        rollerServo.setPower(STOP);
     }
 
 }
