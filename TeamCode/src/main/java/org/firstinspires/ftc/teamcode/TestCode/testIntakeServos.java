@@ -24,8 +24,8 @@ public class testIntakeServos extends LinearOpMode {
 
         waitForStart();
 
-        servo1.setPower(-FULL_POWER);
-        servo2.setPower(FULL_POWER);
+        servo1.setPower(FULL_POWER);
+        servo2.setPower(-FULL_POWER);
 
         while(opModeIsActive() && !this.isStopRequested()){
 /*

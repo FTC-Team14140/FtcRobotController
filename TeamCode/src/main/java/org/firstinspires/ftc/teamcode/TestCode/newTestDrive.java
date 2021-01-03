@@ -31,7 +31,7 @@ public class newTestDrive extends LinearOpMode {
             drive.initDriveMotors();
             drive.setBrakeAllDriveMotors();
             drive.initImu();
-            drive.initSensors(false);
+            drive.initSensors();
             drive.resetHeading();
         }
 /*

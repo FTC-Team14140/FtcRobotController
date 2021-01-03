@@ -94,7 +94,7 @@ public class RobotDrive {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void initSensors(boolean frontOnly) {
+    public void initSensors() {
     /*  TODO: rewrite when we add sensors to this year's robot
         frontSensorsOnly = frontOnly;
         frontLeftDistance = new DistanceSensors(hardwareMap.get(Rev2mDistanceSensor.class, "frontLeftDistance"));

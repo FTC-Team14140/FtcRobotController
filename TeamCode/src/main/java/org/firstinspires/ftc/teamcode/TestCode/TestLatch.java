@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Assemblies.Latch;
+import org.firstinspires.ftc.teamcode.Assemblies.OLD.Latch;
 
 @TeleOp(name = "TestLatch")
 @Disabled
