@@ -13,6 +13,8 @@ public class CalibrateDriveSystem extends LinearOpMode {
 
     Robot robot;
     TeamGamepad teamGamePad;
+    double HEADING = 0;
+    long TIME = 3;
 
     public void initialize() {
         teamUtil.init(this);
@@ -21,6 +23,33 @@ public class CalibrateDriveSystem extends LinearOpMode {
         robot.init(true);
         teamUtil.initPerf();
     }
+
+    public void testDriveMotors() {
+        robot.drive.setDriveVelocities(robot.drive.START_SPEED,0,0,0);
+        teamUtil.pause(1000);
+        robot.drive.setDriveVelocities(0,robot.drive.START_SPEED,0,0);
+        teamUtil.pause(1000);
+        robot.drive.setDriveVelocities(0,0,robot.drive.START_SPEED,0);
+        teamUtil.pause(1000);
+        robot.drive.setDriveVelocities(0,0,0,robot.drive.START_SPEED);
+    }
+
+    public void moveNoAccelerateNoHeadingControl () {
+        robot.drive.driveMotorsHeadings(HEADING, HEADING, robot.drive.START_SPEED);
+        teamUtil.pause(TIME*1000);
+        robot.drive.stopMotors();
+    }
+
+    public void moveNoAccelerateWithHeadingControl () {
+        long doneTime = System.currentTimeMillis() + (int)(TIME*1000);
+        double heldHeading = robot.drive.getHeading();
+        while (System.currentTimeMillis() < doneTime) {
+            robot.drive.driveMotorsHeadings(HEADING, heldHeading, robot.drive.START_SPEED);
+        }
+        robot.drive.stopMotors();
+    }
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
@@ -49,6 +78,26 @@ public class CalibrateDriveSystem extends LinearOpMode {
                 robot.drive.findMaxForwardSpeed();
             } else if (gamepad2.right_bumper) {
                 robot.drive.findMaxLeftSpeed();
+            }
+
+            if (gamepad2.left_stick_y == -1) {
+                moveNoAccelerateNoHeadingControl();
+            } else if (gamepad2.left_stick_y == 1) {
+                moveNoAccelerateWithHeadingControl();
+            }
+
+            if (gamepad2.left_stick_button && gamepad2.right_stick_button) {
+                robot.drive.resetHeading();
+            } else if (gamepad2.right_stick_button) {  // HOLD the right stick button to adjust the HEADING/TIME parameters
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
+                    HEADING = HEADING + 22.5;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
+                    HEADING = HEADING - 22.5;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
+                    TIME = TIME + 1;
+                } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+                    TIME = TIME - 1;
+                }
             }
 
             // HOLD the GP2 left TRIGGER to adjust the movement parameters
@@ -91,10 +140,10 @@ public class CalibrateDriveSystem extends LinearOpMode {
                 }
             }
 
-
             robot.drive.telemetryDriveEncoders();
             teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
             telemetry.addLine("Start:"+ robot.drive.START_SPEED+" End:"+robot.drive.END_SPEED+" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
+            telemetry.addLine("Heading:"+ HEADING+" TIME:"+TIME);
             teamUtil.telemetry.update();
 
         }

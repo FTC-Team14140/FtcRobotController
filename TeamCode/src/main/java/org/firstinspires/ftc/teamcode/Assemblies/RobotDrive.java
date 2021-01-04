@@ -431,6 +431,7 @@ public class RobotDrive {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // return the difference between the current heading and a target heading.  Returns -180 to 180
+    // Positive number means we need to turn left
     public double getHeadingError(double targetAngle) {
 
         double robotError;
