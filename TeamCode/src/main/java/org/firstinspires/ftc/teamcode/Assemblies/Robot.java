@@ -59,15 +59,14 @@ public class Robot {
     // Call this before first use!
     public void init(boolean usingDistanceSensors) {
         teamUtil.log("Initializing Robot");
+        drive.initDriveMotors();
 
-        leftIntake.init("conveyorServoLeft", "rollerServoLeft");
-        leftIntake.init("conveyorServoRight", "rollerServoLRight");
-        blocker.init();
-        sweeper.init();
-        grabber.init();
-        leftIntake.init("conveyorServoLeft", "rollerServoLeft");
-        rightIntake.init("conveyorServoRight", "rollerServoLRight");
-        shooter.init();
+        //leftIntake.init("conveyorServoLeft", "rollerServoLeft");
+        //leftIntake.init("conveyorServoRight", "rollerServoRight");
+        //blocker.init();
+        //sweeper.init();
+        //grabber.init();
+        //shooter.init();
 
         // reset mechanisms if we did not just run auto
         if (!justRanAuto) {
@@ -75,8 +74,8 @@ public class Robot {
 
             drive.initImu();
             drive.initSensors();
-            sweeper.reset();
-            grabber.reset();
+            //sweeper.reset();
+            //grabber.reset();
         }
         drive.resetHeading();
         teamUtil.log("Initializing Robot - Finished");

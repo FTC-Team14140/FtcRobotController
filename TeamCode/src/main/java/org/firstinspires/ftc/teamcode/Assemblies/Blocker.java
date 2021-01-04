@@ -14,8 +14,8 @@ public class Blocker {
     double FOWARD_FULL_POWER = 1;
     double STOP = 0;
     double BACKWARDS_FULL_POWER = -1;
-    long EXTEND_TIME = 3000;
-    long RETRACT_TIME = 3000;
+    long EXTEND_TIME = 3000; // TODO: Find the correct time for the extension of the blocker
+    long RETRACT_TIME = 3000; // TODO: Find the correct time for the retract of the blocker
     boolean moving = false;
 
     void Blocker() {

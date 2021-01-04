@@ -85,10 +85,10 @@ public class RobotDrive {
         bRightMotor = hardwareMap.get(DcMotorEx.class, "bRightMotor");
         fLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         bLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        fLeftMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);   // These coeffiecients were found using the technique in this doc: https://docs.google.com/document/d/1tyWrXDfMidwYyP_5H4mZyVgaEswhOC35gvdmP-V-5hA/edit#
-        fRightMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);  // these are NOT the defaults for these motors
-        bLeftMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);
-        bRightMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);
+        //fLeftMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);   // These coeffiecients were found using the technique in this doc: https://docs.google.com/document/d/1tyWrXDfMidwYyP_5H4mZyVgaEswhOC35gvdmP-V-5hA/edit#
+        //fRightMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);  // these are NOT the defaults for these motors
+        //bLeftMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);
+        //bRightMotor.setVelocityPIDFCoefficients(1.5, 0.15, 0, 14.9);
         setAllMotorsWithEncoder();
         setBrakeAllDriveMotors();
     }
