@@ -39,8 +39,9 @@ public class TestDriveSystem extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
-        storedHeading = robot.drive.getHeading();
         waitForStart();
+        robot.drive.resetHeading();
+        storedHeading = robot.drive.getHeading();
 
         while (opModeIsActive()) {
             teamGamePad.gamepadLoop();
@@ -115,15 +116,8 @@ public class TestDriveSystem extends LinearOpMode {
             }
 
 
-//            robot.driveTelemetry();
-            teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
-            //teamUtil.telemetry.addData("ColorSensor: ", robot.drive.bottomColor.getReading());
-            //teamUtil.telemetry.addData("ColorSensor BlueTape?: ", robot.drive.bottomColor.onBlue());
-            //teamUtil.telemetry.addData("ColorSensor RedTape?: ", robot.drive.bottomColor.onRed());
-
-
-            //robot.drive.distanceTelemetry();
             robot.drive.telemetryDriveEncoders();
+            teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
             telemetry.addLine("Start:"+ robot.drive.START_SPEED+" End:"+robot.drive.END_SPEED+" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
             teamUtil.telemetry.update();
 
