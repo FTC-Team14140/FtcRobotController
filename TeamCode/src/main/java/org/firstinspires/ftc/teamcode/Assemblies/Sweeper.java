@@ -20,6 +20,10 @@ public class Sweeper {
     Double EXTEND_SPEED = 1000.0; //TODO: find right number
     int FULLY_RETRACTED = 1000; //TODO: find right number for retracted encoder position
     Double RETRACT_SPEED = 1000.0; //TODO: find right number
+    final float SWEEP = 0.1f; //TODO: find right number
+    final float STOWED = 0.1f; //TODO: find right number
+    final float READY = 0.1f; //TODO: find right number
+
 
 
     void Sweeper() {
@@ -80,17 +84,17 @@ public class Sweeper {
 
     // Move the sweeper servo to the stow position
     void moveToStow() {
-
+        sweeper.setPosition(STOWED);
     }
 
     // Move the sweeper servo to the ready position (run to position) (high enough to not block rings, but as close as possible.
     void moveToReady() {
-
+        sweeper.setPosition(READY);
     }
 
     // Move the sweeper servo to the sweep position. (run to position)
     void moveToSweep() {
-
+        sweeper.setPosition(SWEEP);
     }
 
     // Move the sweeper to the specified position.
@@ -98,12 +102,13 @@ public class Sweeper {
     // 1 means straight down
     // This is intended to be hooked up to a gamepad control for manual control over the sweeper position
     void manualControl(float position) {
-
+        float controlledPosition = (SWEEP-READY)*position+READY;
+        sweeper.setPosition(controlledPosition);
     }
 
     // Launches a new thread to retract and stow the sweeper
     void retractAndStowNoWait () {
-
+        moveToStow();
+        retract();
     }
-
 }
