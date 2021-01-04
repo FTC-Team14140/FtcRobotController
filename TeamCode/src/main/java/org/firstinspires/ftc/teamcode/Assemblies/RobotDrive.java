@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.teamcode.basicLibs.DistanceSensors;
 import org.firstinspires.ftc.teamcode.basicLibs.revHubIMUGyro;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
@@ -71,14 +72,6 @@ public class RobotDrive {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void initDriveMotors() {
-        //fLeftMotor = hardwareMap.dcMotor.get("fLeftMotor");
-        //fRightMotor = hardwareMap.dcMotor.get("fRightMotor");
-        //bLeftMotor = hardwareMap.dcMotor.get("bLeftMotor");
-        // bRightMotor = hardwareMap.dcMotor.get("bRightMotor");
-        // fLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        // bLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        // setAllMotorsWithoutEncoder();  // This might not be the best option at this point...
-
         fLeftMotor = hardwareMap.get(DcMotorEx.class, "fLeftMotor");
         fRightMotor = hardwareMap.get(DcMotorEx.class, "fRightMotor");
         bLeftMotor = hardwareMap.get(DcMotorEx.class, "bLeftMotor");
@@ -175,11 +168,6 @@ public class RobotDrive {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void encoderTelemetry() {
-        teamUtil.telemetry.addData("FL ENCODER POS:", fRightMotor.getCurrentPosition());
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public int getBackLeftMotorPos() {
         return bLeftMotor.getCurrentPosition();
     }
@@ -198,6 +186,7 @@ public class RobotDrive {
     public int getFrontLeftMotorPos() {
         return fLeftMotor.getCurrentPosition();
     }
+
 
 
 
@@ -575,209 +564,6 @@ public class RobotDrive {
 
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Basic Movement methods for inches or time
-    // Use at lower speeds or wheel slippage may compromise accuracy
-
-    /* The following methods should all be deprecated...use or enhance the ones with acceleration curves instead
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Move forward for a specified amouunt of time and then stop
-    public void driveForward(double power, double timeInMilliseconds) {
-        teamUtil.log("Moving Forward Milliseconds: " + timeInMilliseconds);
-        ElapsedTime driveTime = new ElapsedTime();
-        power = clip(power);
-        setBrakeAllDriveMotors();
-        do {
-            driveForward(power);
-        } while (driveTime.milliseconds() < timeInMilliseconds && teamUtil.theOpMode.opModeIsActive());
-        stopMotors();
-        teamUtil.log("Moving Forward Milliseconds - Finished");
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // move a specified number of inches (using encoder on front right wheel to measure) with the
-    // provided power/speed values for each of the 4 motors.
-    // This will work in both RUN_USING_ENCODERS and RUN_WITHOUT_ENCODERS but may give very different results...
-    public void moveInches(double distance, double lfspeed, double rfspeed, double lbspeed, double rbspeed, long timeOut) {
-        teamUtil.log("Move Inches: " + distance + " " + fRightMotor.getMode()); // log the distance and motor mode
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
-        setBrakeAllDriveMotors();
-        int offset = fRightMotor.getCurrentPosition();
-        int encoderCounts = (int) (COUNTS_PER_INCH * distance);
-        fLeftMotor.setPower(lfspeed);
-        fRightMotor.setPower(rfspeed);
-        bLeftMotor.setPower(lbspeed);
-        bRightMotor.setPower(rbspeed);
-        while ((Math.abs(fRightMotor.getCurrentPosition() - offset) < encoderCounts) && teamUtil.keepGoing(timeOutTime)) {
-            // cruising to our destination  could log encoder positions here if needed
-        }
-        stopMotors();
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("Move Inches - TIMED OUT!");
-        }
-        teamUtil.log("Move Inches - Finished");
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void moveInchesForward(double speed, double inches, long timeOut) {
-        teamUtil.log("Moving Inches Forward: " + inches);
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
-
-        //resets the motors
-        fRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setAllMotorsWithEncoder();
-        setBrakeAllDriveMotors();
-
-        //sets the number of desired inches on both motors
-        int encoderCounts = (int) (COUNTS_PER_INCH * inches);
-        speed = clip(speed);
-
-        do {
-
-            driveForward(speed);
-
-            encoderTelemetry();
-
-
-        } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
-
-
-        //turns off both motors
-        stopMotors();
-
-        //sets it back to normal (there is nothing normal about running drive motors without encoders...-Coach)
-        //setAllMotorsWithoutEncoder();
-
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("Moving Inches Forward - TIMED OUT!");
-        }
-        teamUtil.log("Moving Inches Forward - Finished");
-
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void moveInchesBackward(double speed, double inches, long timeOut) {
-        teamUtil.log("Moving Inches Backward: " + inches);
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
-        //resets the motors
-        fRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setAllMotorsWithEncoder();
-
-
-        //fRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //sets the number of desired inches on both motors
-
-        int encoderCounts = (int) (COUNTS_PER_INCH * inches);
-        speed = clip(speed);
-
-        do {
-            driveBackward(speed);
-            //teamUtil.log("fRightMotor: " + getBackLeftMotorPos());
-            encoderTelemetry();
-
-
-        } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
-        //runs to the set number of inches at the desired speed
-
-        //turns off both motors
-        stopMotors();
-
-        //sets it back to normal
-        //setAllMotorsWithoutEncoder();
-
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("Moving Inches Backward - TIMED OUT!");
-        }
-        teamUtil.log("Moving Inches Backward - Finished");
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void moveInchesLeft(double speed, double inches, long timeOut) {
-        teamUtil.log("Moving Inches Left: " + inches);
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
-        //resets the motors
-        fRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setAllMotorsWithEncoder();
-
-
-        //fRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //sets the number of desired inches on both motors
-
-        int encoderCounts = (int) (COUNTS_PER_INCH_SIDEWAYS * inches);
-        speed = clip(speed);
-
-        do {
-            driveLeft(speed);
-            //teamUtil.log("fRightMotor: " + getBackLeftMotorPos());
-            encoderTelemetry();
-
-
-        } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
-        //runs to the set number of inches at the desired speed
-
-        //turns off both motors
-        stopMotors();
-
-        //sets it back to normal
-        //setAllMotorsWithoutEncoder();
-
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("Moving Inches Left - TIMED OUT!");
-        }
-        teamUtil.log("Moving Inches Left - Finished");
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void moveInchesRight(double speed, double inches, long timeOut) {
-        teamUtil.log("Moving Inches Right: " + inches);
-        long timeOutTime = System.currentTimeMillis() + timeOut;
-        timedOut = false;
-        //resets the motors
-        fRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setAllMotorsWithEncoder();
-
-
-        //fRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //sets the number of desired inches on both motors
-
-        int encoderCounts = (int) (COUNTS_PER_INCH_SIDEWAYS * inches);
-        speed = clip(speed);
-
-        do {
-            driveRight(speed);
-            //teamUtil.log("fRightMotor: " + getBackLeftMotorPos());
-            encoderTelemetry();
-
-
-        } while ((Math.abs(fRightMotor.getCurrentPosition()) < encoderCounts) && teamUtil.keepGoing(timeOutTime));
-        //runs to the set number of inches at the desired speed
-
-
-        //turns off both motors
-        stopMotors();
-
-        //sets it back to normal
-        //setAllMotorsWithoutEncoder();
-
-        timedOut = (System.currentTimeMillis() > timeOutTime);
-        if (timedOut) {
-            teamUtil.log("Moving Inches Right - TIMED OUT!");
-        }
-        teamUtil.log("Moving Inches Right - Finished");
-    }
-
-    */
 
 
 
@@ -788,9 +574,6 @@ public class RobotDrive {
     //
     // Methods for moving specific distances using acceleration/deceleration
     // The LATEST AND GREATEST versions that were used in Autonomous in SkyStone
-    // TODO: create left and right movement versions of these
-    // TODO: Better yet, create a version that works for any direction like this:
-    //      moveInches(double maxVelocity, double inches, double driveHeading, double robotHeading, long timeOut)
 
     public int inchesToEncoderTics(double inches) {
         return (int) (inches * COUNTS_PER_INCH);
@@ -932,339 +715,220 @@ public class RobotDrive {
 
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Methods to move a specific distance with acceleration/deceleration but with non zero start or end speeds
-    // These presume the caller will handle needed movement before or after
-    // TODO: If we are going to use these methods, we should modify them to use SetVelocity() instead of setPower() on the motors
 
-/*
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // accelerate from the startSpeed to the endSpeed trying not to slip the wheels.
-    // This will leave the robot moving when the method exits
-    // Covered distance can be found in the motor encoder counts
-    public void accelerateToSpeedRight(double startSpeed, double endSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
-        final double MIN_SPEED = Range.clip(startSpeed, 0.35, 1);    // NeverRest 40 at 1:1
-        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
 
-        int accelerationEncoderCount;
-        double speedChange = Range.clip(endSpeed, 0.35, 1) - MIN_SPEED;
 
-        accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Universal Move Inches  NEW for Ultimate Goal!
+    // These methods implement a universal moveInches that takes a heading in degrees and attempts to move
+    // a specified number of inches in that direction.  Distance is based on encoder readings, so acceleration
+    // slopes are used at the start and end of movements to try to avoid wheel slippage.
+    // A non-zero end velocity can be used in which case the robot will remain moving when the method returns.
+    // This is intended to allow for a sequence of moves or a fast transition into a sensor driven movement.
 
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
+    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next
+    double DRIVE_MAX_VELOCITY = 500; // TODO: find a reasonable maximum velocity for the drive
+    double ROTATION_ADJUST_FACTOR = 0.1; // TODO: verify this is a reasonable P coefficient for rotational error adjustment
 
-        teamUtil.log("About to accelerate right");
-        teamUtil.log("Accel Distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-        while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
-            //ACCELERATING
-            double accelSpeed = (MIN_SPEED + (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
-            teamUtil.log("Acceleration speed: " + accelSpeed);
-            driveRight(accelSpeed);
-        }
+    // Return the number of encoder tics needed to ramp from start speed to end speed at the specified acceleration
+    public int rampEncoderCount(double startSpeed, double endSpeed, double acceleration) {
+        return Math.abs(inchesToEncoderTics((endSpeed - startSpeed) / acceleration));
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // accelerate from the startSpeed to the endSpeed trying not to slip the wheels.
-    // This will leave the robot moving when the method exits
-    // Covered distance can be found in the motor encoder counts
-    public void accelerateToSpeedForwards(double startSpeed, double endSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = Range.clip(startSpeed, 0.3, 1);    // NeverRest 40 at 1:1
-        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
-
-        int accelerationEncoderCount;
-        double speedChange = Range.clip(endSpeed, 0.3, 1) - MIN_SPEED;
-
-        accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
-
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
-
-        teamUtil.log("Abbouta accelerate forward");
-        teamUtil.log("Accel Distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-
-        while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
-            //ACCELERATING
-            double accelSpeed = (MIN_SPEED - (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
-            teamUtil.log("Acceleration speed: " + accelSpeed);
-            driveForward(accelSpeed);
-        }
+    class MotorData { // a helper class to allow for faster access to hub data
+        int eFL, eFR, eBL, eBR;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // accelerate from the startSpeed to the endSpeed trying not to slip the wheels.
-    // This will leave the robot moving when the method exits
-    // Covered distance can be found in the motor encoder counts
-    public void accelerateToSpeedBackwards(double startSpeed, double endSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = Range.clip(startSpeed, 0.3, 1);    // NeverRest 40 at 1:1
-        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
-
-        int accelerationEncoderCount;
-        double speedChange = Range.clip(endSpeed, 0.3, 1) - MIN_SPEED;
-
-        accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
-
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
-
-        teamUtil.log("Abbouta accelerate back");
-        teamUtil.log("Accel Distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-
-        while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
-            //ACCELERATING
-            double accelSpeed = (MIN_SPEED + (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
-            teamUtil.log("Acceleration speed: " + accelSpeed);
-            driveBackward(accelSpeed);
-        }
+    // Return the encoder positions for all 4 drive motors
+    // TODO: Use the Batch data feature (see examples) to speed this up
+    public void getDriveMotorData(MotorData data) {
+        data.eFL = fLeftMotor.getCurrentPosition();
+        data.eFR = fRightMotor.getCurrentPosition();
+        data.eBL = bLeftMotor.getCurrentPosition();
+        data.eBR = bRightMotor.getCurrentPosition();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // accelerate from the startSpeed to the endSpeed trying not to slip the wheels.
-    // This will leave the robot moving when the method exits
-    // Covered distance can be found in the motor encoder counts
-    public void accelerateToSpeedLeft(double startSpeed, double endSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = Range.clip(startSpeed, 0.35, 1);    // NeverRest 40 at 1:1
-        final double MAX_ACCEL_PER_INCH = .2; // max power acceleration per inch without skidding
-
-        int accelerationEncoderCount;
-        double speedChange = Range.clip(endSpeed, 0.35, 1) - MIN_SPEED;
-
-        accelerationEncoderCount = (int) ((speedChange / MAX_ACCEL_PER_INCH) * COUNTS_PER_INCH);
-
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
-
-        teamUtil.log("Abbouta accelerate left");
-        teamUtil.log("Accel Distance: " + accelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-
-        while (Math.abs(fRightMotor.getCurrentPosition()) < accelerationEncoderCount) {
-            //ACCELERATING
-            double accelSpeed = (MIN_SPEED - (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_ACCEL_PER_INCH);
-            teamUtil.log("Acceleration speed: " + accelSpeed);
-            driveLeft(accelSpeed);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Decelerate from the startSpeed to a stop after traveling the specified distance while trying not to slip the wheels.
-    // This assume the robot is moving when it is called
-    public void decelerateInchesRight(double startSpeed, double inches) {
-        double startingPosition = fRightMotor.getCurrentPosition();
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = 0.35;    // NeverRest 40 at 1:1
-        final double MAX_DECEL_PER_INCH = .05; // max power acceleration per inch without skidding
-
-        int decelerationEncoderCount;
-        double targetPositionRightMotor = inches * COUNTS_PER_INCH;
-
-        double speedChange = startSpeed - MIN_SPEED;
-
-        decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
-        double endingPoint = startingPosition - inches * COUNTS_PER_INCH;
-        double decelerationPoint = endingPoint + decelerationEncoderCount;
-
-
-        setAllMotorsWithEncoder();
-//        resetAllDriveEncoders();
-
-        while (fRightMotor.getCurrentPosition() > decelerationPoint) {
-            //CRUISING
-            driveRight(startSpeed);
-            teamUtil.log("Cruising speed: " + startSpeed);
-        }
-
-        teamUtil.log("start decelerating");
-
-        while (fRightMotor.getCurrentPosition() > endingPoint) {
-            //DECELERATING
-            double decelSpeed = Range.clip((startSpeed - (Math.abs(fRightMotor.getCurrentPosition() - decelerationPoint) / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH), 0.3, 1);
-            teamUtil.log("Deceleration speed: " + decelSpeed);
-            teamUtil.log("decelDistanceTraveled: " + (Math.abs(fRightMotor.getCurrentPosition() - decelerationPoint)));
-            teamUtil.log("DecelDistance: " + decelerationEncoderCount);
-
-            driveRight(decelSpeed);
-        }
-
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Decelerate from the startSpeed to a stop after traveling the specified distance while trying not to slip the wheels.
-    // This assume the robot is moving when it is called
-    public void decelerateInchesLeft(double startSpeed, double inches) {
-        double startingPosition = fRightMotor.getCurrentPosition();
-
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = 0.35;    // NeverRest 40 at 1:1
-        final double MAX_DECEL_PER_INCH = .05; // max power acceleration per inch without skidding
-
-        int decelerationEncoderCount;
-
-        double speedChange = startSpeed - MIN_SPEED;
-
-        decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
-        double endingPoint = startingPosition + inches * COUNTS_PER_INCH;
-        double decelerationPoint = endingPoint - decelerationEncoderCount;
-
-
-        setAllMotorsWithEncoder();
-//        resetAllDriveEncoders();
-
-        while (fRightMotor.getCurrentPosition() < decelerationPoint) {
-            //CRUISING
-            driveLeft(startSpeed);
-            teamUtil.log("Cruising speed: " + startSpeed);
-        }
-
-        teamUtil.log("start decelerating");
-
-        while (fRightMotor.getCurrentPosition() < endingPoint) {
-            //DECELERATING
-            double decelSpeed = Range.clip((startSpeed - ((fRightMotor.getCurrentPosition() - decelerationPoint) / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH), 0.3, 1);
-            teamUtil.log("Deceleration speed: " + decelSpeed);
-            teamUtil.log("decelDistanceTraveled: " + (fRightMotor.getCurrentPosition() - decelerationPoint));
-            teamUtil.log("DecelDistance: " + decelerationEncoderCount);
-
-            driveLeft(decelSpeed);
-        }
-
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Not really sure what this does...needs a comment!
-    public void decelerateToSpeedLeft(double startSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = 0.35;    // NeverRest 40 at 1:1
-        final double MAX_DECEL_PER_INCH = .05; // max power acceleration per inch without skidding
-
-        int decelerationEncoderCount;
-        double speedChange = startSpeed - MIN_SPEED;
-
-        decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
-
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
-
-        teamUtil.log("Abbouta decelerate left");
-        teamUtil.log("decel Distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-        while (Math.abs(fRightMotor.getCurrentPosition()) < decelerationEncoderCount) {
-
-            double accelSpeed = (startSpeed + (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH);
-            teamUtil.log("deceleration speed: " + accelSpeed);
-            driveLeft(accelSpeed);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Not really sure what this does...needs a comment!
-    public void decelerateToSpeedForwards(double startSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = 0.35;    // NeverRest 40 at 1:1
-        final double MAX_DECEL_PER_INCH = .05; // max power acceleration per inch without skidding
-
-        int decelerationEncoderCount;
-        double speedChange = startSpeed - MIN_SPEED;
-
-        decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
-
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
-
-        teamUtil.log("Abbouta decelerate forward");
-        teamUtil.log("decel Distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-        while (Math.abs(fRightMotor.getCurrentPosition()) < decelerationEncoderCount) {
-
-            double accelSpeed = (startSpeed + (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH);
-            teamUtil.log("deceleration speed: " + accelSpeed);
-            driveForward(accelSpeed);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Not really sure what this does...needs a comment!
-    public void decelerateToSpeedBackwards(double startSpeed) {
-        final double COUNTS_PER_MOTOR_REV = 1120;    // NeverRest 40 at 1:1
-        final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-        final double WHEEL_DIAMETER_INCHES = 3.93701;     // For figuring circumference
-        final double COUNTS_PER_INCH =
-                (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-
-        final double MIN_SPEED = 0.35;    // NeverRest 40 at 1:1
-        final double MAX_DECEL_PER_INCH = .05; // max power acceleration per inch without skidding
-
-        int decelerationEncoderCount;
-        double speedChange = startSpeed - MIN_SPEED;
-
-        decelerationEncoderCount = (int) ((speedChange / MAX_DECEL_PER_INCH) * COUNTS_PER_INCH);
-
-        setAllMotorsWithEncoder();
-        resetAllDriveEncoders();
-
-        teamUtil.log("Abbouta decelerate back");
-        teamUtil.log("decel Distance: " + decelerationEncoderCount * 1 / COUNTS_PER_INCH);
-        teamUtil.log("AbsRightMotorEncoder: " + Math.abs(fRightMotor.getCurrentPosition()));
-        while (Math.abs(fRightMotor.getCurrentPosition()) < decelerationEncoderCount) {
-
-            double accelSpeed = (startSpeed - (-fRightMotor.getCurrentPosition() / COUNTS_PER_INCH) * MAX_DECEL_PER_INCH);
-            teamUtil.log("deceleration speed: " + accelSpeed);
-            driveBackward(accelSpeed);
-        }
+    // Update the drive motor velocities
+    // TODO: Use the Batch data feature (see examples) to speed this up
+    public void setDriveVelocities(double flV, double frV, double blV, double brV){
+        fLeftMotor.setVelocity(flV);
+        fRightMotor.setVelocity(frV);
+        bLeftMotor.setVelocity(blV);
+        bRightMotor.setVelocity(brV);
     }
 
 
- */
+    // Calculate the distance the robot has moved from the specified initialPosition
+    public int getEncoderDistance(MotorData initialPositions) {
+        MotorData currentPositions = new MotorData();
+        getDriveMotorData(currentPositions);
+
+        // Calculate the vector along the forward/backward axis
+        int ForwardVector = (currentPositions.eFL-initialPositions.eFL)
+                + (currentPositions.eFR-initialPositions.eFR)
+                + (currentPositions.eBL-initialPositions.eBL)
+                + (currentPositions.eBR-initialPositions.eBR);
+        // Calculate the vector along the left/right axis
+        int SideVector = (currentPositions.eFL-initialPositions.eFL)
+                + (currentPositions.eBR-initialPositions.eBR)
+                - ((currentPositions.eFR-initialPositions.eFR)
+                   + (currentPositions.eBL-initialPositions.eBL));
+        // Return the hypotenuse of the two vectors
+        // divide by 4 to account for the math that adds all 4 motor encoders
+        return (int) (Math.sqrt(Math.pow(ForwardVector,2)+Math.pow(SideVector,2)) / 4);
+    }
+
+    // Set the velocity of all 4 motors based on a driveHeading and provided velocity
+    // Corrects for rotational drift based on robotHeading
+    public void driveMotorsHeadings(double driveHeading, double robotHeading, double velocity) {
+        double flV, frV, blV, brV;
+        double x, y, scale;
+
+        // Determine how much adjustment for rotational drift
+        double rotationAdjust = getHeadingError(robotHeading) * ROTATION_ADJUST_FACTOR * velocity;
+
+        // Covert heading to cartesian on the unit circle and scale so largest value is 1
+        // This is essentially creating joystick values from the heading
+        x = Math.cos(Math.toRadians(driveHeading + 90)); // + 90 cause forward is 0...
+        y = Math.sin(Math.toRadians(driveHeading + 90));
+        scale = 1 / Math.max(Math.abs(x), Math.abs(y));
+        x = x * scale;
+        y = y * scale;
+
+        // Clip to motor power range
+        flV = Math.max(-1.0, Math.min(x + y, 1.0));
+        brV = flV;
+        frV = Math.max(-1.0, Math.min(y - x, 1.0));
+        blV = frV;
+
+        // Adjust for rotational drift
+        flV = flV - rotationAdjust;
+        brV = brV + rotationAdjust;
+        frV = frV + rotationAdjust;
+        blV = blV - rotationAdjust;
+
+        // Update the motors
+        setDriveVelocities(flV, frV, blV, brV);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Drive the motors towards the specified heading, holding the robotHeading, for the specified encodercount
+    // Ramp velocity from startVelocity to endVelocity linearly
+    public void driveMotors(double driveHeading, double robotHeading, double encoderCount, double startVelocity, double endVelocity, long timeOut) {
+        boolean details = false;
+        teamUtil.log("driveMotors: heading:" + driveHeading + " encoders:" + encoderCount + " StartSpeed:" + startVelocity + " EndSpeed:" + endVelocity);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        // Figure out the distance we need to ramp in encoder tics
+        double speedChange = endVelocity - startVelocity; // + if accelerating or - if decelerating
+        double slope = speedChange / encoderCount; // slope for the velocity ramp.  + or -
+
+        // Get the encoder positions at the start of the movement
+        MotorData initialPositions = new MotorData();
+        getDriveMotorData(initialPositions);
+        int encoderTicsTraveled = 0;
+
+        while (encoderTicsTraveled < encoderCount && teamUtil.keepGoing(timeOutTime)) {
+
+            // constantly adjust the motor speeds to ramp velocity and correct rotational drift
+            driveMotorsHeadings(driveHeading, robotHeading, startVelocity + slope*encoderTicsTraveled);
+            if (details)
+                teamUtil.log("Distance Traveled: " + encoderTicsTraveled);
+            encoderTicsTraveled = getEncoderDistance(initialPositions);
+        }
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("driveMotors - TIMED OUT!");
+        }
+        teamUtil.log("driveMotors - Finished");
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Move in any direction a specified number of inches using acceleration curves at start and end
+    // Supports non-zero start and end speeds (start speed is presumed to be the last end speed.)
+    public void moveInches(double driveHeading, double inches, long timeOut) {
+        moveInches(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, 0, getHeading());
+    }
+    public void moveInches(double driveHeading, double inches, long timeOut, double endSpeed) {
+        moveInches(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, getHeading());
+    }
+    public void moveInches(double driveHeading, double inches, long timeOut, double endSpeed , double robotHeading) {
+        moveInches(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, robotHeading);
+    }
+    public void moveInches(double driveHeading, double inches, long timeOut, double maxVelocity, double endSpeed, double robotHeading) {
+        boolean details = false;
+        boolean stopAtEnd = false;
+        teamUtil.log("moveInches: driveHeading:" + driveHeading + " Inches:" + inches+ "velocity:" + maxVelocity);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        double startSpeed = LastEndSpeed;
+        LastEndSpeed = endSpeed; // save this for next time this method is called TODO: Need a way to deal with some other method stopping the robot...  They could all just set this...
+        if (endSpeed == 0) {  // in case they are trying to stop the robot, fix it so we don't stall
+            endSpeed = END_SPEED;
+            stopAtEnd = true;
+        }
+
+        // Figure out the distances for each phase in encoder tics.  These are all + numbers
+        int totalEncoderCount = inchesToEncoderTics(inches);
+        int accelerationEncoderCount = rampEncoderCount(startSpeed, maxVelocity, MAX_ACCEL_PER_INCH);
+        int decelerationEncoderCount = rampEncoderCount(maxVelocity, endSpeed, MAX_DECEL_PER_INCH);
+
+        // figure out slopes for acceleration and deceleration phases.
+        double accelerationSlope = (maxVelocity - startSpeed) / accelerationEncoderCount; // positive slope
+        double decelerationSlope = (maxVelocity - endSpeed) / decelerationEncoderCount * -1; // Negative slope
+
+        int target = totalEncoderCount;
+        int cruiseStart, decelerationStart;
+        if (accelerationEncoderCount + decelerationEncoderCount < totalEncoderCount) {
+            // Enough distance to reach maxVelocity
+            cruiseStart = accelerationEncoderCount;
+            decelerationStart = target - decelerationEncoderCount;
+        } else {
+            // we don't have enough space to ramp up to full speed so calculate the actual maximum velocity
+            // by finding the y value of the two ramp lines where they intersect given the maximum distance
+            maxVelocity = (decelerationSlope * totalEncoderCount * accelerationSlope -
+                    endSpeed*accelerationSlope +
+                    startSpeed * decelerationSlope) / decelerationSlope;
+            teamUtil.log("Limited Max Velocity to:" + maxVelocity);
+
+            // recompute shortened ramp phases
+            accelerationEncoderCount = rampEncoderCount(startSpeed, maxVelocity, MAX_ACCEL_PER_INCH);
+            decelerationEncoderCount = rampEncoderCount(maxVelocity, endSpeed, MAX_DECEL_PER_INCH);
+            cruiseStart = accelerationEncoderCount;
+            decelerationStart = target - decelerationEncoderCount;
+        }
+        teamUtil.log("accelerationSlope:" + accelerationSlope + " decelerationSlope:" + decelerationSlope + " totalEncoderCount:" + totalEncoderCount);
+        teamUtil.log("accelerationEncoderCount:" + accelerationEncoderCount + " decelerationEncoderCount:" + decelerationEncoderCount + " decelerationStart:" + decelerationStart + " totalEncoderCount:" + totalEncoderCount);
+
+        // ramp up
+        driveMotors(driveHeading, robotHeading,accelerationEncoderCount,startSpeed,maxVelocity, timeOut);
+
+        // Cruise at Max Velocity
+        driveMotors(driveHeading, robotHeading,decelerationStart-cruiseStart, maxVelocity,maxVelocity,  timeOutTime - System.currentTimeMillis());
+
+        // ramp down
+        driveMotors(driveHeading, robotHeading,totalEncoderCount-decelerationStart,maxVelocity,endSpeed, timeOutTime - System.currentTimeMillis());
+
+        if (stopAtEnd) {  // stop the motors if they intend the robot to hold still
+            setDriveVelocities(0,0,0,0);
+        }
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("moveInches - TIMED OUT!");
+        }
+        teamUtil.log("moveInches - Finished");
+
+    }
+
 
 
 
@@ -1454,32 +1118,32 @@ public class RobotDrive {
 
     public void findMaxForwardSpeed() {
         resetAllDriveEncoders();
-        double travelTics = COUNTS_PER_INCH * 72;
+        double travelTics = COUNTS_PER_INCH * 60;
         setMotorVelocities(10000, 10000, 10000, 10000);
-        double flmax = 0, frmax = 0, blmax = 0, brmax = 0;
+        double flmax = 0, frmax = 0, blmax = 0, brmax = 0, v;
         while (fLeftMotor.getCurrentPosition() < travelTics) {
-            flmax = getFrontLeftMotorPos() > flmax ? getFrontLeftMotorPos() : flmax;
-            frmax = getFrontRightMotorPos() > frmax ? getFrontRightMotorPos() : frmax;
-            blmax = getBackLeftMotorPos() > blmax ? getBackLeftMotorPos() : blmax;
-            brmax = getBackRightMotorPos() > brmax ? getBackRightMotorPos() : brmax;
+            flmax = (v = fLeftMotor.getVelocity()) > flmax ? v : flmax;
+            frmax = (v = fRightMotor.getVelocity()) > frmax ? v: frmax;
+            blmax = (v = bLeftMotor.getVelocity()) > blmax ? v : blmax;
+            brmax = (v = bRightMotor.getVelocity()) > brmax ? v : brmax;
         }
         stopMotors();
-        teamUtil.log("Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
+        teamUtil.log("Forward Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
     }
 
     public void findMaxLeftSpeed() {
         resetAllDriveEncoders();
         double travelTics = COUNTS_PER_INCH * 60;
         setMotorVelocities(-10000, 10000, 10000, -10000);
-        double flmax = 0, frmax = 0, blmax = 0, brmax = 0;
+        double flmax = 0, frmax = 0, blmax = 0, brmax = 0, v;
         while (Math.abs(fLeftMotor.getCurrentPosition()) < travelTics) {
-            flmax = getFrontLeftMotorPos() < flmax ? getFrontLeftMotorPos() : flmax;
-            frmax = getFrontRightMotorPos() > frmax ? getFrontRightMotorPos() : frmax;
-            blmax = getBackLeftMotorPos() > blmax ? getBackLeftMotorPos() : blmax;
-            brmax = getBackRightMotorPos() < brmax ? getBackRightMotorPos() : brmax;
+            flmax = (v = fLeftMotor.getVelocity()) > flmax ? v : flmax;
+            frmax = (v = fRightMotor.getVelocity()) > frmax ? v: frmax;
+            blmax = (v = bLeftMotor.getVelocity()) > blmax ? v : blmax;
+            brmax = (v = bRightMotor.getVelocity()) > brmax ? v : brmax;
         }
         stopMotors();
-        teamUtil.log("Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
+        teamUtil.log("Sideways Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
     }
 }
 

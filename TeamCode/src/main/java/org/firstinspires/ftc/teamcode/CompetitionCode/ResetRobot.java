@@ -24,7 +24,7 @@ public class ResetRobot extends LinearOpMode {
         teamUtil.init(this);
         teamUtil.telemetry.addLine("Initializing Op Mode...please wait");
         teamUtil.telemetry.update();
-        teamUtil.theBlinkin.setSignal(Blinkin.Signals.YELLOW);
+        //teamUtil.theBlinkin.setSignal(Blinkin.Signals.YELLOW);
 
         robot = new Robot(this);
 
@@ -32,7 +32,7 @@ public class ResetRobot extends LinearOpMode {
 
         robot.init(false);
         //robot.latch.latchUp();
-        teamUtil.theBlinkin.setSignal(Blinkin.Signals.READY_TO_START);
+        //teamUtil.theBlinkin.setSignal(Blinkin.Signals.READY_TO_START);
         teamUtil.initPerf();
 
     }

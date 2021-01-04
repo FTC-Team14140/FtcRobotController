@@ -98,8 +98,8 @@ public class Sweeper {
     }
 
     // Move the sweeper to the specified position.
-    // 0 means straight up
-    // 1 means straight down
+    // 0 means READY Position
+    // 1 means SWEEP position
     // This is intended to be hooked up to a gamepad control for manual control over the sweeper position
     void manualControl(float position) {
         float controlledPosition = (SWEEP-READY)*position+READY;
