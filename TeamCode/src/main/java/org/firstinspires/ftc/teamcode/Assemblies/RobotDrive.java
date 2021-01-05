@@ -16,16 +16,17 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
 public class RobotDrive {
 
-    public static final double FULL_POWER = 1;
-    public static final double MAX_MOTOR_VELOCITY = 4400; // tics/sec, for forward and backward
-    public static final double MAX_STRAFING_VELOCITY = 3600; //tics/sec, for left and right
-    public double MAX_ACCEL_PER_INCH = 50; // max velocity acceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
-    public double MAX_DECEL_PER_INCH = 105; // max power deceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
-    public double START_SPEED = 150; // MIN power to get the robot to start moving
-    public double END_SPEED = 50; // Power to decelerate to before stopping completely
-
     private double COUNTS_PER_INCH = 50.625;  // TODO: Update for the Ultimate Goal Robot
     private double COUNTS_PER_INCH_SIDEWAYS = 39.1;  // TODO: Update for the Ultimate Goal Robot
+
+    public static final double MAX_MOTOR_VELOCITY = 4400; // tics/sec, for forward and backward
+    public static final double MAX_STRAFING_VELOCITY = 3600; //tics/sec, for left and right
+
+    public double START_SPEED = 300; // MIN power to get the robot to start moving
+    public double MAX_ACCEL_PER_INCH = 50; // max velocity acceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
+    public double MAX_DECEL_PER_INCH = 105; // max power deceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
+    public double END_SPEED = 50; // Power to decelerate to before stopping completely
+
 
 
     public static double INITIAL_HEADING;
@@ -732,7 +733,7 @@ public class RobotDrive {
     // A non-zero end velocity can be used in which case the robot will remain moving when the method returns.
     // This is intended to allow for a sequence of moves or a fast transition into a sensor driven movement.
 
-    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next
+    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next TODO: Make sure this is set appropriately everywhere
     double DRIVE_MAX_VELOCITY = 500; // TODO: find a reasonable maximum velocity for the drive
     double ROTATION_ADJUST_FACTOR = 0.1; // TODO: verify this is a reasonable P coefficient for rotational error adjustment
 
@@ -784,14 +785,17 @@ public class RobotDrive {
         return (int) (Math.sqrt(Math.pow(ForwardVector,2)+Math.pow(SideVector,2)) / 4);
     }
 
-    // Set the velocity of all 4 motors based on a driveHeading and provided velocity
-    // Corrects for rotational drift based on robotHeading
+    // Set the velocity of all 4 motors based on a driveHeading relative to robot and provided velocity
+    // Corrects for SMALL amounts of rotational drift based on robotHeading
+    // The presumption is that the current heading will be close to the robotHeading.  If that is not true, the
+    // robot will go on a loopy drive...
     public void driveMotorsHeadings(double driveHeading, double robotHeading, double velocity) {
         double flV, frV, blV, brV;
         double x, y, scale;
 
         // Determine how much adjustment for rotational drift
-        double rotationAdjust = getHeadingError(robotHeading) * ROTATION_ADJUST_FACTOR * velocity;
+        double headingError = Math.max(-10.0, Math.min(getHeadingError(robotHeading), 10.0)); // clip this to 10 degrees in either direction
+        double rotationAdjust = headingError * ROTATION_ADJUST_FACTOR * velocity;
 
         // Covert heading to cartesian on the unit circle and scale so largest value is 1
         // This is essentially creating joystick values from the heading
