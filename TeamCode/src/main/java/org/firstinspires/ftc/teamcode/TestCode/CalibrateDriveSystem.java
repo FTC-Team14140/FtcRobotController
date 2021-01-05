@@ -32,10 +32,12 @@ public class CalibrateDriveSystem extends LinearOpMode {
         robot.drive.setDriveVelocities(0,0,robot.drive.START_SPEED,0);
         teamUtil.pause(1000);
         robot.drive.setDriveVelocities(0,0,0,robot.drive.START_SPEED);
+        teamUtil.pause(1000);
+        robot.drive.stopMotors();
     }
 
     public void moveNoAccelerateNoHeadingControl () {
-        robot.drive.driveMotorsHeadings(HEADING, HEADING, robot.drive.START_SPEED);
+        robot.drive.driveMotorsHeadings(HEADING, robot.drive.getHeading(), robot.drive.START_SPEED);
         teamUtil.pause(TIME*1000);
         robot.drive.stopMotors();
     }
@@ -55,6 +57,8 @@ public class CalibrateDriveSystem extends LinearOpMode {
         initialize();
         waitForStart();
         robot.drive.resetHeading();
+
+        //testDriveMotors();
 
         while (opModeIsActive()) {
             teamGamePad.gamepadLoop();

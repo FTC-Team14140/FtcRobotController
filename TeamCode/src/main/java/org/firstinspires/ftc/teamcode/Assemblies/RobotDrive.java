@@ -802,9 +802,9 @@ public class RobotDrive {
         y = y * scale;
 
         // Clip to motor power range
-        flV = Math.max(-1.0, Math.min(x + y, 1.0));
+        flV = Math.max(-1.0, Math.min(x + y, 1.0))*velocity;
         brV = flV;
-        frV = Math.max(-1.0, Math.min(y - x, 1.0));
+        frV = Math.max(-1.0, Math.min(y - x, 1.0))*velocity;
         blV = frV;
 
         // Adjust for rotational drift
