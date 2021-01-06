@@ -18,6 +18,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
 
     public void initialize() {
         teamUtil.init(this);
+        teamUtil.alliance = teamUtil.Alliance.RED;
         robot = new Robot(this);
         teamGamePad = new TeamGamepad(this);
         robot.init(true);
@@ -103,13 +104,13 @@ public class CalibrateDriveSystem extends LinearOpMode {
                 robot.drive.resetHeading();
             } else if (gamepad2.right_stick_button) {  // HOLD the right stick button to adjust the HEADING/TIME parameters
                 if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
-                    HEADING = HEADING + 22.5;
+                    robot.drive.SPIN_DECEL_THRESHOLD = robot.drive.SPIN_DECEL_THRESHOLD + 1;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
-                    HEADING = HEADING - 22.5;
+                    robot.drive.SPIN_DECEL_THRESHOLD = robot.drive.SPIN_DECEL_THRESHOLD - 1;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
-                    TIME = TIME + 1;
+                    robot.drive.SPIN_SLOW_THRESHOLD = robot.drive.SPIN_SLOW_THRESHOLD + 1;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
-                    TIME = TIME - 1;
+                    robot.drive.SPIN_SLOW_THRESHOLD = robot.drive.SPIN_SLOW_THRESHOLD - 1;
                 }
             }
 

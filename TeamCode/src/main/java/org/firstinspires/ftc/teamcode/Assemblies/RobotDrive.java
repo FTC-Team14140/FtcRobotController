@@ -16,8 +16,9 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
 public class RobotDrive {
 
+    // Tuning Constants for drive movements
     private double COUNTS_PER_INCH = 45;  // Calibrated for the Ultimate Goal Robot
-    private double COUNTS_PER_INCH_SIDEWAYS = 50.625;  // Calibrated for the Ultimate Goal Robot
+    private double COUNTS_PER_INCH_SIDEWAYS = 50.625;  // Calibrated for the Ultimate Goal Robot  TODO: See if we can find a trig formula to make inches more accurate at all headings
 
     double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next TODO: Make sure this is set appropriately everywhere
     public double DRIVE_MAX_VELOCITY = 2300; // tics/sec, for forward and backward
@@ -30,10 +31,15 @@ public class RobotDrive {
     public double MAX_DECEL_PER_INCH = 55; // max power deceleration per inch without skidding
     public double END_SPEED = 250; // Power to decelerate to before stopping completely
 
+    // Tuning constants for Spins
+    public double DRIVE_MAX_SPIN_VELOCITY = DRIVE_MAX_VELOCITY; // max velocity for spins
+    public double DRIVE_SLOW_SPIN_VELOCITY = START_SPEED; // slowest velocity for spins
+    public double SPIN_DECEL_THRESHOLD = 60; // start deceleration this many degrees from the target
+    public double SPIN_SLOW_THRESHOLD = 10; // slow down to a very slow turn this far from the target
+    public double SPIN_DRIFT_DEGREES = 1; // cut the motors completely when we are within this many degrees of the target to allow for a little drift
 
 
     public static double INITIAL_HEADING;
-
 
     HardwareMap hardwareMap;
     boolean timedOut = false;
@@ -959,7 +965,7 @@ public class RobotDrive {
     // THESE ARE THE LATEST AND GREATEST THAT WERE USED IN SKYSTONE
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Rotate to the desired direction at the maximum speed
+    // Rotate to the desired field relative direction at the maximum speed
     public enum RobotRotation {GOAL, START, OUR_SIDE, THEIR_SIDE}
 
     public void rotateTo(RobotRotation attitude) {
@@ -972,42 +978,37 @@ public class RobotDrive {
                 break;
             case OUR_SIDE:
                 if (teamUtil.alliance == teamUtil.Alliance.RED) {
-                    rotateTo(90.0);
+                    rotateTo(270);
                 } else {
-                    rotateTo(270.0);
+                    rotateTo(90);
                 }
                 break;
             case THEIR_SIDE:
                 if (teamUtil.alliance == teamUtil.Alliance.BLUE) {
-                    rotateTo(90.0);
+                    rotateTo(270);
                 } else {
-                    rotateTo(270.0);
+                    rotateTo(90);
                 }
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Rotate to the desired heading at the maximum speed, slowing for accuracy at the end
-    // TODO: modify to use setVelocity() instead of setPower()
-
     public void rotateTo(double heading) {
-        teamUtil.log("Starting to rotate to " + heading);
-        final double decelThreshold = 60; // start deceleration this many degrees from the target TODO: Re-tune for new robot
-        final double slowThreshold = 10; // slow down to a very slow turn this far from the target TODO: Re-tune for new robot
-        final double maxPower = 1; // TODO: Re-tune for new robot
-        final double minPower = .15; // TODO: Re-tune for new robot
-        final double decelSlope = (maxPower - minPower) / (decelThreshold - slowThreshold); // + slope
-        final double driftDegrees = 1; // cut the motors completely when we are within this many degrees of the target to allow for a little drift
+        teamUtil.log("Rotate To: " + heading);
+        boolean details = true;
+
+        final double decelSlope = (DRIVE_MAX_SPIN_VELOCITY - DRIVE_SLOW_SPIN_VELOCITY) / (SPIN_DECEL_THRESHOLD - SPIN_SLOW_THRESHOLD); // + slope
         double leftRotatePower = 1; // Keep track of which way we are rotating
         double rightRotatePower = 1;
-        double rotatePower = maxPower; // start at full power
+        double rotatePower = DRIVE_MAX_SPIN_VELOCITY; // start at full power
 
         double currentHeading = getHeading();
         double initialHeading = currentHeading; // Stash this so we can make this a "relative" turn from a heading of 0.
 
         // Determine how many degrees we need to turn from our current position to get to the target
         double turnDegrees = minDegreeDiff(heading, currentHeading); // always +
-        turnDegrees = turnDegrees - driftDegrees; // stop early to allow for drift
+        turnDegrees = turnDegrees - SPIN_DRIFT_DEGREES; // stop early to allow for drift
 
         // Determine which we we are spinning (take the short way around)
         if (currentHeading < heading) {
@@ -1029,29 +1030,32 @@ public class RobotDrive {
         // Number of degrees we have turned (in either direction) since we started
         currentHeading = minDegreeDiff(getHeading(), initialHeading); // always +
 
-        // Rotate at max power until we get to deceleration phase
-        while (currentHeading < turnDegrees - decelThreshold) {
-            setMotorPowers(maxPower * leftRotatePower, maxPower * rightRotatePower, maxPower * leftRotatePower, maxPower * rightRotatePower);
-            //teamUtil.log("MAX: Relative Heading:"+currentHeading+" DifferenceInAngle: "+ (turnDegrees-currentHeading)+" RotatePower: " + maxPower);
+        // If there is a Full power phase: Rotate at max power until we get to deceleration phase
+        if ((currentHeading = minDegreeDiff(getHeading(), initialHeading)) <  turnDegrees - SPIN_DECEL_THRESHOLD) {
+            setDriveVelocities(DRIVE_MAX_SPIN_VELOCITY * leftRotatePower, DRIVE_MAX_SPIN_VELOCITY * rightRotatePower, DRIVE_MAX_SPIN_VELOCITY * leftRotatePower, DRIVE_MAX_SPIN_VELOCITY * rightRotatePower);
+            while (currentHeading < turnDegrees - SPIN_DECEL_THRESHOLD) {
+                if (details)
+                    teamUtil.log("MAX: Relative Heading:" + currentHeading + " DifferenceInAngle: " + (turnDegrees - currentHeading) + " RotatePower: " + DRIVE_MAX_SPIN_VELOCITY);
+                currentHeading = minDegreeDiff(getHeading(), initialHeading); // always +
+            }
+        }
+
+        // If we have a deceleration phase: rotate at decelerating power as we close to target
+        while (currentHeading < turnDegrees - SPIN_SLOW_THRESHOLD) {
+            rotatePower = (turnDegrees - SPIN_SLOW_THRESHOLD - currentHeading) * decelSlope + DRIVE_SLOW_SPIN_VELOCITY; // decelerate proportionally down to min
+            setDriveVelocities(rotatePower * leftRotatePower, rotatePower * rightRotatePower, rotatePower * leftRotatePower, rotatePower * rightRotatePower);
+            if (details) teamUtil.log("DECEL: Relative Heading:"+currentHeading+" DifferenceInAngle: "+ (turnDegrees-currentHeading)+" RotatePower: " + rotatePower);
             currentHeading = minDegreeDiff(getHeading(), initialHeading); // always +
         }
 
-        // rotate at decelerating power as we close to target
-        while (currentHeading < turnDegrees - slowThreshold) {
-            rotatePower = (turnDegrees - slowThreshold - currentHeading) * decelSlope + minPower; // decelerate proportionally down to min
-            setMotorPowers(rotatePower * leftRotatePower, rotatePower * rightRotatePower, rotatePower * leftRotatePower, rotatePower * rightRotatePower);
-            //teamUtil.log("DECEL: Relative Heading:"+currentHeading+" DifferenceInAngle: "+ (turnDegrees-currentHeading)+" RotatePower: " + rotatePower);
-            currentHeading = minDegreeDiff(getHeading(), initialHeading); // always +
-        }
-
-        // rotate at minSpeed once we are very close to target
+        // Always have a 'crawl' phase where we rotate at minSpeed once we are very close to target
+        setDriveVelocities(DRIVE_SLOW_SPIN_VELOCITY * leftRotatePower, DRIVE_SLOW_SPIN_VELOCITY * rightRotatePower, DRIVE_SLOW_SPIN_VELOCITY * leftRotatePower, DRIVE_SLOW_SPIN_VELOCITY * rightRotatePower);
         while (currentHeading < turnDegrees) {
-            setMotorPowers(minPower * leftRotatePower, minPower * rightRotatePower, minPower * leftRotatePower, minPower * rightRotatePower);
-            //teamUtil.log("CRAWL: Relative Heading:"+currentHeading+" DifferenceInAngle: "+ (turnDegrees-currentHeading)+" RotatePower: " + minPower);
+            if (details) teamUtil.log("CRAWL: Relative Heading:"+currentHeading+" DifferenceInAngle: "+ (turnDegrees-currentHeading)+" RotatePower: " + DRIVE_SLOW_SPIN_VELOCITY);
             currentHeading = minDegreeDiff(getHeading(), initialHeading); // always +
         }
-        stopMotors();
-        teamUtil.log("Finished Turning.  Actual Heading: " + getHeading());
+        setDriveVelocities(0,0,0,0);
+        teamUtil.log("Finished Turning.  Heading: " + getHeading());
     }
 
 
