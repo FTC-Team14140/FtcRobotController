@@ -16,16 +16,19 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
 public class RobotDrive {
 
-    private double COUNTS_PER_INCH = 50.625;  // TODO: Update for the Ultimate Goal Robot
-    private double COUNTS_PER_INCH_SIDEWAYS = 39.1;  // TODO: Update for the Ultimate Goal Robot
+    private double COUNTS_PER_INCH = 45;  // Calibrated for the Ultimate Goal Robot
+    private double COUNTS_PER_INCH_SIDEWAYS = 50.625;  // Calibrated for the Ultimate Goal Robot
 
-    public static final double MAX_MOTOR_VELOCITY = 4400; // tics/sec, for forward and backward
-    public static final double MAX_STRAFING_VELOCITY = 3600; //tics/sec, for left and right
+    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next TODO: Make sure this is set appropriately everywhere
+    public double DRIVE_MAX_VELOCITY = 2300; // tics/sec, for forward and backward
+    public double DRIVE_MAX_STRAFE_VELOCITY = 1900; //tics/sec, for left and right
+
+    double ROTATION_ADJUST_FACTOR = 0.1; // TODO: verify this is a reasonable P coefficient for rotational error adjustment
 
     public double START_SPEED = 300; // MIN power to get the robot to start moving
-    public double MAX_ACCEL_PER_INCH = 50; // max velocity acceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
-    public double MAX_DECEL_PER_INCH = 105; // max power deceleration per inch without skidding TODO: Update for the Ultimate Goal Robot
-    public double END_SPEED = 50; // Power to decelerate to before stopping completely
+    public double MAX_ACCEL_PER_INCH = 250; // max velocity acceleration per inch without skidding
+    public double MAX_DECEL_PER_INCH = 55; // max power deceleration per inch without skidding
+    public double END_SPEED = 250; // Power to decelerate to before stopping completely
 
 
 
@@ -733,9 +736,6 @@ public class RobotDrive {
     // A non-zero end velocity can be used in which case the robot will remain moving when the method returns.
     // This is intended to allow for a sequence of moves or a fast transition into a sensor driven movement.
 
-    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next TODO: Make sure this is set appropriately everywhere
-    double DRIVE_MAX_VELOCITY = 500; // TODO: find a reasonable maximum velocity for the drive
-    double ROTATION_ADJUST_FACTOR = 0.1; // TODO: verify this is a reasonable P coefficient for rotational error adjustment
 
     // Return the number of encoder tics needed to ramp from start speed to end speed at the specified acceleration
     public int rampEncoderCount(double startSpeed, double endSpeed, double acceleration) {
@@ -869,12 +869,16 @@ public class RobotDrive {
     }
     public void moveInches(double driveHeading, double inches, long timeOut, double maxVelocity, double endSpeed, double robotHeading) {
         boolean details = false;
+        boolean cruisePhase = true;
         boolean stopAtEnd = false;
-        teamUtil.log("moveInches: driveHeading:" + driveHeading + " Inches:" + inches+ "velocity:" + maxVelocity);
+        teamUtil.log("moveInches: driveHeading:" + driveHeading + " Inches:" + inches+ " Velocity:" + maxVelocity);
         long timeOutTime = System.currentTimeMillis() + timeOut;
         timedOut = false;
 
         double startSpeed = LastEndSpeed;
+        if (startSpeed < START_SPEED) {
+            startSpeed = START_SPEED;
+        }
         LastEndSpeed = endSpeed; // save this for next time this method is called TODO: Need a way to deal with some other method stopping the robot...  They could all just set this...
         if (endSpeed == 0) {  // in case they are trying to stop the robot, fix it so we don't stall
             endSpeed = END_SPEED;
@@ -887,8 +891,9 @@ public class RobotDrive {
         int decelerationEncoderCount = rampEncoderCount(maxVelocity, endSpeed, MAX_DECEL_PER_INCH);
 
         // figure out slopes for acceleration and deceleration phases.
-        double accelerationSlope = (maxVelocity - startSpeed) / accelerationEncoderCount; // positive slope
-        double decelerationSlope = (maxVelocity - endSpeed) / decelerationEncoderCount * -1; // Negative slope
+        // These are fixed for now, but could vary based on heading given the mecanum wheels
+        double accelerationSlope = MAX_ACCEL_PER_INCH / COUNTS_PER_INCH;  // positive slope
+        double decelerationSlope = MAX_DECEL_PER_INCH / COUNTS_PER_INCH * -1; // Negative slope
 
         int target = totalEncoderCount;
         int cruiseStart, decelerationStart;
@@ -899,9 +904,11 @@ public class RobotDrive {
         } else {
             // we don't have enough space to ramp up to full speed so calculate the actual maximum velocity
             // by finding the y value of the two ramp lines where they intersect given the maximum distance
-            maxVelocity = (decelerationSlope * totalEncoderCount * accelerationSlope -
-                    endSpeed*accelerationSlope +
-                    startSpeed * decelerationSlope) / decelerationSlope;
+            maxVelocity = (accelerationSlope * endSpeed -
+                    decelerationSlope*startSpeed -
+                    accelerationSlope * decelerationSlope * totalEncoderCount) /
+                    (accelerationSlope-decelerationSlope);
+            cruisePhase = false;
             teamUtil.log("Limited Max Velocity to:" + maxVelocity);
 
             // recompute shortened ramp phases
@@ -913,14 +920,20 @@ public class RobotDrive {
         teamUtil.log("accelerationSlope:" + accelerationSlope + " decelerationSlope:" + decelerationSlope + " totalEncoderCount:" + totalEncoderCount);
         teamUtil.log("accelerationEncoderCount:" + accelerationEncoderCount + " decelerationEncoderCount:" + decelerationEncoderCount + " decelerationStart:" + decelerationStart + " totalEncoderCount:" + totalEncoderCount);
 
-        // ramp up
-        driveMotors(driveHeading, robotHeading,accelerationEncoderCount,startSpeed,maxVelocity, timeOut);
+        // ramp up if needed
+        if (accelerationEncoderCount > 0) {
+            driveMotors(driveHeading, robotHeading,accelerationEncoderCount,startSpeed,maxVelocity, timeOut);
+        }
 
-        // Cruise at Max Velocity
-        driveMotors(driveHeading, robotHeading,decelerationStart-cruiseStart, maxVelocity,maxVelocity,  timeOutTime - System.currentTimeMillis());
+        // Cruise at Max Velocity if we have a cruise phase
+        if (cruisePhase) {
+            driveMotors(driveHeading, robotHeading, decelerationStart - cruiseStart, maxVelocity, maxVelocity, timeOutTime - System.currentTimeMillis());
+        }
 
-        // ramp down
-        driveMotors(driveHeading, robotHeading,totalEncoderCount-decelerationStart,maxVelocity,endSpeed, timeOutTime - System.currentTimeMillis());
+        // ramp down if needed
+        if (decelerationEncoderCount > 0) {
+            driveMotors(driveHeading, robotHeading, totalEncoderCount - decelerationStart, maxVelocity, endSpeed, timeOutTime - System.currentTimeMillis());
+        }
 
         if (stopAtEnd) {  // stop the motors if they intend the robot to hold still
             setDriveVelocities(0,0,0,0);
@@ -1124,7 +1137,7 @@ public class RobotDrive {
     public void findMaxForwardSpeed() {
         resetAllDriveEncoders();
         double travelTics = COUNTS_PER_INCH * 60;
-        setMotorVelocities(10000, 10000, 10000, 10000);
+        setMotorVelocities(3000, 3000, 3000, 3000);
         double flmax = 0, frmax = 0, blmax = 0, brmax = 0, v;
         while (fLeftMotor.getCurrentPosition() < travelTics) {
             flmax = (v = fLeftMotor.getVelocity()) > flmax ? v : flmax;
@@ -1132,14 +1145,14 @@ public class RobotDrive {
             blmax = (v = bLeftMotor.getVelocity()) > blmax ? v : blmax;
             brmax = (v = bRightMotor.getVelocity()) > brmax ? v : brmax;
         }
-        stopMotors();
+        setMotorVelocities(0, 0, 0, 0);
         teamUtil.log("Forward Max Velocities FL:"+flmax+" FR:"+frmax+" BL:"+blmax+" BR:"+brmax);
     }
 
     public void findMaxLeftSpeed() {
         resetAllDriveEncoders();
         double travelTics = COUNTS_PER_INCH * 60;
-        setMotorVelocities(-10000, 10000, 10000, -10000);
+        setMotorVelocities(-3000, 3000, 3000, -3000);
         double flmax = 0, frmax = 0, blmax = 0, brmax = 0, v;
         while (Math.abs(fLeftMotor.getCurrentPosition()) < travelTics) {
             flmax = (v = fLeftMotor.getVelocity()) > flmax ? v : flmax;

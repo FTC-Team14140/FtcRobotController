@@ -96,9 +96,9 @@ public class TestDriveSystem extends LinearOpMode {
                 // HOLD the GP2 Right TRIGGER to adjust the movement parameters
             } else if(gamepad2.right_trigger > 0.5){
                 if (gamepad2.dpad_up) {
-                    robot.drive.accelerateInchesForward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                    robot.drive.accelerateInchesForward(robot.drive.DRIVE_MAX_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_down) {
-                    robot.drive.accelerateInchesBackward(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                    robot.drive.accelerateInchesBackward(robot.drive.DRIVE_MAX_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_left) {
                     //robot.drive.accelerateInchesLeft(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_right) {

@@ -79,7 +79,16 @@ public class CalibrateDriveSystem extends LinearOpMode {
 
             // Code to get max velocities
             if (gamepad2.left_bumper) {
-                robot.drive.findMaxForwardSpeed();
+                //robot.drive.findMaxForwardSpeed();
+                robot.drive.moveInches(0, 36, 7000);
+                robot.drive.moveInches(90, 36, 7000);
+                robot.drive.moveInches(180, 36, 7000);
+                robot.drive.moveInches(270, 36, 7000);
+                robot.drive.moveInches(45, 44, 7000);
+                robot.drive.moveInches(180, 32, 7000);
+                robot.drive.moveInches(315, 44, 7000);
+                robot.drive.moveInches(180, 32, 7000);
+
             } else if (gamepad2.right_bumper) {
                 robot.drive.findMaxLeftSpeed();
             }
@@ -138,7 +147,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
                 } else if (gamepad2.a) {
                     robot.drive.moveInches(225, 36, 7000);
                 } else if (gamepad2.x) {
-                    robot.drive.moveInches(90, 36, 7000);
+                    robot.drive.moveInches(135, 36, 7000);
                 } else if (gamepad2.b) {
                     robot.drive.moveInches(315, 36, 7000);
                 }
