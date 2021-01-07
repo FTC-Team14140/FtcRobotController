@@ -157,6 +157,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
             robot.drive.telemetryDriveEncoders();
             teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
             telemetry.addLine("Start:"+ robot.drive.START_SPEED+" End:"+robot.drive.END_SPEED+" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
+            telemetry.addLine("SpinSLOW:"+ robot.drive.DRIVE_SLOW_SPIN_VELOCITY+" SpinMAX:"+robot.drive.DRIVE_MAX_SPIN_VELOCITY+" SlowThreshold:"+robot.drive.SPIN_SLOW_THRESHOLD+" Dec:"+robot.drive.SPIN_DECEL_THRESHOLD);
             telemetry.addLine("Heading:"+ HEADING+" TIME:"+TIME);
             teamUtil.telemetry.update();
 

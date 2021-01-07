@@ -33,10 +33,10 @@ public class RobotDrive {
 
     // Tuning constants for Spins
     public double DRIVE_MAX_SPIN_VELOCITY = DRIVE_MAX_VELOCITY; // max velocity for spins
-    public double DRIVE_SLOW_SPIN_VELOCITY = START_SPEED; // slowest velocity for spins
-    public double SPIN_DECEL_THRESHOLD = 60; // start deceleration this many degrees from the target
-    public double SPIN_SLOW_THRESHOLD = 10; // slow down to a very slow turn this far from the target
-    public double SPIN_DRIFT_DEGREES = 1; // cut the motors completely when we are within this many degrees of the target to allow for a little drift
+    public double DRIVE_SLOW_SPIN_VELOCITY = 250; // slowest velocity for spins
+    public double SPIN_DECEL_THRESHOLD = 50; // start deceleration this many degrees from the target
+    public double SPIN_SLOW_THRESHOLD = 13; // slow down to a very slow turn this far from the target
+    public double SPIN_DRIFT_DEGREES = 1.5; // cut the motors completely when we are within this many degrees of the target to allow for a little drift
 
 
     public static double INITIAL_HEADING;
