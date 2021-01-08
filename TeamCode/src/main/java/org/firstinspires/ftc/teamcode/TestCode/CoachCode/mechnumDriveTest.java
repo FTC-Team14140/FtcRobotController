@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
-import org.firstinspires.ftc.teamcode.basicLibs.DistanceSensors;
+import org.firstinspires.ftc.teamcode.basicLibs.OLD.DistanceSensors;
 import org.firstinspires.ftc.teamcode.basicLibs.revHubIMUGyro;
 import org.firstinspires.ftc.teamcode.basicLibs.teamColorSensor;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
@@ -111,7 +111,7 @@ public class mechnumDriveTest extends LinearOpMode {
         frontmiddleDistance = hardwareMap.get(DistanceSensor.class, "frontColorSensor");
         frontmiddleColor = hardwareMap.get(ColorSensor.class, "frontColorSensor");
         bottomColorSensor = hardwareMap.get(ColorSensor.class, "bottomColorSensor");
-        bottomColor = new teamColorSensor(telemetry, bottomColorSensor);
+        bottomColor = new teamColorSensor(bottomColorSensor);
         bottomColor.calibrate();
     }
 

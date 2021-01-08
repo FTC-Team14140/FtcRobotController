@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.basicLibs.DistanceSensors;
+import org.firstinspires.ftc.teamcode.basicLibs.OLD.DistanceSensors;
 import org.firstinspires.ftc.teamcode.basicLibs.revHubIMUGyro;
 import org.firstinspires.ftc.teamcode.basicLibs.teamColorSensor;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
@@ -135,7 +135,7 @@ public class skyStoneRobotDrive {
         frontmiddleDistance = hardwareMap.get(DistanceSensor.class, "frontColorSensor");
         frontmiddleColor = hardwareMap.get(ColorSensor.class, "frontColorSensor");
         bottomColorSensor = hardwareMap.get(ColorSensor.class, "bottomColorSensor");
-        bottomColor = new teamColorSensor(teamUtil.telemetry, bottomColorSensor);
+        bottomColor = new teamColorSensor( bottomColorSensor);
         bottomColor.calibrate();
         frontLeftDistance.setOffset((float) (0.0));
         frontRightDistance.setOffset((float) (0.0));

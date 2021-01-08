@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
 import org.firstinspires.ftc.teamcode.Assemblies.RobotDrive;
-import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
@@ -77,13 +76,13 @@ public class TestDriveSystem extends LinearOpMode {
             // HOLD the GP2 left TRIGGER to adjust the movement parameters
             if (gamepad2.left_trigger > 0.5) {
                 if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
-                    robot.drive.START_SPEED = robot.drive.START_SPEED + 10;
+                    robot.drive.MIN_START_SPEED = robot.drive.MIN_START_SPEED + 10;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
-                    robot.drive.START_SPEED = robot.drive.START_SPEED - 10;
+                    robot.drive.MIN_START_SPEED = robot.drive.MIN_START_SPEED - 10;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
-                    robot.drive.END_SPEED = robot.drive.END_SPEED - 10;
+                    robot.drive.MIN_END_SPEED = robot.drive.MIN_END_SPEED - 10;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
-                    robot.drive.END_SPEED = robot.drive.END_SPEED + 10;
+                    robot.drive.MIN_END_SPEED = robot.drive.MIN_END_SPEED + 10;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) {
                     robot.drive.MAX_ACCEL_PER_INCH = robot.drive.MAX_ACCEL_PER_INCH + 10;
                 } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2A)) {
@@ -96,22 +95,22 @@ public class TestDriveSystem extends LinearOpMode {
                 // HOLD the GP2 Right TRIGGER to adjust the movement parameters
             } else if(gamepad2.right_trigger > 0.5){
                 if (gamepad2.dpad_up) {
-                    robot.drive.accelerateInchesForward(robot.drive.DRIVE_MAX_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                    //robot.drive.accelerateInchesForward(robot.drive.DRIVE_MAX_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_down) {
-                    robot.drive.accelerateInchesBackward(robot.drive.DRIVE_MAX_VELOCITY, 36, robot.drive.getHeading(), 7000);
+                    //robot.drive.accelerateInchesBackward(robot.drive.DRIVE_MAX_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_left) {
                     //robot.drive.accelerateInchesLeft(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.dpad_right) {
                     //robot.drive.accelerateInchesRight(RobotDrive.MAX_MOTOR_VELOCITY, 36, robot.drive.getHeading(), 7000);
                 } else if (gamepad2.a) {
-                    robot.drive.stopMotors();
+                    robot.drive.stopDrive();
                 }
             }
 
 
             robot.drive.telemetryDriveEncoders();
             teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
-            telemetry.addLine("Start:"+ robot.drive.START_SPEED+" End:"+robot.drive.END_SPEED+" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
+            telemetry.addLine("Start:"+ robot.drive.MIN_START_SPEED +" End:"+robot.drive.MIN_END_SPEED +" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
             teamUtil.telemetry.update();
 
         }

@@ -60,8 +60,8 @@ public class teleOpDriver extends LinearOpMode {
         rightRearMotor = hardwareMap.get(DcMotor.class, "motorRight");
         laMotor = hardwareMap.get(DcMotor.class, "LAMotor");
         //digitalTouch = hardwareMap.get(DigitalChannel.class, "digitalTouch");
-        leftColor = new teamColorSensor(telemetry, hardwareMap.get(ColorSensor.class, "leftRearColor"));
-        rightColor = new teamColorSensor(telemetry, hardwareMap.get(ColorSensor.class, "rightRearColor"));
+        leftColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "leftRearColor"));
+        rightColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "rightRearColor"));
         //sensorDistance = hardwareMap.get(DistanceSensor.class, "sensorColorRange");
         //grabberServoFTC = hardwareMap.get(Servo.class, "grabberServo");
         //reachServoFTC = hardwareMap.get(Servo.class, "reachServo");

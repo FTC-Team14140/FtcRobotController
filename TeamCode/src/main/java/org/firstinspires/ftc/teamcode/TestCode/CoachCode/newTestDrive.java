@@ -25,13 +25,13 @@ public class newTestDrive extends LinearOpMode {
         public void initialize() {
             teamUtil.init(this);
             teamUtil.theBlinkin.setSignal(Blinkin.Signals.OFF);
-            drive = new RobotDrive(hardwareMap, telemetry);
+            drive = new RobotDrive();
 
 //        teamGamePad = new TeamGamepad(this);
             drive.initDriveMotors();
             drive.setBrakeAllDriveMotors();
             drive.initImu();
-            drive.initSensors();
+            drive.initSensors(true);
             drive.resetHeading();
         }
 /*

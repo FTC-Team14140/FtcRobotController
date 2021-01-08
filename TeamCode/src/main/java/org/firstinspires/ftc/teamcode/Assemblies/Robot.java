@@ -43,7 +43,7 @@ public class Robot {
         hardwareMap = opMode.hardwareMap;
 
         teamUtil.log("Constructing Assemblies");
-        drive = new RobotDrive(hardwareMap, telemetry);
+        drive = new RobotDrive();
         blocker = new Blocker();
         sweeper = new Sweeper();
         grabber = new GrabberArm();
@@ -68,19 +68,28 @@ public class Robot {
         //grabber.init();
         //shooter.init();
 
-        // reset mechanisms if we did not just run auto
+        // reset mechanisms and initialize sensors if we did NOT just run auto
         if (!justRanAuto) {
             teamUtil.log("Resetting Robot");
 
             drive.initImu();
-            drive.initSensors();
             //sweeper.reset();
             //grabber.reset();
         }
+        drive.initSensors(usingDistanceSensors);
+        drive.calibrateColorSensors(); // Color sensors should be over non taped mat when this is called
+
         drive.resetHeading();
         teamUtil.log("Initializing Robot - Finished");
     }
 
+    public void doAuto() {
+        // TODO: Do a bunch of stuff and get a bunch of points
+
+
+        // record that Auto has been run so we don't reinitialize certain sensors and calibrate motor encoders
+        justRanAuto = true;
+    }
 }
 
 
