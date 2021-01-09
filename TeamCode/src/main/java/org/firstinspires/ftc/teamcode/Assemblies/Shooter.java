@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Assemblies;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,6 +17,14 @@ public class Shooter {
     Servo pusher;
     Servo tilter;
 
+    //defining new type with specific values
+    public enum ShooterTarget {
+        POWERSHOT,
+        HIGH_GOAL
+    }
+
+    ShooterTarget currentTarget;
+
 
     void Shooter() {
         teamUtil.log("Constructing Shooter");
@@ -26,27 +37,37 @@ public class Shooter {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         pusher = hardwareMap.servo.get("grabberServo");
         tilter = hardwareMap.servo.get("tilterServo");
+        currentTarget = ShooterTarget.POWERSHOT;
     }
 
     // Tilt the shooter to aim at the powershots
     // If the flywheel is running, this will change the speed as needed
-    void aimAtPowerShot () {
+    void aimAt(ShooterTarget newTarget) {
+        if (newTarget == currentTarget) {
+            return;
+        }else {
+            currentTarget = newTarget;
+            changeSpeed();
+            changeAngle();
+        }
 
     }
 
-    // Tilt the shooter to aim at the highgoal
-    // If the flywheel is running, this will change the speed as needed
-    void aimAtHighGoal () {
+    void changeSpeed() {
+
+    }
+
+    void changeAngle() {
 
     }
 
     // StartFlyWheel at the speed needed for the current aim
-    void startFlyWheel () {
+    void startFlyWheel() {
 
     }
 
     // Returns true if the flywheel is spinning fast enough for the current aim
-    boolean flywheelReady () {
+    boolean flywheelReady() {
         return true;
     }
 
