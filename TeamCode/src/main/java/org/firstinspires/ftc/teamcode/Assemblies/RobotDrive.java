@@ -69,9 +69,9 @@ public class RobotDrive {
 
     public boolean distanceSensorsOnline = false; // True if distance sensors initialized and online
     public teamDistanceSensor frontDistance;
+    public teamDistanceSensor rightDistance;
     public teamColorSensor frontLeftColor;
-
-
+    public teamColorSensor frontRightColor;
 
 
 
