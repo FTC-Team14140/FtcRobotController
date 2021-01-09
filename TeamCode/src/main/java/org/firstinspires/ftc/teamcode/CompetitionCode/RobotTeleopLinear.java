@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.CompetitionCode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Assemblies.OLD.Grabber;
-import org.firstinspires.ftc.teamcode.Assemblies.OLD.LiftSystem;
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
 import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
@@ -12,32 +10,23 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
 @TeleOp(name = "RobotTeleopLinear", group = "z")
 public class RobotTeleopLinear extends LinearOpMode {
-    public static final double SCALE_DOWN_CONSTANT = 0.3;
-    public static final double SCALE_UP_CONSTANT = 2;
-    int level = 0;
-    Grabber.GrabberRotation grabberRotation;
     TeamGamepad teamGamePad;
-
     Robot robot;
-    boolean wasTurning = false;
     double storedHeading;
 
     public void initialize() {
 
         teamUtil.init(this);
+        teamUtil.alliance = teamUtil.Alliance.RED;
         teamUtil.telemetry.addLine("Initializing Op Mode...please wait");
         teamUtil.telemetry.update();
         teamUtil.theBlinkin.setSignal(Blinkin.Signals.INIT);
 
-        robot = new Robot(this);
-
         teamGamePad = new TeamGamepad(this);
-
+        robot = new Robot(this);
         robot.init(false);
-        //robot.latch.latchUp();
         //teamUtil.theBlinkin.setSignal(Blinkin.Signals.READY_TO_START);
         //teamUtil.initPerf();
-
     }
 
     @Override
@@ -45,7 +34,7 @@ public class RobotTeleopLinear extends LinearOpMode {
 
         initialize();
 
-        teamUtil.telemetry.addLine("Ready to Shoot :D");
+        teamUtil.telemetry.addLine("Let's Drive!");
         teamUtil.telemetry.update();
         waitForStart();
 

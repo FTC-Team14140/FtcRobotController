@@ -1,21 +1,42 @@
 package org.firstinspires.ftc.teamcode.basicLibs;
 
-import com.qualcomm.robotcore.hardware.ControlSystem;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
-import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
-import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@SuppressWarnings({"WeakerAccess", "unused"}) // Ignore access and unused warnings
-@I2cDeviceType
-@DeviceProperties(name = "Team Distance Sensor", description = "Team Distance Sensor", xmlTag = "TEAM_RANGE_SENSOR", compatibleControlSystems = ControlSystem.REV_HUB, builtIn = true)
-public class teamDistanceSensor extends teamVL53L0X {
-    public teamDistanceSensor(I2cDeviceSynch deviceClient) {
-        super(deviceClient);
+public class teamDistanceSensor {
+
+    Rev2mDistanceSensor sensor;
+    double minValidReading, maxValidReading;
+    private float offset;
+    public boolean lastReadingValid = false; // True if last reading was valid and was not clipped
+
+    public teamDistanceSensor(Rev2mDistanceSensor theSensor, float theOffset, double maxDistance, double minDistance) {
+        sensor = theSensor;
+        offset = theOffset;
+        minValidReading = minDistance;
+        maxValidReading = maxDistance;
     }
 
-    @Override
-    public String getDeviceName() {
-        return "TEAM 2M ToF Distance Sensor";
+    private double adjustDistance(double distance) {
+        if (distance < minValidReading) {
+            lastReadingValid = false;
+            return minValidReading;
+        } else if (distance > maxValidReading) {
+            lastReadingValid = false;
+            return maxValidReading;
+        } else {
+            lastReadingValid = true;
+            return distance;
+        }
+    }
+    // Return the current reading constrained to the min and max settings
+    public double getDistanceInches() {
+        return adjustDistance( sensor.getDistance(DistanceUnit.INCH) + offset);
+    }
+
+    // Return the current reading constrainted to the min and max settings
+    public double getDistanceCms() {
+        return adjustDistance(sensor.getDistance(DistanceUnit.CM) + offset);
     }
 }

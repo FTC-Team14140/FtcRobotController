@@ -46,7 +46,7 @@ public class skyStoneRobot {
 
         teamUtil.log("Constructing Assemblies");
         //liftSystem = new LiftSystem(hardwareMap, telemetry);
-        drive = new RobotDrive(hardwareMap, telemetry);
+        drive = new RobotDrive();
         //latch = new Latch(hardwareMap, telemetry);
         teamUtil.log("Constructing Assemblies - Finished");
         teamUtil.log("Constructed Robot - Finished");
