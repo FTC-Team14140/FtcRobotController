@@ -16,6 +16,14 @@ public class Shooter {
     DcMotorEx flywheel;
     Servo pusher;
     Servo tilter;
+    double currentTargetVelocity = 0;
+    double POWERSHOT_VELOCITY = 1.0; //TODO: find right number
+    double HIGH_GOAL_VELOCITY = 2.0; //TODO: find right number
+    double POWERSHOT_POSITION = 0; //TODO: find right number
+    double HIGH_GOAL_POSITION = 1; //TODO: find right number
+    double LAUNCH_POSITION = 0; //TODO: find right number
+    double RELOAD_POSITION = 0; //TODO: find right number
+    boolean motorRunning = false;
 
     //defining new type with specific values
     public enum ShooterTarget {
@@ -54,30 +62,51 @@ public class Shooter {
     }
 
     void changeSpeed() {
-
+        if (currentTarget == ShooterTarget.POWERSHOT) {
+            currentTargetVelocity = POWERSHOT_VELOCITY;
+        }else{
+            currentTargetVelocity = HIGH_GOAL_VELOCITY;
+        }
+        if (motorRunning){
+            flywheel.setVelocity(currentTargetVelocity);
+        }
     }
 
     void changeAngle() {
-
+        if (currentTarget == ShooterTarget.POWERSHOT) {
+            tilter.setPosition(POWERSHOT_POSITION);
+        }else {
+            tilter.setPosition(HIGH_GOAL_POSITION);
+        }
     }
 
     // StartFlyWheel at the speed needed for the current aim
-    void startFlyWheel() {
-
+    void flywheelStart() {
+        if (motorRunning = false){
+            flywheel.setVelocity(currentTargetVelocity);
+            motorRunning = true;
+        }
     }
 
     // Returns true if the flywheel is spinning fast enough for the current aim
     boolean flywheelReady() {
-        return true;
+        if (Math.abs(flywheel.getVelocity() - currentTargetVelocity)<currentTargetVelocity*0.05){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     // cut power to the flywheel and let it coast to a stop
     void stopFlywheel() {
-
+        flywheel.setVelocity(0);
+        motorRunning = false;
     }
 
     // Launch a ring
     void launch() {
-
+        pusher.setPosition(LAUNCH_POSITION);
+        teamUtil.pause(500);
+        pusher.setPosition(RELOAD_POSITION);
     }
 }
