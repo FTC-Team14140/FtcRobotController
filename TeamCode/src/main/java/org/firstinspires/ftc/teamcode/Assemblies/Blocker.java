@@ -11,7 +11,7 @@ public class Blocker {
     Telemetry telemetry;
     CRServo driveServo;
 
-    double FOWARD_FULL_POWER = 1;
+    double FORWARD_FULL_POWER = 1;
     double STOP = 0;
     double BACKWARDS_FULL_POWER = -1;
     long EXTEND_TIME = 3000; // TODO: Find the correct time for the extension of the blocker
@@ -32,7 +32,7 @@ public class Blocker {
 
     // Starts the blocker moving out.  Will continue until stop is called
     void extend() {
-        driveServo.setPower(FOWARD_FULL_POWER);
+        driveServo.setPower(FORWARD_FULL_POWER);
     }
 
     // Starts the blocker moving in.  Will continue until stop is called
@@ -45,7 +45,7 @@ public class Blocker {
         driveServo.setPower(STOP);
     }
     void extendFully () {
-        driveServo.setPower(FOWARD_FULL_POWER);
+        driveServo.setPower(FORWARD_FULL_POWER);
         teamUtil.pause(EXTEND_TIME);
         driveServo.setPower(STOP);
     }

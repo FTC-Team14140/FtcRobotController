@@ -124,7 +124,7 @@ public class Robot {
         robot.drive.moveInches(90, 2, 7000);
 
         //Aims the shooter starts the flywheel and launch one ring at the power shot then moving to next powershot etc
-        robot.shooter.startFlyWheel();
+        robot.shooter.flywheelStart();
         robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
         while (!robot.shooter.flywheelReady()) {
 
