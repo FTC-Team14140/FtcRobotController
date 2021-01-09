@@ -13,6 +13,14 @@ public class GrabberArm {
     DcMotorEx arm;
     Servo grabber;
 
+    final double STALL_POWER = .098; //idk if this is the right number
+    boolean isReset = false;
+
+    enum GRABBER_POS {
+        OPEN,
+        CLOSE
+    }
+
     void GrabberArm() {
         teamUtil.log("Constructing GrabberArm");
 
@@ -30,7 +38,33 @@ public class GrabberArm {
     // and resets the encoder position to 0
     void reset() {
         teamUtil.log("Resetting GrabberArm");
+        grab();
+        arm.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setPower(STALL_POWER);
+        teamUtil.pause(500); // let them get going
+        do {
+            long last = arm.getCurrentPosition();
+            teamUtil.sleep(250);
+            // if things aren't moving, we have stalled
+            if (arm.getCurrentPosition() == last) {
+                arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                arm.setPower(0);
+                arm.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                isReset = true;
+                teamUtil.log("Calibrating Grabber - Finished");
 
+                return;
+            }
+            teamUtil.log("Grabber Encoder:" + " " + last);
+
+        } while (true);
+    }
+
+    // Starts the blocker moving out at full speed.  Will continue until stop is called
+    void extend() {
+        arm.setTargetPosition(FULLY_EXTENDED);
+        arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        arm.setVelocity(EXTEND_SPEED);
     }
 
     // move the servo to the grab position
