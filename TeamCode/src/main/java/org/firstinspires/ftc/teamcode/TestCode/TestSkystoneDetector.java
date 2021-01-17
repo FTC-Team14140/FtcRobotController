@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 @Autonomous(name = "testDaDetector")
 //@Disabled
 
-public class TestDetector extends LinearOpMode {
+public class TestSkystoneDetector extends LinearOpMode {
 
     SkystoneDetector detector;
     @Override
