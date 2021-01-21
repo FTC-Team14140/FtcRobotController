@@ -156,11 +156,11 @@ public class CalibrateDriveSystem extends LinearOpMode {
     public void testMoveToDistance() {
         if (gamepad2.right_bumper) {
             // Test starting from a stop
-            robot.drive.moveToDistance(robot.drive.frontDistance, 0, 10, 7000);
+            robot.drive.moveToDistance(robot.drive.frontDistance, 0, 5, 7000);
         } else if (gamepad2.left_bumper) {
             // Test starting from a full speed drive
-            robot.drive.moveInches(0, 36, 7000, robot.drive.DRIVE_MAX_VELOCITY);
-            robot.drive.moveToDistance(robot.drive.frontDistance, 0, 10, 7000);
+            robot.drive.moveInches(0, 48, 7000, robot.drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
+            robot.drive.moveToDistance(robot.drive.frontDistance, 0, 5, 7000);
         }
     }
 
@@ -175,13 +175,13 @@ public class CalibrateDriveSystem extends LinearOpMode {
     public void testMoveToLine() {
         if (gamepad2.right_bumper) {
             // Test starting from a stop
-            robot.drive.moveToLine(robot.drive.frontLeftColor, teamColorSensor.TapeColor.RED, 0, 7000);
+            robot.drive.moveToLine(robot.drive.frontLeftColor, teamColorSensor.TapeColor.WHITE, 0, 7000);
             robot.drive.stopDrive();
         } else if (gamepad2.left_bumper) {
             // Test starting from drive at various velocities
-            robot.drive.moveInches(0, 36, 7000, testVelocity); // go fast then slow down to find tape
+            robot.drive.moveInches(0, 36, 7000, robot.drive.FIND_LINE_SPEED); // go fast then slow down to find tape
             robot.drive.moveToLine(robot.drive.frontLeftColor, teamColorSensor.TapeColor.RED, 0, 7000);
-            robot.drive.moveInches(0, 10, 7000); // move a certain distance after tape and stop
+            robot.drive.moveInches(0, 5, 7000); // move a certain distance after tape and stop
         }
     }
 
@@ -212,6 +212,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
             teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
             robot.drive.distanceTelemetry();
             robot.drive.colorTelemetry();
+            robot.drive.rawColorTelemetry();
             telemetry.addLine("DistNoMv:"+ robot.drive.MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD +" Drift:"+robot.drive.MOVE_TO_DISTANCE_DRIFT_DISTANCE +" Slow:"+robot.drive.MOVE_TO_DISTANCE_SLOW_DISTANCE+" Dec:"+robot.drive.MOVE_TO_DISTANCE_DECEL_DISTANCE);
             telemetry.addLine("Velocity:"+ testVelocity);
 

@@ -7,7 +7,7 @@ public class teamColorSensor {
     private ColorSensor colorSensor;
     private int matValueRed;
     private int matValueBlue;
-    double WHITE_THRESHOLD = 1000; // TODO: Tune this
+    double WHITE_THRESHOLD = 4000; // TODO: Tune this
 
     public enum TapeColor {RED, BLUE, WHITE, NONE}
 
@@ -25,19 +25,19 @@ public class teamColorSensor {
     }
 
     public TapeColor getColor() {
-        if (colorSensor.red() > matValueBlue * 1.5) {
+        if (onWhite()) {
+            return TapeColor.WHITE;  // Test for white first since white will also read red or blue...
+        } else if (onRed()) {
             return TapeColor.RED;
-        } else if (colorSensor.blue() > matValueBlue * 1.5) {
+        } else if (onBlue()) {
             return TapeColor.BLUE;
-        } else if (colorSensor.alpha() > WHITE_THRESHOLD) {
-            return TapeColor.WHITE;
-        } else {
+        } else  {
             return TapeColor.NONE;
         }
     }
 
     public boolean isOnTape(){
-        return onBlue() || onRed();
+        return onBlue() || onRed() || onWhite();
 
     }
     public boolean onBlue() {
@@ -47,7 +47,7 @@ public class teamColorSensor {
         return colorSensor.red() > matValueBlue * 1.5;
     }
     public boolean onWhite() {
-        return colorSensor.red() > matValueBlue * 1.5;
+        return colorSensor.alpha() > WHITE_THRESHOLD;
     }
 
     public int redValue() {

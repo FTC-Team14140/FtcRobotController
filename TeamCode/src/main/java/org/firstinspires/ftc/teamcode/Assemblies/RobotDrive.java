@@ -30,7 +30,7 @@ public class RobotDrive {
     private double COUNTS_PER_INCH = 45;  // Calibrated for the Ultimate Goal Robot
     private double COUNTS_PER_INCH_SIDEWAYS = 50.625;  // Calibrated for the Ultimate Goal Robot  TODO: See if we can find a trig formula to make inches more accurate at all headings
 
-    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next TODO: Make sure this is set appropriately everywhere
+    double LastEndSpeed = 0;  //Keep track of the end velocity of the last movement so we can start from there on the next
     public double DRIVE_MAX_VELOCITY = 2300; // tics/sec, for forward and backward
     public double DRIVE_MAX_STRAFE_VELOCITY = 1900; //tics/sec, for left and right
 
@@ -49,10 +49,13 @@ public class RobotDrive {
     public double SPIN_DRIFT_DEGREES = 1.5; // cut the motors completely when we are within this many degrees of the target to allow for a little drift
 
     // Tuning constants for MoveToInches
-    public double MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD = 1; // slowest velocity for spins
-    public double MOVE_TO_DISTANCE_DRIFT_DISTANCE = .5; // slowest velocity for spins
-    public double MOVE_TO_DISTANCE_SLOW_DISTANCE = 5; // slowest velocity for spins
-    public double MOVE_TO_DISTANCE_DECEL_DISTANCE = 10; // slowest velocity for spins
+    public double DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY = DRIVE_MAX_VELOCITY/2;
+    public double MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD = 1; // No movement if we are within this distance of target
+    public double MOVE_TO_DISTANCE_DRIFT_DISTANCE = .5; // Cut motors at this distance from target to allow for drift
+    public double MOVE_TO_DISTANCE_SLOW_DISTANCE = 4; // Drop motors to a slow crawl at this distance from target
+    public double MOVE_TO_DISTANCE_DECEL_DISTANCE = 10; // Distance for decleration before reaching SLOW_DISTANCE
+
+    public double FIND_LINE_SPEED = 700; // Speed for looking for lines
 
     public static double HEADING_OFFSET; // offset between IMU heading and field
 
@@ -108,7 +111,7 @@ public class RobotDrive {
     public void initSensors(boolean usingDistanceSensors) {
 
         if (usingDistanceSensors) {
-            frontDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "frontDistance"),0,.5,30);
+            frontDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "frontDistance"),1.4f,20,.5);
             distanceSensorsOnline = true;
         }
         frontLeftColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "flColor"));
@@ -144,7 +147,11 @@ public class RobotDrive {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void colorTelemetry() {
-        teamUtil.telemetry.addData("fl: %b", frontLeftColor.isOnTape());
+        teamUtil.telemetry.addData("fl: ", frontLeftColor.isOnTape());
+    }
+
+    public void rawColorTelemetry() {
+        teamUtil.telemetry.addData("FL ","R:%d B:%d A:%.1f", frontLeftColor.redValue(), frontLeftColor.blueValue(), frontLeftColor.getAlpha());
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -464,7 +471,7 @@ public class RobotDrive {
         if (startSpeed < MIN_START_SPEED) {
             startSpeed = MIN_START_SPEED;
         }
-        LastEndSpeed = endSpeed; // save this for next time this method is called TODO: Need a way to deal with some other method stopping the robot...  They could all just set this...
+        LastEndSpeed = endSpeed; // save this for next time this method is called
         if (endSpeed == 0) {  // in case they are trying to stop the robot, fix it so we don't stall
             endSpeed = MIN_END_SPEED;
             stopAtEnd = true;
@@ -548,14 +555,14 @@ public class RobotDrive {
         moveToDistance(sensor, driveHeading, inches, LastEndSpeed, getHeading(), 0, timeOut);
     }
     public void moveToDistance(teamDistanceSensor sensor, double driveHeading, double inches, double startSpeed, double robotHeading, double endSpeed, long timeOut) {
-        boolean details = true;
+        boolean details = false;
         boolean stopAtEnd = false;
 
         long timeOutTime = System.currentTimeMillis() + timeOut;
         timedOut = false;
 
         if (startSpeed == 0) { //No start speed specified so use full power
-            startSpeed = DRIVE_MAX_VELOCITY;
+            startSpeed = DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY;
         } else if (startSpeed < MIN_START_SPEED) { // Make sure we will get the robot moving
             startSpeed = MIN_START_SPEED;
         }
@@ -568,9 +575,9 @@ public class RobotDrive {
         teamUtil.log("moveToDistance: driveHeading:" + driveHeading + " inches:" + inches + " Speed:" + startSpeed + " endSpeed:" + endSpeed + " robotHeading:" + robotHeading);
 
         double velocity = startSpeed;
-        double currentDistance = sensor.getDistanceInches() - inches; // + or -
+        double currentDistance = sensor.getDistanceInches(); // Distance to object
 
-        teamUtil.log("Initial Distance Reading: " + currentDistance);
+        teamUtil.log("Initial Wall Distance Reading: " + currentDistance);
 
         // if we are already close enough, leave the robot where it is
         if (Math.abs(currentDistance - inches) <= MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD) { // was 1
@@ -584,26 +591,26 @@ public class RobotDrive {
             teamUtil.log("Moving Forwards");
         }
 
-        final double preDriftTarget = inches + MOVE_TO_DISTANCE_DRIFT_DISTANCE; // was .5
-        final double slowThreshold = inches + MOVE_TO_DISTANCE_SLOW_DISTANCE; // was 5
-        final double decelThreshold = slowThreshold + MOVE_TO_DISTANCE_DECEL_DISTANCE; // was 10
-        final double slope = (startSpeed - endSpeed) / (decelThreshold - slowThreshold); // slope for the decel phase
+        final double preDriftTarget = MOVE_TO_DISTANCE_DRIFT_DISTANCE; // was .5
+        final double slowThreshold = MOVE_TO_DISTANCE_SLOW_DISTANCE; // was 5
+        final double decelThreshold = MOVE_TO_DISTANCE_SLOW_DISTANCE + MOVE_TO_DISTANCE_DECEL_DISTANCE; // was 10
+        final double slope = (startSpeed - endSpeed) / (decelThreshold - slowThreshold); //  slope for the decel phase
         teamUtil.log("preDriftTarget: " + preDriftTarget + " slowThreshold: " + slowThreshold + " decelThreshold: " + decelThreshold + " slope: " + slope);
             // Cruise at max speed
-            while ((currentDistance = Math.abs(sensor.getDistanceInches()-inches)) > decelThreshold && teamUtil.keepGoing(timeOutTime)) {
+            while ((currentDistance = Math.abs(sensor.getDistanceInches() -inches)) > decelThreshold && teamUtil.keepGoing(timeOutTime)) {
                 driveMotorsHeadings(driveHeading, robotHeading, startSpeed);
-                if (details) teamUtil.log("CRUISING: Distance:" + currentDistance + " velocity: " + startSpeed);
+                if (details) teamUtil.log("CRUISING: TargetDistance:" + currentDistance + " velocity: " + startSpeed);
             }
             // Decelerate to min speed
-            while ((currentDistance = Math.abs(sensor.getDistanceInches()-inches)) > slowThreshold && teamUtil.keepGoing(timeOutTime)) {
-                velocity = Math.min((currentDistance - slowThreshold) * slope * -1 + endSpeed, startSpeed); // decelerate proportionally down to min - don't exceed initial speed
+            while ((currentDistance = Math.abs(sensor.getDistanceInches() -inches)) > slowThreshold && teamUtil.keepGoing(timeOutTime)) {
+                velocity = Math.min((currentDistance - slowThreshold) * slope + endSpeed, startSpeed); // decelerate proportionally down to min - don't exceed initial speed
                 driveMotorsHeadings(driveHeading, robotHeading, velocity);
-                if (details) teamUtil.log("SLOWING: Distance:" + currentDistance + " velocity: " + velocity);
+                if (details) teamUtil.log("SLOWING: TargetDistance:" + currentDistance + " velocity: " + velocity);
             }
             // cruise at minSpeed once we are very close to target
-            while ((currentDistance = Math.abs(sensor.getDistanceInches()-inches)) > preDriftTarget && teamUtil.keepGoing(timeOutTime)) {
+            while ((currentDistance = Math.abs(sensor.getDistanceInches() -inches)) > preDriftTarget && teamUtil.keepGoing(timeOutTime)) {
                 driveMotorsHeadings(driveHeading, robotHeading, endSpeed);
-                if (details) teamUtil.log("CRAWLING: Distance:" + currentDistance + " velocity: " + endSpeed);
+                if (details) teamUtil.log("CRAWLING: TargetDistance:" + currentDistance + " velocity: " + endSpeed);
             }
         if (stopAtEnd) {  // stop the motors if they intend the robot to hold still
             stopDrive();
@@ -629,14 +636,14 @@ public class RobotDrive {
         moveToLine(sensor, color, driveHeading, LastEndSpeed, getHeading(), timeout);
     }
     public void moveToLine(teamColorSensor sensor, teamColorSensor.TapeColor color, double driveHeading, double startSpeed, double robotHeading, long timeout) {
-        boolean details = true;
+        boolean details = false;
         boolean stopAtEnd = false;
 
         long timeOutTime = System.currentTimeMillis() + timeout;
         timedOut = false;
 
-        if (startSpeed == 0) { //No start speed specified so use full power
-            startSpeed = DRIVE_MAX_VELOCITY;
+        if (startSpeed == 0) { //No start speed specified so use line seeking speed
+            startSpeed = FIND_LINE_SPEED;
         } else if (startSpeed < MIN_START_SPEED) { // Make sure we will get the robot moving
             startSpeed = MIN_START_SPEED;
         }
@@ -655,7 +662,10 @@ public class RobotDrive {
         if (timedOut) {
             teamUtil.log("moveToDistance - TIMED OUT!");
         }
-        teamUtil.log("Finished moveToDistance");
+        if (stopAtEnd || timedOut) {  // stop the motors if they intend the robot to hold still
+            stopDrive();
+        }
+        teamUtil.log("Finished moveToLine");
 
     }
 
