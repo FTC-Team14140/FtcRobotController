@@ -156,7 +156,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
     public void testMoveToDistance() {
         if (gamepad2.right_bumper) {
             // Test starting from a stop
-            robot.drive.moveToDistance(robot.drive.frontDistance, 0, 5, 7000);
+            robot.drive.moveToDistance(robot.drive.rightDistance, 270, 5, 7000);
         } else if (gamepad2.left_bumper) {
             // Test starting from a full speed drive
             robot.drive.moveInches(0, 48, 7000, robot.drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);

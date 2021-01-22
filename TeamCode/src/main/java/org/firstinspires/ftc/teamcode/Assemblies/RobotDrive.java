@@ -71,10 +71,10 @@ public class RobotDrive {
     DcMotorEx bRightMotor;
 
     public boolean distanceSensorsOnline = false; // True if distance sensors initialized and online
-    public teamDistanceSensor frontDistance;
-    public teamDistanceSensor rightDistance;
-    public teamColorSensor frontLeftColor;
-    public teamColorSensor frontRightColor;
+    public teamDistanceSensor frontDistance, backDistance;
+    public teamDistanceSensor rightDistance, leftDistance;
+    public teamColorSensor frontLeftColor, backLeftColor;
+    public teamColorSensor frontRightColor, backRightColor;
 
 
 
@@ -112,14 +112,23 @@ public class RobotDrive {
 
         if (usingDistanceSensors) {
             frontDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "frontDistance"),1.4f,20,.5);
+            backDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "backDistance"),1.4f,20,.5);
+            leftDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "leftDistance"),0f,30,.5);
+            rightDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "rightDistance"),0f,30,.5);
             distanceSensorsOnline = true;
         }
         frontLeftColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "flColor"));
+        frontRightColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "frColor"));
+        backLeftColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "blColor"));
+        backRightColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "brColor"));
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void calibrateColorSensors() {
         frontLeftColor.calibrate();
+        frontRightColor.calibrate();
+        backLeftColor.calibrate();
+        backRightColor.calibrate();
     }
 
 
@@ -141,17 +150,24 @@ public class RobotDrive {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void distanceTelemetry() {
         if (distanceSensorsOnline) {
-            teamUtil.telemetry.addData("Distance F:", "%.1f %b", frontDistance.getDistanceInches(),frontDistance.lastReadingValid);
+            teamUtil.telemetry.addData("Distance ", "F:%.1f %b L:%.1f %b B:%.1f %b R:%.1f %b",
+                    frontDistance.getDistanceInches(),frontDistance.lastReadingValid,
+                    leftDistance.getDistanceInches(),leftDistance.lastReadingValid,
+                    backDistance.getDistanceInches(),backDistance.lastReadingValid,
+                    rightDistance.getDistanceInches(),rightDistance.lastReadingValid);
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void colorTelemetry() {
-        teamUtil.telemetry.addData("fl: ", frontLeftColor.isOnTape());
+        teamUtil.telemetry.addLine("fl:"+ frontLeftColor.getColor() + " fr:"+frontRightColor.getColor()  + " bl:"+backLeftColor.getColor() + " br:"+backRightColor.getColor());
     }
 
     public void rawColorTelemetry() {
         teamUtil.telemetry.addData("FL ","R:%d B:%d A:%.1f", frontLeftColor.redValue(), frontLeftColor.blueValue(), frontLeftColor.getAlpha());
+        teamUtil.telemetry.addData("FR ","R:%d B:%d A:%.1f", frontRightColor.redValue(), frontRightColor.blueValue(), frontRightColor.getAlpha());
+        teamUtil.telemetry.addData("BL ","R:%d B:%d A:%.1f", backLeftColor.redValue(), backLeftColor.blueValue(), backLeftColor.getAlpha());
+        teamUtil.telemetry.addData("BR ","R:%d B:%d A:%.1f", backRightColor.redValue(), backRightColor.blueValue(), backRightColor.getAlpha());
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
