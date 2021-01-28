@@ -15,6 +15,9 @@ public class Intake {
     CRServo conveyorServo, rollerServo;
     double FULL_POWER = 1;
     double STOP = 0;
+    public boolean intakeRunning = false;
+
+
 
     void Intake() {
         teamUtil.log("Constructing Intake");
@@ -26,18 +29,22 @@ public class Intake {
         teamUtil.log("Initializing Intake");
         conveyorServo = hardwareMap.crservo.get(conveyorServoName);
         rollerServo = hardwareMap.crservo.get(rollerServoName);
+
     }
 
     // Starts the mechanisms at full speed
-    void start() {
+    public void start() {
         conveyorServo.setPower(FULL_POWER);
         rollerServo.setPower(FULL_POWER);
+        intakeRunning = true;
+
     }
 
     // Stops the mechanisms
-    void stop() {
+    public void stop() {
         conveyorServo.setPower(STOP);
         rollerServo.setPower(STOP);
+        intakeRunning = false;
     }
 
 }

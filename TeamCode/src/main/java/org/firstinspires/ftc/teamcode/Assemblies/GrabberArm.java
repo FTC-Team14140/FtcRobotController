@@ -24,12 +24,15 @@ public class GrabberArm {
     boolean isReset = false;
     boolean isBusy = false;
 
-    enum GRABBER_POS {
+    public enum GRABBER_POS {
         OPEN,
         CLOSE
     }
 
-    GRABBER_POS currentGrabberPosition;
+    public GRABBER_POS currentGrabberPosition;
+
+
+
 
     void GrabberArm() {
         teamUtil.log("Constructing GrabberArm");
@@ -38,10 +41,11 @@ public class GrabberArm {
         telemetry = teamUtil.telemetry;
     }
 
-    void init() {
+    public void init() {
         teamUtil.log("Initializing GrabberArm");
         arm = hardwareMap.get(DcMotorEx.class, "armMotor");
         grabber = hardwareMap.servo.get("grabberServo");
+        currentGrabberPosition = GRABBER_POS.OPEN;
     }
 
     // Moves the arm to the start position (straight up)
@@ -72,20 +76,20 @@ public class GrabberArm {
 
     // move the servo to the grab positionu
     // This is also the stowed position
-    void grab() {
+    public void grab() {
         grabber.setPosition(GRABBER_GRAB);
         currentGrabberPosition = GRABBER_POS.CLOSE;
     }
 
     // move the servo to the release position
     // This is also the ready position
-    void release() {
+    public void release() {
         grabber.setPosition(GRABBER_OPEN);
         currentGrabberPosition = GRABBER_POS.OPEN;
     }
 
     // Launches a new thread to move the arm to its ready position with the grabber open and ready
-    void moveToReadyNoWait() {
+    public void moveToReadyNoWait() {
         if (isBusy) {
             teamUtil.log("called moveToReadyNoWait while grabber busy");
             return;
@@ -120,9 +124,17 @@ public class GrabberArm {
         while (Math.abs(arm.getCurrentPosition()-TRANSPORT_POS)>50){
         }
     }
+    void lift () {
+        teamUtil.pause(1000);
+        arm.setTargetPosition(TRANSPORT_POS);
+        arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        arm.setVelocity(ARM_SPEED);
+        while (Math.abs(arm.getCurrentPosition()-TRANSPORT_POS)>50){
+        }
+    }
 
     // Launches a new thread to Grab a wobble goal and lift it up for transport
-    void grabAndLiftNoWait () {
+    public void grabAndLiftNoWait () {
         if (isBusy) {
             teamUtil.log("called grabAndLiftNoWait while grabber busy");
             return;
@@ -131,6 +143,21 @@ public class GrabberArm {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 grabAndLift();
+                isBusy = false;
+            }
+        });
+        thread.start();
+    }
+
+    public void liftNoWait () {
+        if (isBusy) {
+            teamUtil.log("called LiftNoWait while grabber busy");
+            return;
+        }
+        isBusy = true;
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                lift();
                 isBusy = false;
             }
         });

@@ -17,6 +17,7 @@ public class Blocker {
     long EXTEND_TIME = 3000; // TODO: Find the correct time for the extension of the blocker
     long RETRACT_TIME = 3000; // TODO: Find the correct time for the retract of the blocker
     boolean moving = false;
+    public boolean blockerExtended = true;
 
     void Blocker() {
         teamUtil.log("Constructing Blocker");
@@ -33,11 +34,13 @@ public class Blocker {
     // Starts the blocker moving out.  Will continue until stop is called
     void extend() {
         driveServo.setPower(FORWARD_FULL_POWER);
+
     }
 
     // Starts the blocker moving in.  Will continue until stop is called
     void retract() {
         driveServo.setPower(BACKWARDS_FULL_POWER);
+
     }
 
     // Stop the blocker from moving
@@ -48,9 +51,10 @@ public class Blocker {
         driveServo.setPower(FORWARD_FULL_POWER);
         teamUtil.pause(EXTEND_TIME);
         driveServo.setPower(STOP);
+        blockerExtended = true;
     }
     // Launches a new thread to extend the servo fully
-    void extendNoWait () {
+    public void extendNoWait () {
         if (moving) {
             teamUtil.log("called extendNotWait while moving blocker mechanism");
             return;
@@ -69,10 +73,11 @@ public class Blocker {
         driveServo.setPower(BACKWARDS_FULL_POWER);
         teamUtil.pause(RETRACT_TIME);
         driveServo.setPower(STOP);
+        blockerExtended = false;
     }
 
     // Launches a new thread to retract the servo fully
-    void retractNoWait () {
+    public void retractNoWait () {
         if (moving) {
             teamUtil.log("called retractNotWait while moving blocker mechanism");
             return;

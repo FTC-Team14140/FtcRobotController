@@ -14,6 +14,8 @@ public class TeamGamepad {
         GAMEPAD1DPADDOWN,
         GAMEPAD1DPADLEFT,
         GAMEPAD1DPADRIGHT,
+        GAMEPAD1RIGHTTRIGGER,
+        GAMEPAD1LEFTTRIGGER,
         GAMEPAD2RB,
         GAMEPAD2LB,
         GAMEPAD2A,
@@ -23,7 +25,10 @@ public class TeamGamepad {
         GAMEPAD2DPADUP,
         GAMEPAD2DPADDOWN,
         GAMEPAD2DPADLEFT,
-        GAMEPAD2DPADRIGHT
+        GAMEPAD2DPADRIGHT,
+        GAMEPAD2RIGHTBUMPPER,
+        GAMEPAD2RIGHTTRIGGER,
+        GAMEPAD2LEFTTRIGGER
     }
     private boolean[] pressed = new boolean[buttons.values().length];
     private boolean[] bounced = new boolean[buttons.values().length];
@@ -181,9 +186,24 @@ public class TeamGamepad {
 
         if(theOpMode.gamepad2.dpad_right){
             pressed[buttons.GAMEPAD2DPADRIGHT.ordinal()] = true;
-        }else if (pressed[buttons.GAMEPAD2DPADRIGHT.ordinal()] && !theOpMode.gamepad1.dpad_right){
+        }else if (pressed[buttons.GAMEPAD2DPADRIGHT.ordinal()] && !theOpMode.gamepad2.dpad_right){
             bounced[buttons.GAMEPAD2DPADRIGHT.ordinal()] = true;
             pressed[buttons.GAMEPAD2DPADRIGHT.ordinal()] = false;
+
+        }
+        if(theOpMode.gamepad2.right_bumper){
+            pressed[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] = true;
+        }else if (pressed[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] && !theOpMode.gamepad2.right_bumper){
+            bounced[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] = true;
+            pressed[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] = false;
+
+        }
+        if(theOpMode.gamepad2.right_trigger > 0.5){
+            pressed[buttons.GAMEPAD2RIGHTTRIGGER.ordinal()] = true;
+        }else if (pressed[buttons.GAMEPAD2RIGHTTRIGGER.ordinal()] && theOpMode.gamepad2.right_trigger < 0.5){
+            bounced[buttons.GAMEPAD2RIGHTTRIGGER.ordinal()] = true;
+            pressed[buttons.GAMEPAD2RIGHTTRIGGER.ordinal()] = false;
+
         }
 
     }

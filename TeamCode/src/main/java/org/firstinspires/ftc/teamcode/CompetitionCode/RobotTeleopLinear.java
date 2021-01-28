@@ -3,16 +3,22 @@ package org.firstinspires.ftc.teamcode.CompetitionCode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Assemblies.GrabberArm;
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
 import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
+import org.firstinspires.ftc.teamcode.Assemblies.Blocker;
+import org.firstinspires.ftc.teamcode.Assemblies.Shooter;
+import org.firstinspires.ftc.teamcode.Assemblies.Intake;
 
 @TeleOp(name = "RobotTeleopLinear", group = "z")
 public class RobotTeleopLinear extends LinearOpMode {
     TeamGamepad teamGamePad;
     Robot robot;
     double storedHeading;
+    boolean blockerExtended = false;
+
 
     public void initialize() {
 
@@ -60,6 +66,66 @@ public class RobotTeleopLinear extends LinearOpMode {
 
             if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
                 robot.drive.resetHeading();
+            }
+
+
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1X)) {
+                if (!robot.rightIntake.flywheelRunning && !robot.leftIntake.flywheelRunning) {
+                    robot.leftIntake.start();
+                    robot.rightIntake.start();
+                } else {
+                    robot.leftIntake.stop();
+                    robot.rightIntake.stop();
+
+                }
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RB)) {
+                if (!robot.blocker.blockerExtended) {
+                    robot.blocker.extendNoWait();
+                } else {
+                    robot.blocker.retractNoWait();
+
+                }
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
+                robot.grabber.liftNoWait();
+
+            }
+            if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
+                robot.grabber.moveToReadyNoWait();
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTTRIGGER)) {
+                if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
+                    robot.grabber.grab();
+
+                } else {
+                    robot.grabber.release();
+
+                }
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTBUMPPER)) {
+                if (!robot.shooter.motorRunning) {
+                    robot.shooter.flywheelStart();
+
+                } else {
+                    robot.shooter.stopFlywheel();
+
+                }
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTTRIGGER)) {
+                robot.shooter.launch();
+
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) {
+                robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2X)) {
+                robot.shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
+
             }
 
             //this code is the telemetry

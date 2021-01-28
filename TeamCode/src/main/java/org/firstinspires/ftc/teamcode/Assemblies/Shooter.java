@@ -23,16 +23,19 @@ public class Shooter {
     double HIGH_GOAL_POSITION = 1; //TODO: find right number
     double LAUNCH_POSITION = 0; //TODO: find right number
     double RELOAD_POSITION = 0; //TODO: find right number
-    boolean motorRunning = false;
+    public boolean motorRunning = false;
 
     //defining new type with specific values
     public enum ShooterTarget {
         POWERSHOT,
         HIGH_GOAL
     }
-
+    public enum FlyWheel {
+        ON,
+        OFF
+    }
     ShooterTarget currentTarget;
-
+    FlyWheel flywheelRunning;
 
     void Shooter() {
         teamUtil.log("Constructing Shooter");
@@ -50,7 +53,7 @@ public class Shooter {
 
     // Tilt the shooter to aim at the powershots
     // If the flywheel is running, this will change the speed as needed
-    void aimAt(ShooterTarget newTarget) {
+    public void aimAt(ShooterTarget newTarget) {
         if (newTarget == currentTarget) {
             return;
         }else {
@@ -61,7 +64,7 @@ public class Shooter {
 
     }
 
-    void changeSpeed() {
+    public void changeSpeed() {
         if (currentTarget == ShooterTarget.POWERSHOT) {
             currentTargetVelocity = POWERSHOT_VELOCITY;
         }else{
@@ -75,13 +78,14 @@ public class Shooter {
     void changeAngle() {
         if (currentTarget == ShooterTarget.POWERSHOT) {
             tilter.setPosition(POWERSHOT_POSITION);
+
         }else {
             tilter.setPosition(HIGH_GOAL_POSITION);
         }
     }
 
     // StartFlyWheel at the speed needed for the current aim
-    void flywheelStart() {
+    public void flywheelStart() {
         if (motorRunning = false){
             flywheel.setVelocity(currentTargetVelocity);
             motorRunning = true;
@@ -98,13 +102,13 @@ public class Shooter {
     }
 
     // cut power to the flywheel and let it coast to a stop
-    void stopFlywheel() {
+    public void stopFlywheel() {
         flywheel.setVelocity(0);
         motorRunning = false;
     }
 
     // Launch a ring
-    void launch() {
+    public void launch() {
         pusher.setPosition(LAUNCH_POSITION);
         teamUtil.pause(500);
         pusher.setPosition(RELOAD_POSITION);
