@@ -70,7 +70,7 @@ public class RobotTeleopLinear extends LinearOpMode {
 
 
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1X)) {
-                if (!robot.rightIntake.flywheelRunning && !robot.leftIntake.flywheelRunning) {
+                if (!robot.rightIntake.intakeRunning && !robot.leftIntake.intakeRunning) {
                     robot.leftIntake.start();
                     robot.rightIntake.start();
                 } else {
