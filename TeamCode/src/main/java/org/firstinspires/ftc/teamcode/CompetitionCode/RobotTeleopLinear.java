@@ -121,7 +121,9 @@ public class RobotTeleopLinear extends LinearOpMode {
                 }
             }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTTRIGGER)) {
-                robot.shooter.launch();
+                if (robot.shooter.flywheelReady()) {
+                    robot.shooter.launch();
+                }
 
             }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) {

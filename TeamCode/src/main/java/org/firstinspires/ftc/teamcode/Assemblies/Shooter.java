@@ -93,7 +93,7 @@ public class Shooter {
     }
 
     // Returns true if the flywheel is spinning fast enough for the current aim
-    boolean flywheelReady() {
+    public boolean flywheelReady() {
         if (Math.abs(flywheel.getVelocity() - currentTargetVelocity)<currentTargetVelocity*0.05){
             return true;
         }else{

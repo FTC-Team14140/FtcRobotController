@@ -17,7 +17,7 @@ public class Blocker {
     long EXTEND_TIME = 3000; // TODO: Find the correct time for the extension of the blocker
     long RETRACT_TIME = 3000; // TODO: Find the correct time for the retract of the blocker
     boolean moving = false;
-    public boolean blockerExtended = true;
+    public boolean blockerExtended = false;
 
     void Blocker() {
         teamUtil.log("Constructing Blocker");
