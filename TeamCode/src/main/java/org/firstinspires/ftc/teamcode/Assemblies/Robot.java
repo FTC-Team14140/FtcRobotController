@@ -47,15 +47,14 @@ public class Robot {
 
         teamUtil.log("Constructing Assemblies");
         drive = new RobotDrive();
+        leftIntake = new Intake();
+        rightIntake = new Intake();
         blocker = new Blocker();
         sweeper = new Sweeper();
         grabber = new GrabberArm();
-        leftIntake = new Intake();
-        rightIntake = new Intake();
         shooter = new Shooter();
-
-//latch = new Latch(hardwareMap, telemetry);
         teamUtil.log("Constructing Assemblies - Finished");
+
         teamUtil.log("Constructed Robot - Finished");
     }
 
@@ -64,12 +63,12 @@ public class Robot {
         teamUtil.log("Initializing Robot");
         drive.initDriveMotors();
 
-        //leftIntake.init("conveyorServoLeft", "rollerServoLeft");
-        //leftIntake.init("conveyorServoRight", "rollerServoRight");
-        //blocker.init();
-        //sweeper.init();
-        //grabber.init();
-        //shooter.init();
+        leftIntake.init("leftPulleyServo", "leftRollerServo");
+        rightIntake.init("rightPulleyServo", "rightRollerServo");
+        blocker.init();
+        sweeper.init();
+        grabber.init();
+        shooter.init();
 
         // reset mechanisms and initialize sensors if we did NOT just run auto
         if (!justRanAuto) {

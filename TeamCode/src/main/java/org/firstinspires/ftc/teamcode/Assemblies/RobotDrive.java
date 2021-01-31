@@ -88,6 +88,7 @@ public class RobotDrive {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public RobotDrive() {
+        teamUtil.log("Constructing RobotDrive");
         hardwareMap = teamUtil.theOpMode.hardwareMap;
     }
 

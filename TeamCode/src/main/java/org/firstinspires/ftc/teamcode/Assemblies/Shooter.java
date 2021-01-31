@@ -37,7 +37,7 @@ public class Shooter {
     ShooterTarget currentTarget;
     FlyWheel flywheelRunning;
 
-    void Shooter() {
+    public Shooter() {
         teamUtil.log("Constructing Shooter");
         hardwareMap = teamUtil.theOpMode.hardwareMap;
         telemetry = teamUtil.telemetry;
@@ -46,7 +46,7 @@ public class Shooter {
     void init() {
         teamUtil.log("Initializing Shooter");
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
-        pusher = hardwareMap.servo.get("grabberServo");
+        pusher = hardwareMap.servo.get("pusherServo");
         tilter = hardwareMap.servo.get("tilterServo");
         currentTarget = ShooterTarget.POWERSHOT;
     }

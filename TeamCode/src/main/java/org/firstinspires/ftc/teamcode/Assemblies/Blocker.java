@@ -19,7 +19,7 @@ public class Blocker {
     boolean moving = false;
     public boolean blockerExtended = false;
 
-    void Blocker() {
+    public Blocker() {
         teamUtil.log("Constructing Blocker");
 
         hardwareMap = teamUtil.theOpMode.hardwareMap;
@@ -28,7 +28,7 @@ public class Blocker {
 
     void init() {
         teamUtil.log("Initializing Blocker");
-        driveServo = hardwareMap.crservo.get("driveServo");
+        driveServo = hardwareMap.crservo.get("blockerServo");
     }
 
     // Starts the blocker moving out.  Will continue until stop is called

@@ -1,23 +1,40 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <Robot type="FirstInspires-FTC">
-    <!--
-    <Webcam name="Webcam 1" serialNumber="CCB77690" />
-    -->
+    <Webcam name="Webcam 1" serialNumber="12D5F020" />
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 3" port="3">
-            <Matrix12vMotor name="shooter" port="0" />
-            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <!-- Motors -->
+            <goBILDA5202SeriesMotor name="sweeperMotor" port="0" />
+            <goBILDA5202SeriesMotor name="armMotor" port="1" />
+            <Matrix12vMotor name="flywheel" port="2" />
+            <!-- IMU (built in) -->
+            <LynxEmbeddedIMU name="imu2" port="0" bus="0" />
+            <!-- Servos -->
+            <ContinuousRotationServo name="rightRollerServo" port="0" />
+            <Servo name="grabberServo" port="2" />
+            <ContinuousRotationServo name="leftRollerServo" port="5" />
+            <!-- Sensors -->
             <RevColorSensorV3 name="flColor" port="1" bus="0"/>
             <RevColorSensorV3 name="blColor" port="0" bus="1"/>
             <RevColorSensorV3 name="brColor" port="0" bus="2"/>
             <RevColorSensorV3 name="frColor" port="0" bus="3"/>
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
+            <!-- Motors -->
             <goBILDA5202SeriesMotor name="bRightMotor" port="0" />
             <goBILDA5202SeriesMotor name="fRightMotor" port="1" />
             <goBILDA5202SeriesMotor name="fLeftMotor" port="2" />
             <goBILDA5202SeriesMotor name="bLeftMotor" port="3" />
-            <LynxEmbeddedIMU name="imu 1" port="0" bus="0" />
+            <!-- IMU (built in) -->
+            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <!-- Servos -->
+            <Servo name="tilterServo" port="0" />
+            <Servo name="pusherServo" port="1" />
+            <Servo name="sweeperServo" port="2" />
+            <ContinuousRotationServo name="leftPulleyServo" port="3" />
+            <ContinuousRotationServo name="rightPulleyServo" port="4" />
+            <ContinuousRotationServo name="blockerServo" port="5" />
+            <!-- Sensors -->
             <REV_VL53L0X_RANGE_SENSOR name="frontDistance" port="1" bus="0"/>
             <REV_VL53L0X_RANGE_SENSOR name="rightDistance" port="0" bus="1"/>
             <REV_VL53L0X_RANGE_SENSOR name="backDistance" port="0" bus="2"/>

@@ -26,7 +26,7 @@ public class Sweeper {
 
 
 
-    void Sweeper() {
+    public Sweeper() {
         teamUtil.log("Constructing Sweeper");
         hardwareMap = teamUtil.theOpMode.hardwareMap;
         telemetry = teamUtil.telemetry;

@@ -19,7 +19,7 @@ public class Intake {
 
 
 
-    void Intake() {
+    public Intake() {
         teamUtil.log("Constructing Intake");
         hardwareMap = teamUtil.theOpMode.hardwareMap;
         telemetry = teamUtil.telemetry;

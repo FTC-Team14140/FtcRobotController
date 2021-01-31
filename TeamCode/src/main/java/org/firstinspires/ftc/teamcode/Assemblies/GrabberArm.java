@@ -34,7 +34,7 @@ public class GrabberArm {
 
 
 
-    void GrabberArm() {
+    public GrabberArm() {
         teamUtil.log("Constructing GrabberArm");
 
         hardwareMap = teamUtil.theOpMode.hardwareMap;
