@@ -14,8 +14,8 @@ public class Shooter {
     HardwareMap hardwareMap;
     Telemetry telemetry;
     DcMotorEx flywheel;
-    Servo pusher;
-    Servo tilter;
+    public Servo pusher;
+    public Servo tilter;
     double currentTargetVelocity = 0;
     double POWERSHOT_VELOCITY = 1.0; //TODO: find right number
     double HIGH_GOAL_VELOCITY = 2.0; //TODO: find right number
@@ -49,6 +49,10 @@ public class Shooter {
         pusher = hardwareMap.servo.get("pusherServo");
         tilter = hardwareMap.servo.get("tilterServo");
         currentTarget = ShooterTarget.POWERSHOT;
+    }
+
+    public void shooterTelemetry() {
+        teamUtil.telemetry.addLine("Shooter Tilt:"+ tilter.getPosition() + " Flywheel:"+flywheel.getVelocity());
     }
 
     // Tilt the shooter to aim at the powershots

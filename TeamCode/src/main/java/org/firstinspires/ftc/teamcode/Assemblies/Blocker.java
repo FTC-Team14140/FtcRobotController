@@ -31,22 +31,27 @@ public class Blocker {
         driveServo = hardwareMap.crservo.get("blockerServo");
     }
 
+    public void blockerTelemetry() {
+        teamUtil.telemetry.addLine("Blocker Arm:"+ driveServo.getPower());
+    }
+
     // Starts the blocker moving out.  Will continue until stop is called
-    void extend() {
+    public void extend() {
         driveServo.setPower(FORWARD_FULL_POWER);
 
     }
 
     // Starts the blocker moving in.  Will continue until stop is called
-    void retract() {
+    public void retract() {
         driveServo.setPower(BACKWARDS_FULL_POWER);
 
     }
 
     // Stop the blocker from moving
-    void stop() {
+    public void stop() {
         driveServo.setPower(STOP);
     }
+
     void extendFully () {
         driveServo.setPower(FORWARD_FULL_POWER);
         teamUtil.pause(EXTEND_TIME);

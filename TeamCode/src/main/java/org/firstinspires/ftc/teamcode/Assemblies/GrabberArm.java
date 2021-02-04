@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 public class GrabberArm {
     HardwareMap hardwareMap;
     Telemetry telemetry;
-    DcMotorEx arm;
-    Servo grabber;
+    public DcMotorEx arm;
+    public Servo grabber;
 
     final double STALL_POWER = .098; //idk if this is the right number
     final int HORIZONTAL = 1; // TODO: find correct number
@@ -46,6 +46,10 @@ public class GrabberArm {
         arm = hardwareMap.get(DcMotorEx.class, "armMotor");
         grabber = hardwareMap.servo.get("grabberServo");
         currentGrabberPosition = GRABBER_POS.OPEN;
+    }
+
+    public void armTelemetry() {
+        teamUtil.telemetry.addLine("Grabber Arm:"+ arm.getCurrentPosition() + " Grabber:"+currentGrabberPosition);
     }
 
     // Moves the arm to the start position (straight up)

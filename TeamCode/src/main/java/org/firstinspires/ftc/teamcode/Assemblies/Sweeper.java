@@ -13,12 +13,16 @@ public class Sweeper {
     HardwareMap hardwareMap;
     Telemetry telemetry;
     DcMotorEx motor;
-    Servo sweeper;
+    public Servo sweeper;
     Boolean sweeperCalibrated = false;
     Double TENSION_POWER = 0.098;
     int FULLY_EXTENDED = 1000; //TODO: find right number for extended encoder position
+    int EXTENDED_THESHOLD = (int) (FULLY_EXTENDED * .95);
     Double EXTEND_SPEED = 1000.0; //TODO: find right number
     int FULLY_RETRACTED = 1000; //TODO: find right number for retracted encoder position
+    int RETRACTED_DOWN_THESHOLD = 1000;
+    int RETRACTED_UP_THESHOLD = FULLY_RETRACTED + 5;
+
     Double RETRACT_SPEED = 1000.0; //TODO: find right number
     final float SWEEP = 0.1f; //TODO: find right number
     final float STOWED = 0.1f; //TODO: find right number
@@ -36,6 +40,10 @@ public class Sweeper {
         teamUtil.log("Initializing Sweeper");
         motor = hardwareMap.get(DcMotorEx.class, "sweeperMotor");
         sweeper = hardwareMap.servo.get("sweeperServo");
+    }
+
+    public void sweeperTelemetry() {
+        teamUtil.telemetry.addLine("Sweeper Arm:"+ motor.getCurrentPosition() + " Grabber:"+sweeper.getPosition());
     }
 
     // retracts the arm fully and resets the encoder position to 0
@@ -63,15 +71,37 @@ public class Sweeper {
         } while (true);
     }
 
-    // Starts the blocker moving out at full speed.  Will continue until stop is called
+    // Extends the sweeper arm at full speed until stop is called or it hits the end
     void extend() {
+        if (motor.getCurrentPosition() > EXTENDED_THESHOLD) {
+            stop();
+        } else {
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setVelocity(EXTEND_SPEED);
+        }
+    }
+
+    // retract the sweeper arm at full speed until stop is called or it cannot go further
+    void retract() {
+        if (sweeper.getPosition() <= READY && motor.getCurrentPosition() < RETRACTED_UP_THESHOLD) {
+            stop();
+        } else if (sweeper.getPosition() > READY && motor.getCurrentPosition() < RETRACTED_DOWN_THESHOLD) {
+            stop();
+        } else  {
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setVelocity(RETRACT_SPEED);
+        }
+    }
+
+    // Extends the sweeper arm to full extension
+    void extendFully() {
         motor.setTargetPosition(FULLY_EXTENDED);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setVelocity(EXTEND_SPEED);
     }
 
     // Starts the blocker moving in and full speed.  Will continue until stop is called
-    void retract() {
+    void retractFully() {
         motor.setTargetPosition(FULLY_RETRACTED);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setVelocity(RETRACT_SPEED);
@@ -109,6 +139,6 @@ public class Sweeper {
     // Launches a new thread to retract and stow the sweeper
     void retractAndStowNoWait () {
         moveToStow();
-        retract();
+        retractFully();
     }
 }
