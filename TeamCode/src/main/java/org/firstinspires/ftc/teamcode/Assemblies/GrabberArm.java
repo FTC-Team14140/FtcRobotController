@@ -13,7 +13,7 @@ public class GrabberArm {
     public DcMotorEx arm;
     public Servo grabber;
 
-    final double STALL_POWER = .098; //idk if this is the right number
+    final double STALL_POWER = -0.098; //idk if this is the right number UP is Negative
     final int HORIZONTAL = 1; // TODO: find correct number
     final int STOW_POS = 1; // TODO: find correct number
     final int READY_POS = 1; // TODO: find correct number
