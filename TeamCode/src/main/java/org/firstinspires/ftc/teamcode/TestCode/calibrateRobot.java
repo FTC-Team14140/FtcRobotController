@@ -28,7 +28,7 @@ public class calibrateRobot extends LinearOpMode {
         double MAJOR_INCREMENT = 0.05;
         double MINOR_INCREMENT = 0.01;
 
-        if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1DPADUP) && (servo.getPosition()<1)) {
+        if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP) && (servo.getPosition()<1)) {
             servo.setPosition(servo.getPosition() + MAJOR_INCREMENT);
         }
         if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN) && (servo.getPosition()>0)) {
@@ -47,18 +47,22 @@ public class calibrateRobot extends LinearOpMode {
         initialize();
         waitForStart();
         robot.drive.resetHeading();
+        robot.grabber.grabber.setPosition(0.75);
+        robot.shooter.tilter.setPosition(0.5);
+        robot.shooter.pusher.setPosition(0.5);
+        robot.sweeper.sweeper.setPosition(0.5);
 
         while (opModeIsActive()) {
             teamGamePad.gamepadLoop();
 
             if (gamepad2.a) {
-                findServoPosition(robot.grabber.grabber);
+                findServoPosition(robot.grabber.grabber); // check wired
             } else if (gamepad2.b) {
-                findServoPosition(robot.shooter.tilter);
+                findServoPosition(robot.shooter.tilter);  // check wired
             } else if (gamepad2.x) {
-                findServoPosition(robot.shooter.pusher);
+                findServoPosition(robot.shooter.pusher);// check wired
             } else if (gamepad2.y) {
-                findServoPosition(robot.sweeper.sweeper);
+                findServoPosition(robot.sweeper.sweeper); // check wired
             }
             if (gamepad2.left_bumper) {
                 robot.leftIntake.start();
@@ -71,9 +75,9 @@ public class calibrateRobot extends LinearOpMode {
                 robot.rightIntake.stop();
             }
             if (gamepad2.left_trigger > .5) {
-                robot.blocker.extend();
+                robot.blocker.extend(); // check wired
             } else if (gamepad2.right_trigger > .5) {
-                robot.blocker.retract();
+                robot.blocker.retract(); // check wired
             } else {
                 robot.blocker.stop();
             }

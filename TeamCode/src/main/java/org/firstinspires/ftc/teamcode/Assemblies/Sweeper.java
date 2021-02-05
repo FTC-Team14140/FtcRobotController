@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Assemblies;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -40,6 +41,7 @@ public class Sweeper {
         teamUtil.log("Initializing Sweeper");
         motor = hardwareMap.get(DcMotorEx.class, "sweeperMotor");
         sweeper = hardwareMap.servo.get("sweeperServo");
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void sweeperTelemetry() {
@@ -83,7 +85,7 @@ public class Sweeper {
 
     // retract the sweeper arm at full speed until stop is called or it cannot go further
     void retract() {
-        if (sweeper.getPosition() <= READY && motor.getCurrentPosition() < RETRACTED_UP_THESHOLD) {
+        if (sweeper.getPosition() >= STOWED && motor.getCurrentPosition() < RETRACTED_UP_THESHOLD) {
             stop();
         } else if (sweeper.getPosition() > READY && motor.getCurrentPosition() < RETRACTED_DOWN_THESHOLD) {
             stop();

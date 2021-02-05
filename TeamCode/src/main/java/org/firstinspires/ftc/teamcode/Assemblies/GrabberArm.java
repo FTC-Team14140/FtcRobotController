@@ -49,7 +49,7 @@ public class GrabberArm {
     }
 
     public void armTelemetry() {
-        teamUtil.telemetry.addLine("Grabber Arm:"+ arm.getCurrentPosition() + " Grabber:"+currentGrabberPosition);
+        teamUtil.telemetry.addLine("Grabber Arm:"+ arm.getCurrentPosition() + " Grabber:"+grabber.getPosition()+ " Enum:"+currentGrabberPosition);
     }
 
     // Moves the arm to the start position (straight up)

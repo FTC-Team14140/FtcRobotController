@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Assemblies;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -25,11 +26,16 @@ public class Intake {
         telemetry = teamUtil.telemetry;
     }
 
-    void init(String conveyorServoName, String rollerServoName) {
+    void init(String conveyorServoName, boolean reverseConveyer, String rollerServoName, boolean reverseRoller) {
         teamUtil.log("Initializing Intake");
         conveyorServo = hardwareMap.crservo.get(conveyorServoName);
+        if (reverseConveyer) {
+            conveyorServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
         rollerServo = hardwareMap.crservo.get(rollerServoName);
-
+        if (reverseRoller) {
+            rollerServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
     }
 
     // Starts the mechanisms at full speed

@@ -63,8 +63,8 @@ public class Robot {
         teamUtil.log("Initializing Robot");
         drive.initDriveMotors();
 
-        leftIntake.init("leftPulleyServo", "leftRollerServo");
-        rightIntake.init("rightPulleyServo", "rightRollerServo");
+        leftIntake.init("leftPulleyServo", true,"leftRollerServo", false);
+        rightIntake.init("rightPulleyServo", false,"rightRollerServo",true);
         blocker.init();
         sweeper.init();
         grabber.init();
