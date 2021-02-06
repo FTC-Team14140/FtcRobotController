@@ -42,6 +42,7 @@ public class Intake {
     public void start() {
         conveyorServo.setPower(FULL_POWER);
         rollerServo.setPower(FULL_POWER);
+
         intakeRunning = true;
 
     }

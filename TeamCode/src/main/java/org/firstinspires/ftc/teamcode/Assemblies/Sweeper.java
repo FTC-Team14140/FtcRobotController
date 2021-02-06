@@ -28,7 +28,7 @@ public class Sweeper {
     final float SWEEP = 0.1f; //TODO: find right number
     final float STOWED = 0.1f; //TODO: find right number
     final float READY = 0.1f; //TODO: find right number
-
+    public boolean motorRunning = false;
 
 
     public Sweeper() {
@@ -74,17 +74,19 @@ public class Sweeper {
     }
 
     // Extends the sweeper arm at full speed until stop is called or it hits the end
-    void extend() {
+    public void extend() {
         if (motor.getCurrentPosition() > EXTENDED_THESHOLD) {
             stop();
+            motorRunning = false;
         } else {
+            motorRunning = true;
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setVelocity(EXTEND_SPEED);
         }
     }
 
     // retract the sweeper arm at full speed until stop is called or it cannot go further
-    void retract() {
+    public void retract() {
         if (sweeper.getPosition() >= STOWED && motor.getCurrentPosition() < RETRACTED_UP_THESHOLD) {
             stop();
         } else if (sweeper.getPosition() > READY && motor.getCurrentPosition() < RETRACTED_DOWN_THESHOLD) {
@@ -110,7 +112,7 @@ public class Sweeper {
     }
 
     // Stop the blocker at its current position
-    void stop() {
+    public void stop() {
         motor.setVelocity(0);
     }
 
@@ -133,7 +135,7 @@ public class Sweeper {
     // 0 means READY Position
     // 1 means SWEEP position
     // This is intended to be hooked up to a gamepad control for manual control over the sweeper position
-    void manualControl(float position) {
+    public void manualControl(float position) {
         float controlledPosition = (SWEEP-READY)*position+READY;
         sweeper.setPosition(controlledPosition);
     }

@@ -134,7 +134,29 @@ public class RobotTeleopLinear extends LinearOpMode {
                 robot.shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
 
             }
-
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
+                if (!robot.sweeper.motorRunning) {
+                    robot.sweeper.retract();
+                }else {
+                    robot.sweeper.stop();
+                }
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+                if (!robot.sweeper.motorRunning) {
+                    robot.sweeper.extend();
+                }else {
+                    robot.sweeper.stop();
+                }
+            }
+            //sweeper is the servo
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2B)) {
+                robot.sweeper.manualControl(1);
+                //SWEEP position
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2A)) {
+                robot.sweeper.manualControl(0);
+                //READY Position
+            }
             //this code is the telemetry
             teamUtil.telemetry.update();
 
