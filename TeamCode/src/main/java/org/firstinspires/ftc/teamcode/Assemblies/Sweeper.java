@@ -16,18 +16,18 @@ public class Sweeper {
     DcMotorEx motor;
     public Servo sweeper;
     Boolean sweeperCalibrated = false;
-    Double TENSION_POWER = 0.098;
-    int FULLY_EXTENDED = 1000; //TODO: find right number for extended encoder position
-    int EXTENDED_THESHOLD = (int) (FULLY_EXTENDED * .95);
+    Double TENSION_POWER = -0.3;
+    int FULLY_EXTENDED = 1800; //TODO: find right number for extended encoder position
+    int EXTENDED_THESHOLD = (int) (FULLY_EXTENDED * .9);
     Double EXTEND_SPEED = 1000.0; //TODO: find right number
-    int FULLY_RETRACTED = 1000; //TODO: find right number for retracted encoder position
-    int RETRACTED_DOWN_THESHOLD = 1000;
-    int RETRACTED_UP_THESHOLD = FULLY_RETRACTED + 5;
+    int FULLY_RETRACTED = 50; //TODO: find right number for retracted encoder position
+    int RETRACTED_DOWN_THESHOLD = 200;
+    int RETRACTED_UP_THESHOLD = 50;
 
-    Double RETRACT_SPEED = 1000.0; //TODO: find right number
-    final float SWEEP = 0.1f; //TODO: find right number
-    final float STOWED = 0.1f; //TODO: find right number
-    final float READY = 0.1f; //TODO: find right number
+    Double RETRACT_SPEED = -1000.0; //TODO: find right number
+    public final float SWEEP = 0.2f;
+    public final float STOWED = 0.86f;
+    public final float READY = 0.1f; //TODO: find right number
     public boolean motorRunning = false;
 
 
@@ -49,7 +49,7 @@ public class Sweeper {
     }
 
     // retracts the arm fully and resets the encoder position to 0
-    void reset() {
+    public void reset() {
         teamUtil.log("Resetting Sweeper");
         moveToStow();
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -98,14 +98,16 @@ public class Sweeper {
     }
 
     // Extends the sweeper arm to full extension
-    void extendFully() {
+    public void extendFully() {
+        teamUtil.log("sweeper is extending fully to pos: " + FULLY_EXTENDED);
         motor.setTargetPosition(FULLY_EXTENDED);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setVelocity(EXTEND_SPEED);
     }
 
     // Starts the blocker moving in and full speed.  Will continue until stop is called
-    void retractFully() {
+    public void retractFully() {
+        teamUtil.log("sweeper is retracting fully to pos: " + FULLY_RETRACTED);
         motor.setTargetPosition(FULLY_RETRACTED);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setVelocity(RETRACT_SPEED);

@@ -14,8 +14,8 @@ public class Blocker {
     double FORWARD_FULL_POWER = 1;
     double STOP = 0;
     double BACKWARDS_FULL_POWER = -1;
-    long EXTEND_TIME = 3000; // TODO: Find the correct time for the extension of the blocker
-    long RETRACT_TIME = 3000; // TODO: Find the correct time for the retract of the blocker
+    long EXTEND_TIME = 1900; // TODO: Find the correct time for the extension of the blocker
+    long RETRACT_TIME = 1900; // TODO: Find the correct time for the retract of the blocker
     boolean moving = false;
     public boolean blockerExtended = false;
 
@@ -56,6 +56,9 @@ public class Blocker {
         driveServo.setPower(FORWARD_FULL_POWER);
         teamUtil.pause(EXTEND_TIME);
         driveServo.setPower(STOP);
+        driveServo.setPower(-0.5);
+        teamUtil.pause(100);
+        driveServo.setPower(STOP);
         blockerExtended = true;
     }
     // Launches a new thread to extend the servo fully
@@ -78,6 +81,10 @@ public class Blocker {
         driveServo.setPower(BACKWARDS_FULL_POWER);
         teamUtil.pause(RETRACT_TIME);
         driveServo.setPower(STOP);
+        driveServo.setPower(0.5);
+        teamUtil.pause(100);
+        driveServo.setPower(STOP);
+        blockerExtended = true;
         blockerExtended = false;
     }
 

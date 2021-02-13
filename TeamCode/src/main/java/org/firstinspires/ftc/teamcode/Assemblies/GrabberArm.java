@@ -14,13 +14,13 @@ public class GrabberArm {
     public Servo grabber;
 
     final double STALL_POWER = -0.098; //idk if this is the right number UP is Negative
-    final int HORIZONTAL = 1; // TODO: find correct number
-    final int STOW_POS = 1; // TODO: find correct number
-    final int READY_POS = 1; // TODO: find correct number
-    final int TRANSPORT_POS = 1; // TODO: find correct number
-    final double ARM_SPEED = .50; // TODO: find correct number
-    final float GRABBER_GRAB = .50f; // TODO: find correct number
-    final float GRABBER_OPEN = .50f; // TODO: find correct number
+    final int HORIZONTAL = 0;
+    final int STOW_POS = 3800;
+    final int READY_POS = 2500;
+    final int TRANSPORT_POS = 600;
+    final double ARM_SPEED = .50;
+    final float GRABBER_GRAB = .598f;
+    final float GRABBER_OPEN = 1f;
     boolean isReset = false;
     boolean isBusy = false;
 
@@ -54,7 +54,7 @@ public class GrabberArm {
 
     // Moves the arm to the start position (straight up)
     // and resets the encoder position to 0
-    void reset() {
+    public void reset() {
         teamUtil.log("Resetting GrabberArm");
         grab();
         arm.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
+import org.firstinspires.ftc.teamcode.Assemblies.Shooter;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
@@ -70,7 +71,9 @@ public class calibrateRobot extends LinearOpMode {
                 robot.leftIntake.stop();
             }
             if (gamepad2.right_bumper) {
-                robot.rightIntake.start();
+//                robot.rightIntake.start();
+                robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+                robot.shooter.flywheelStart();
             } else {
                 robot.rightIntake.stop();
             }
@@ -80,6 +83,14 @@ public class calibrateRobot extends LinearOpMode {
                 robot.blocker.retract(); // check wired
             } else {
                 robot.blocker.stop();
+            }
+
+            if(gamepad2.left_stick_button){
+                robot.grabber.reset();
+                robot.shooter.launch();
+            } else if(gamepad2.right_stick_button){
+                robot.sweeper.reset();
+                robot.shooter.launch();
             }
             robot.grabber.armTelemetry();
             robot.shooter.shooterTelemetry();

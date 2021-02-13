@@ -75,8 +75,8 @@ public class Robot {
             teamUtil.log("Resetting Robot");
 
             drive.initImu();
-            //sweeper.reset();
-            //grabber.reset();
+            sweeper.reset();
+            grabber.reset();
         }
         drive.initSensors(usingDistanceSensors);
         drive.calibrateColorSensors(); // Color sensors should be over non taped mat when this is called

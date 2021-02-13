@@ -19,20 +19,16 @@ public class RobotTeleopLinear extends LinearOpMode {
     double storedHeading;
     boolean blockerExtended = false;
 
-
     public void initialize() {
 
         teamUtil.init(this);
         teamUtil.alliance = teamUtil.Alliance.RED;
         teamUtil.telemetry.addLine("Initializing Op Mode...please wait");
         teamUtil.telemetry.update();
-        teamUtil.theBlinkin.setSignal(Blinkin.Signals.INIT);
-
         teamGamePad = new TeamGamepad(this);
         robot = new Robot(this);
         robot.init(false);
-        //teamUtil.theBlinkin.setSignal(Blinkin.Signals.READY_TO_START);
-        //teamUtil.initPerf();
+
     }
 
     @Override
@@ -91,6 +87,15 @@ public class RobotTeleopLinear extends LinearOpMode {
 
                 }
             }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RIGHTTRIGGER)) {
+                if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
+                    robot.grabber.grab();
+
+                } else {
+                    robot.grabber.release();
+
+                }
+            }
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //Gamepad 2 code
@@ -102,15 +107,7 @@ public class RobotTeleopLinear extends LinearOpMode {
             if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
                 robot.grabber.moveToReadyNoWait();
             }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTTRIGGER)) {
-                if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
-                    robot.grabber.grab();
 
-                } else {
-                    robot.grabber.release();
-
-                }
-            }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTBUMPPER)) {
                 if (!robot.shooter.motorRunning) {
                     robot.shooter.flywheelStart();
@@ -136,28 +133,41 @@ public class RobotTeleopLinear extends LinearOpMode {
             }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
                 if (!robot.sweeper.motorRunning) {
-                    robot.sweeper.retract();
-                }else {
-                    robot.sweeper.stop();
+                    robot.sweeper.retractFully();
                 }
             }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
                 if (!robot.sweeper.motorRunning) {
-                    robot.sweeper.extend();
-                }else {
-                    robot.sweeper.stop();
+                    robot.sweeper.extendFully();
                 }
             }
+
+            if(gamepad2.left_stick_y > 0.1){
+                robot.sweeper.extend();
+
+            } else if(gamepad2.left_stick_y < -0.1){
+                robot.sweeper.retract();
+            } else robot.sweeper.stop();
+
+            if(gamepad2.right_stick_y > 0.1){
+                //TODO: sweeper manual control up
+
+            } else if(gamepad2.right_stick_y < -0.1){
+                //TODO: sweeper manual control down
+            }
+
             //sweeper is the servo
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2B)) {
-                robot.sweeper.manualControl(1);
+                robot.sweeper.manualControl(robot.sweeper.SWEEP);
                 //SWEEP position
             }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2A)) {
-                robot.sweeper.manualControl(0);
+                robot.sweeper.manualControl(robot.sweeper.STOWED);
                 //READY Position
             }
             //this code is the telemetry
+            robot.shooter.shooterTelemetry();
+            robot.sweeper.sweeperTelemetry();
             teamUtil.telemetry.update();
 
             // teamUtil.trackPerf();

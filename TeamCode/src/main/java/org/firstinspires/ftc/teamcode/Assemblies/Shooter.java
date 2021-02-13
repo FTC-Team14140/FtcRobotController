@@ -17,12 +17,13 @@ public class Shooter {
     public Servo pusher;
     public Servo tilter;
     double currentTargetVelocity = 0;
-    double POWERSHOT_VELOCITY = 1.0; //TODO: find right number
-    double HIGH_GOAL_VELOCITY = 2.0; //TODO: find right number
-    double POWERSHOT_POSITION = 0; //TODO: find right number
-    double HIGH_GOAL_POSITION = 1; //TODO: find right number
-    double LAUNCH_POSITION = 0; //TODO: find right number
-    double RELOAD_POSITION = 0; //TODO: find right number
+    double FLYWHEEL_MAX_VELOCITY = 2620;
+    double POWERSHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY;
+    double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
+    double POWERSHOT_POSITION = 0.46;
+    double HIGH_GOAL_POSITION = 0.45;
+    double LAUNCH_POSITION = 0.71;
+    double RELOAD_POSITION = 0.51;
     public boolean motorRunning = false;
 
     //defining new type with specific values
@@ -49,10 +50,12 @@ public class Shooter {
         pusher = hardwareMap.servo.get("pusherServo");
         tilter = hardwareMap.servo.get("tilterServo");
         currentTarget = ShooterTarget.POWERSHOT;
+        currentTargetVelocity = POWERSHOT_VELOCITY;
+//        flywheel.setVelocity(10000000);
     }
 
     public void shooterTelemetry() {
-        teamUtil.telemetry.addLine("Shooter Tilt:"+ tilter.getPosition() + " Flywheel:"+flywheel.getVelocity());
+        teamUtil.telemetry.addLine("Shooter Tilt:"+ tilter.getPosition() + "Shooter Pusher" + pusher.getPosition() + " Flywheel:"+flywheel.getVelocity());
     }
 
     // Tilt the shooter to aim at the powershots
@@ -90,7 +93,9 @@ public class Shooter {
 
     // StartFlyWheel at the speed needed for the current aim
     public void flywheelStart() {
-        if (motorRunning = false){
+        teamUtil.log("fly wheel start");
+        if (motorRunning == false){
+            teamUtil.log("fly wheel starting: " + currentTargetVelocity);
             flywheel.setVelocity(currentTargetVelocity);
             motorRunning = true;
         }
@@ -99,6 +104,7 @@ public class Shooter {
     // Returns true if the flywheel is spinning fast enough for the current aim
     public boolean flywheelReady() {
         if (Math.abs(flywheel.getVelocity() - currentTargetVelocity)<currentTargetVelocity*0.05){
+            teamUtil.log("Flywheel is ready, thing: " + Math.abs(flywheel.getVelocity() - currentTargetVelocity) );
             return true;
         }else{
             return false;
