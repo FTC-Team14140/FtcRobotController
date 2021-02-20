@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.basicLibs.SkystoneDetector;
 import org.firstinspires.ftc.teamcode.basicLibs.runningVoteCount;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
-@Autonomous(name = "testDaDetector")
+@Autonomous(name = "testSkystoneDetector")
 //@Disabled
 
 public class TestSkystoneDetector extends LinearOpMode {

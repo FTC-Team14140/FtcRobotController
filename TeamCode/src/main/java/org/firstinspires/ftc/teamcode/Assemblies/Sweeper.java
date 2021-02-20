@@ -17,17 +17,17 @@ public class Sweeper {
     public Servo sweeper;
     Boolean sweeperCalibrated = false;
     Double TENSION_POWER = -0.3;
-    int FULLY_EXTENDED = 1800; //TODO: find right number for extended encoder position
-    int EXTENDED_THESHOLD = (int) (FULLY_EXTENDED * .9);
-    Double EXTEND_SPEED = 1000.0; //TODO: find right number
-    int FULLY_RETRACTED = 50; //TODO: find right number for retracted encoder position
-    int RETRACTED_DOWN_THESHOLD = 200;
-    int RETRACTED_UP_THESHOLD = 50;
+    int FULLY_EXTENDED = 1800;
+    int EXTENDED_THESHOLD = (int) (FULLY_EXTENDED * .95);
+    Double EXTEND_SPEED = 2000.0; //TODO: find right number
+    Double RETRACT_SPEED = -2000.0; //TODO: find right number
+    int FULLY_RETRACTED = 0;
+    int RETRACTED_DOWN_THESHOLD = FULLY_RETRACTED + 200;
+    int RETRACTED_UP_THESHOLD = FULLY_RETRACTED + 40;
 
-    Double RETRACT_SPEED = -1000.0; //TODO: find right number
     public final float SWEEP = 0.2f;
     public final float STOWED = 0.86f;
-    public final float READY = 0.1f; //TODO: find right number
+    public final float READY = (STOWED-SWEEP)/2+SWEEP; // half way between the two
     public boolean motorRunning = false;
 
 
@@ -45,7 +45,14 @@ public class Sweeper {
     }
 
     public void sweeperTelemetry() {
-        teamUtil.telemetry.addLine("Sweeper Arm:"+ motor.getCurrentPosition() + " Grabber:"+sweeper.getPosition());
+        String s = "UNKNOWN";
+        if (sweeper.getPosition() == STOWED)
+            s = "STOWED";
+        else if (sweeper.getPosition() == READY)
+            s = "READY";
+        else if (sweeper.getPosition() == SWEEP)
+            s = "SWEEP";
+        teamUtil.telemetry.addLine("Sweeper Arm:"+ motor.getCurrentPosition() + " Grabber:"+s+ " Grabber:"+sweeper.getPosition());
     }
 
     // retracts the arm fully and resets the encoder position to 0
@@ -60,12 +67,21 @@ public class Sweeper {
             teamUtil.sleep(250);
             // if things aren't moving, we have stalled
             if (motor.getCurrentPosition() == last) {
+                // reset stalled position as Zero
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setPower(0);
+
+                // Move the motor out a bit so it won't interfere with the intake
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motor.setVelocity(EXTEND_SPEED);
+                motor.setTargetPosition(RETRACTED_UP_THESHOLD);
+                while (motor.isBusy()) {}
+
+                // Get state ready to run
                 motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motor.setPower(0);
                 sweeperCalibrated = true;
                 teamUtil.log("Calibrating Sweeper - Finished");
-
                 return;
             }
             teamUtil.log("Sweeper Encoder:" + " " + last);
@@ -87,30 +103,43 @@ public class Sweeper {
 
     // retract the sweeper arm at full speed until stop is called or it cannot go further
     public void retract() {
-        if (sweeper.getPosition() >= STOWED && motor.getCurrentPosition() < RETRACTED_UP_THESHOLD) {
-            stop();
-        } else if (sweeper.getPosition() > READY && motor.getCurrentPosition() < RETRACTED_DOWN_THESHOLD) {
-            stop();
-        } else  {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setVelocity(RETRACT_SPEED);
+        if (sweeper.getPosition() >= STOWED) {
+            if (motor.getCurrentPosition() < RETRACTED_UP_THESHOLD+30) {
+                stop();
+            } else {
+                motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motor.setVelocity(RETRACT_SPEED);
+            }
+        } else {
+            if (motor.getCurrentPosition() < RETRACTED_DOWN_THESHOLD+30) {
+                stop();
+            } else  {
+                motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motor.setVelocity(RETRACT_SPEED);
+            }
         }
     }
 
     // Extends the sweeper arm to full extension
+    // TODO: Test
     public void extendFully() {
         teamUtil.log("sweeper is extending fully to pos: " + FULLY_EXTENDED);
-        motor.setTargetPosition(FULLY_EXTENDED);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setVelocity(EXTEND_SPEED);
+        motor.setTargetPosition(FULLY_EXTENDED);
     }
 
     // Starts the blocker moving in and full speed.  Will continue until stop is called
+    // TODO: Test
     public void retractFully() {
-        teamUtil.log("sweeper is retracting fully to pos: " + FULLY_RETRACTED);
-        motor.setTargetPosition(FULLY_RETRACTED);
+        // set target based on servo position
+        int target = sweeper.getPosition() >= STOWED ? RETRACTED_UP_THESHOLD : RETRACTED_DOWN_THESHOLD;
+        teamUtil.log("sweeper is retracting fully to pos: " + target);
+
+        // start the motors moving to the target
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setVelocity(RETRACT_SPEED);
+        motor.setTargetPosition(target);
     }
 
     // Stop the blocker at its current position
@@ -134,12 +163,21 @@ public class Sweeper {
     }
 
     // Move the sweeper to the specified position.
-    // 0 means READY Position
-    // 1 means SWEEP position
-    // This is intended to be hooked up to a gamepad control for manual control over the sweeper position
-    public void manualControl(float position) {
-        float controlledPosition = (SWEEP-READY)*position+READY;
-        sweeper.setPosition(controlledPosition);
+    // 1 means SWEEP Position
+    // -1 means STOWED position
+    // This is intended to be hooked up to a gamepad joystick for manual control over the sweeper position
+//    public void manualControl(float position) {
+//        if (position > .1) {// allow for a little dead zone
+//            double slope = (SWEEP - READY) / .9;
+//            sweeper.setPosition(READY + (position * slope));
+//        } else if (position < -.1) {
+//            double slope = (READY - STOWED) / .9;
+//            sweeper.setPosition(READY + (position * slope));
+//        }
+//    }
+    public void manualControl(float triggerPosition) {
+            double slope = (SWEEP - READY) ;
+            sweeper.setPosition(READY + (triggerPosition * slope));
     }
 
     // Launches a new thread to retract and stow the sweeper

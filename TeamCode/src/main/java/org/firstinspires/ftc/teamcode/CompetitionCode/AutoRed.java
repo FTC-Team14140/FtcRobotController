@@ -13,20 +13,15 @@ public class AutoRed extends LinearOpMode {
     TeamGamepad teamGamePad;
     Robot robot;
 
-
     public void initialize() {
 
         teamUtil.init(this);
         teamUtil.alliance = teamUtil.Alliance.RED;
         teamUtil.telemetry.addLine("Initializing Op Mode...please wait");
         teamUtil.telemetry.update();
-        teamUtil.theBlinkin.setSignal(Blinkin.Signals.INIT);
-
         teamGamePad = new TeamGamepad(this);
         robot = new Robot(this);
         robot.init(true);
-        //teamUtil.theBlinkin.setSignal(Blinkin.Signals.READY_TO_START);
-        //teamUtil.initPerf();
     }
 
     @Override

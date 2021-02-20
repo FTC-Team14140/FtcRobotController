@@ -16,9 +16,9 @@ public class GrabberArm {
     final double STALL_POWER = -0.098; //idk if this is the right number UP is Negative
     final int HORIZONTAL = 0;
     final int STOW_POS = 3800;
-    final int READY_POS = 2500;
+    final int READY_POS = 2575;
     final int TRANSPORT_POS = 600;
-    final double ARM_SPEED = .50;
+    final double ARM_SPEED = 1500;
     final float GRABBER_GRAB = .598f;
     final float GRABBER_OPEN = 1f;
     boolean isReset = false;
@@ -110,9 +110,9 @@ public class GrabberArm {
 
     // Moves the arm to the place/ready position and releases the wobble goal.
     void placeAndRelease() {
-        arm.setTargetPosition(READY_POS);
         arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         arm.setVelocity(ARM_SPEED);
+        arm.setTargetPosition(READY_POS);
         while (Math.abs(arm.getCurrentPosition()-READY_POS)>50){
         }
         release();
@@ -180,7 +180,7 @@ public class GrabberArm {
     }
 
     // Launches a new thread to stow the grabber and arm inside the robot
-    void stowNoWait() {
+    public void stowNoWait() {
         if (isBusy) {
             teamUtil.log("called stowNoWait while grabber busy");
             return;

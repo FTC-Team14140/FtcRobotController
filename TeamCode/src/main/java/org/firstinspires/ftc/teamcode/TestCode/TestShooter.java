@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.TestCode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name="TestShooter")
+@Disabled
 public class TestShooter extends LinearOpMode {
     DcMotor m1, m2;
     double FULL_POWER = 1;

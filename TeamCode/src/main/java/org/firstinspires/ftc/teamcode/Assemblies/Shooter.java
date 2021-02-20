@@ -18,12 +18,12 @@ public class Shooter {
     public Servo tilter;
     double currentTargetVelocity = 0;
     double FLYWHEEL_MAX_VELOCITY = 2620;
-    double POWERSHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY;
+    double POWERSHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
     double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
     double POWERSHOT_POSITION = 0.46;
-    double HIGH_GOAL_POSITION = 0.45;
+    double HIGH_GOAL_POSITION = 0.485;
     double LAUNCH_POSITION = 0.71;
-    double RELOAD_POSITION = 0.51;
+    double RELOAD_POSITION = 0.45;
     public boolean motorRunning = false;
 
     //defining new type with specific values
@@ -36,7 +36,6 @@ public class Shooter {
         OFF
     }
     ShooterTarget currentTarget;
-    FlyWheel flywheelRunning;
 
     public Shooter() {
         teamUtil.log("Constructing Shooter");
@@ -49,9 +48,9 @@ public class Shooter {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         pusher = hardwareMap.servo.get("pusherServo");
         tilter = hardwareMap.servo.get("tilterServo");
-        currentTarget = ShooterTarget.POWERSHOT;
-        currentTargetVelocity = POWERSHOT_VELOCITY;
-//        flywheel.setVelocity(10000000);
+        motorRunning = false;
+        pusher.setPosition(RELOAD_POSITION);
+        aimAt(ShooterTarget.HIGH_GOAL);
     }
 
     public void shooterTelemetry() {

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TestCode.CoachCode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,7 +10,7 @@ import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
 @TeleOp(name = "NEW TestDriveSystem")
-//@Disabled
+@Disabled
 public class newTestDrive extends LinearOpMode {
 
         public static double MAX_POWER = 1;

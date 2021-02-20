@@ -160,6 +160,8 @@ public class RingDetector {
                             recognition.getRight(), recognition.getBottom());
                 }
                 telemetry.update();
+            } else {
+                telemetry.addData("no detected rings", 0);
             }
         }
     }

@@ -49,7 +49,8 @@ public class RobotTeleopLinear extends LinearOpMode {
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //Gamepad 1 code
-            //this code is for the drive
+
+            //DRIVE Control
             if (gamepad1.left_trigger > 0.5) {
                 robot.drive.universalJoystick(gamepad1.left_stick_x,
                         gamepad1.left_stick_y,
@@ -69,6 +70,7 @@ public class RobotTeleopLinear extends LinearOpMode {
             }
 
 
+            //INTAKE control
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1X)) {
                 if (!robot.rightIntake.intakeRunning && !robot.leftIntake.intakeRunning) {
                     robot.leftIntake.start();
@@ -79,6 +81,16 @@ public class RobotTeleopLinear extends LinearOpMode {
 
                 }
             }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1A)) {
+                if (robot.shooter.flywheelReady()) {
+                    robot.shooter.launch();
+                    //TODO: make sure you can't launch the next ring until the one before has completely left the robot
+                    //otherwise it'll get stuck
+                }
+
+            }
+
+            //BLOCKER control
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RB)) {
                 if (!robot.blocker.blockerExtended) {
                     robot.blocker.extendNoWait();
@@ -87,8 +99,17 @@ public class RobotTeleopLinear extends LinearOpMode {
 
                 }
             }
+
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1B)) {
+                robot.grabber.stowNoWait();
+            }
+
+            //WOBBLE GOAL GRABBER control
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RIGHTTRIGGER)) {
+                teamUtil.log("grabber control button triggered");
                 if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
+                    teamUtil.log("grabber position is open ");
+                    teamUtil.log("grabber closed on button press");
                     robot.grabber.grab();
 
                 } else {
@@ -100,6 +121,7 @@ public class RobotTeleopLinear extends LinearOpMode {
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //Gamepad 2 code
 
+            //WOBBLE GOAL ARM control
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
                 robot.grabber.liftNoWait();
 
@@ -108,6 +130,7 @@ public class RobotTeleopLinear extends LinearOpMode {
                 robot.grabber.moveToReadyNoWait();
             }
 
+            //SHOOTER control
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTBUMPPER)) {
                 if (!robot.shooter.motorRunning) {
                     robot.shooter.flywheelStart();
@@ -117,12 +140,7 @@ public class RobotTeleopLinear extends LinearOpMode {
 
                 }
             }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTTRIGGER)) {
-                if (robot.shooter.flywheelReady()) {
-                    robot.shooter.launch();
-                }
 
-            }
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) {
                 robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
 
@@ -131,43 +149,38 @@ public class RobotTeleopLinear extends LinearOpMode {
                 robot.shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
 
             }
+            // manual aiming (not sure about these controls for this...
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
+                robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()-.005);
+            }
+            if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+                robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()+.005);
+            }
+
+            //SWEEPER control
+            if(gamepad2.left_stick_y > 0.1){
+                robot.sweeper.retract();
+            } else if(gamepad2.left_stick_y < -0.1){
+                robot.sweeper.extend();
+            }  else
+                robot.sweeper.stop();
+            /*
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
                 if (!robot.sweeper.motorRunning) {
                     robot.sweeper.retractFully();
                 }
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+            } else if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
                 if (!robot.sweeper.motorRunning) {
                     robot.sweeper.extendFully();
                 }
             }
+*/
+            robot.sweeper.manualControl(gamepad2.right_trigger);
 
-            if(gamepad2.left_stick_y > 0.1){
-                robot.sweeper.extend();
 
-            } else if(gamepad2.left_stick_y < -0.1){
-                robot.sweeper.retract();
-            } else robot.sweeper.stop();
-
-            if(gamepad2.right_stick_y > 0.1){
-                //TODO: sweeper manual control up
-
-            } else if(gamepad2.right_stick_y < -0.1){
-                //TODO: sweeper manual control down
-            }
-
-            //sweeper is the servo
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2B)) {
-                robot.sweeper.manualControl(robot.sweeper.SWEEP);
-                //SWEEP position
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2A)) {
-                robot.sweeper.manualControl(robot.sweeper.STOWED);
-                //READY Position
-            }
             //this code is the telemetry
             robot.shooter.shooterTelemetry();
-            robot.sweeper.sweeperTelemetry();
+            //robot.sweeper.sweeperTelemetry();
             teamUtil.telemetry.update();
 
             // teamUtil.trackPerf();

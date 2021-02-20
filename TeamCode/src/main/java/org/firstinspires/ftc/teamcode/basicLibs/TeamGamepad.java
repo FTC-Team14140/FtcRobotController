@@ -206,6 +206,30 @@ public class TeamGamepad {
 
         }
 
+        if(theOpMode.gamepad1.right_trigger > 0.5){
+            pressed[buttons.GAMEPAD1RIGHTTRIGGER.ordinal()] = true;
+        }else if (pressed[buttons.GAMEPAD1RIGHTTRIGGER.ordinal()] && theOpMode.gamepad1.right_trigger < 0.5){
+            bounced[buttons.GAMEPAD1RIGHTTRIGGER.ordinal()] = true;
+            pressed[buttons.GAMEPAD1RIGHTTRIGGER.ordinal()] = false;
+
+        }
+
+        if(theOpMode.gamepad2.left_trigger > 0.5){
+            pressed[buttons.GAMEPAD2LEFTTRIGGER.ordinal()] = true;
+        }else if (pressed[buttons.GAMEPAD2LEFTTRIGGER.ordinal()] && theOpMode.gamepad2.left_trigger < 0.5){
+            bounced[buttons.GAMEPAD2LEFTTRIGGER.ordinal()] = true;
+            pressed[buttons.GAMEPAD2LEFTTRIGGER.ordinal()] = false;
+
+        }
+
+        if(theOpMode.gamepad1.left_trigger > 0.5){
+            pressed[buttons.GAMEPAD1LEFTTRIGGER.ordinal()] = true;
+        }else if (pressed[buttons.GAMEPAD1LEFTTRIGGER.ordinal()] && theOpMode.gamepad1.left_trigger < 0.5){
+            bounced[buttons.GAMEPAD1LEFTTRIGGER.ordinal()] = true;
+            pressed[buttons.GAMEPAD1LEFTTRIGGER.ordinal()] = false;
+
+        }
+
     }
 
 
