@@ -89,7 +89,41 @@ public class Sweeper {
         } while (true);
     }
 
-    // Extends the sweeper arm at full speed until stop is called or it hits the end
+    public int getRetractedTarget() {
+        if (sweeper.getPosition() >= STOWED) {
+            return RETRACTED_UP_THESHOLD;
+        } else {
+            return RETRACTED_DOWN_THESHOLD;
+        }
+    }
+
+    // Use RunToPosition and setVelocity to extend/retract the sweeper
+    public void extend2(float speed) {
+        if (motor.getCurrentPosition() >= EXTENDED_THESHOLD) {
+            stop();
+            motorRunning = false;
+        } else {
+            motorRunning = true;
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setTargetPosition(EXTENDED_THESHOLD);
+            motor.setVelocity(EXTEND_SPEED * speed);
+        }
+    }
+
+    public void retract2(float speed) {
+        int threshold = getRetractedTarget();
+        if (motor.getCurrentPosition() <= threshold) {
+            stop();
+            motorRunning = false;
+        } else {
+            motorRunning = true;
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setTargetPosition(threshold);
+            motor.setVelocity(EXTEND_SPEED * speed);
+        }
+    }
+
+        // Extends the sweeper arm at full speed until stop is called or it hits the end
     public void extend() {
         if (motor.getCurrentPosition() > EXTENDED_THESHOLD) {
             stop();
@@ -100,6 +134,7 @@ public class Sweeper {
             motor.setVelocity(EXTEND_SPEED);
         }
     }
+
 
     // retract the sweeper arm at full speed until stop is called or it cannot go further
     public void retract() {

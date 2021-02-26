@@ -25,6 +25,7 @@ public class Shooter {
     double LAUNCH_POSITION = 0.71;
     double RELOAD_POSITION = 0.45;
     public boolean motorRunning = false;
+    public boolean launching = false;
 
     //defining new type with specific values
     public enum ShooterTarget {
@@ -121,5 +122,21 @@ public class Shooter {
         pusher.setPosition(LAUNCH_POSITION);
         teamUtil.pause(500);
         pusher.setPosition(RELOAD_POSITION);
+        teamUtil.pause(500);
     }
+
+    public void launchNoWait() {
+        if (launching) {
+            return;
+        }
+        launching = true;
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                launch();
+                launching = false;
+            }
+        });
+        thread.start();
+    }
+
 }
