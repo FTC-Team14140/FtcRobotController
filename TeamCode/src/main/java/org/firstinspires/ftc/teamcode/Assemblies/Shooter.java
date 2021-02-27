@@ -22,8 +22,8 @@ public class Shooter {
     double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
     double POWERSHOT_POSITION = 0.46;
     double HIGH_GOAL_POSITION = 0.485;
-    double LAUNCH_POSITION = 0.71;
-    double RELOAD_POSITION = 0.45;
+    double LAUNCH_POSITION = 0.7;
+    double RELOAD_POSITION = 0.50;
     public boolean motorRunning = false;
     public boolean launching = false;
 
@@ -120,9 +120,9 @@ public class Shooter {
     // Launch a ring
     public void launch() {
         pusher.setPosition(LAUNCH_POSITION);
-        teamUtil.pause(500);
+        teamUtil.pause(350);
         pusher.setPosition(RELOAD_POSITION);
-        teamUtil.pause(500);
+        teamUtil.pause(350);
     }
 
     public void launchNoWait() {

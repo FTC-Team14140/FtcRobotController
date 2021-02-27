@@ -113,26 +113,31 @@ public class RingDetector {
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(2.5, 1.78);
 
-
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
+            teamUtil.log("Detector -- Getting List");
+
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-                telemetry.addData("# Object Detected", updatedRecognitions.size());
-
-                // step through the list of recognitions and display boundary info.
+                teamUtil.log("Detector -- Change Found "+updatedRecognitions.size()+" Object(s)");
+                //telemetry.addData("# Object Detected", updatedRecognitions.size());
 
                 for (Recognition recognition : updatedRecognitions) {
+                    teamUtil.log("Found: " + recognition.getLabel());
                     if (recognition.getLabel() == LABEL_FOUR_RINGS) {
                         return 4;
                     } else if (recognition.getLabel() == LABEL_ONE_RING) {
                         return 1;
+                    } else {
+                        teamUtil.log("Found strange object, returning 0");
+                        return 0;
                     }
                 }
-
+                teamUtil.log("Empty list, returning 0");
+                return 0;
 
             } else {
-                teamUtil.log("DetectRings -- no rings found");
+                //teamUtil.log("DetectRings -- no rings found");
                 return 0;
                 }
         }

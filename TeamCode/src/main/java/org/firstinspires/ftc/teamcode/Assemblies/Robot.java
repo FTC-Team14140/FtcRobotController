@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Assemblies.OLD.Latch;
 import org.firstinspires.ftc.teamcode.Assemblies.OLD.LiftSystem;
+import org.firstinspires.ftc.teamcode.basicLibs.RingDetector;
 import org.firstinspires.ftc.teamcode.basicLibs.SkystoneDetector;
 import org.firstinspires.ftc.teamcode.basicLibs.teamColorSensor;
 import org.firstinspires.ftc.teamcode.basicLibs.teamDistanceSensor;
@@ -27,6 +28,7 @@ public class Robot {
     Telemetry telemetry;
 
     public Blocker blocker;
+    RingDetector detector;
     public Sweeper sweeper;
     public GrabberArm grabber;
     public Intake leftIntake, rightIntake;
@@ -53,6 +55,7 @@ public class Robot {
         sweeper = new Sweeper();
         grabber = new GrabberArm();
         shooter = new Shooter();
+        detector = new RingDetector(telemetry, hardwareMap);
         teamUtil.log("Constructing Assemblies - Finished");
 
         teamUtil.log("Constructed Robot - Finished");
@@ -85,7 +88,80 @@ public class Robot {
         teamUtil.log("Initializing Robot - Finished");
     }
 
-    public void doAuto() {
+    public void doAuto2(int rings){
+
+
+        //detect rings here
+        if(rings == 0 || rings == 1){
+            drive.moveInches(180, 67, 9000);
+
+        } else if(rings == 4){
+            drive.moveInches(180, 115, 9000);
+        }
+
+        //line up off of right wall by 16 inches
+        drive.moveToDistance(drive.leftDistance, 90 , 16, 3000);
+
+
+        if(rings == 0 || rings == 4){
+            grabber.placeAndRelease();
+
+            if(rings == 0){
+                //move diaganoally backwards
+                drive.moveInches(315, 18, 4000);
+
+            } else if(rings == 1){
+                //TODO
+
+            } else if(rings == 4){
+                //move diagaonally backwards
+                drive.moveInches(340, 62, 4000);
+            }
+
+        } else if(rings == 1){
+
+            drive.rotateTo(115);
+            drive.moveInches(90, 10, 2000);
+            grabber.placeAndRelease();
+            drive.moveInches(235, 21, 4000);
+
+        }
+
+        //ALL CODE PROCEEDS AS SAME FROM HERE
+        grabber.stowNoWait();
+        drive.rotateTo(270);
+        shooter.flywheelStart();
+        drive.moveInches(0, 15.5, 4000);
+
+        //start shooting for powershots
+
+        shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+        while (!shooter.flywheelReady()) {
+
+        }
+        shooter.launch();
+        drive.moveInches(0, 7.5, 7000);
+        shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+        while (!shooter.flywheelReady()) {
+
+        }
+        shooter.launch();
+        drive.moveInches(0, 7.5, 7000);
+        shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+        while (!shooter.flywheelReady()) {
+
+        }
+        shooter.launch();
+        shooter.stopFlywheel();
+        blocker.extendNoWait();
+        drive.moveInches(200, 32, 4000);
+
+
+
+
+    }
+
+    public void doAuto(int rings) {
         // TODO: Do a bunch of stuff and get a bunch of points
         //The robot starts touching the wall on the closest to the right side wall if you are facing the goals or the closest line to where you should stand
         //Move robot off the wall
@@ -146,8 +222,15 @@ public class Robot {
         //Drives the robot to park on the white line
         drive.moveInches(270, 4, 7000);
 
-        //Extends the blocker
-        blocker.extendFully();
+        //TODO: NEW STUFF HERE 2/26
+        drive.moveInches(0, 5, 7000);
+        grabber.moveToReadyNoWait();
+
+
+
+
+
+
 
         // record that Auto has been run so we don't reinitialize certain sensors and calibrate motor encoders
         justRanAuto = true;

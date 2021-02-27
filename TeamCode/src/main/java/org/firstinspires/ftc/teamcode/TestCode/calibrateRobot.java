@@ -48,10 +48,10 @@ public class calibrateRobot extends LinearOpMode {
         initialize();
         waitForStart();
         robot.drive.resetHeading();
-        robot.grabber.grabber.setPosition(0.75);
-        robot.shooter.tilter.setPosition(0.5);
-        robot.shooter.pusher.setPosition(0.5);
-        robot.sweeper.sweeper.setPosition(0.5);
+        //robot.grabber.grabber.setPosition(0.75);
+        //robot.shooter.tilter.setPosition(0.5);
+        //robot.shooter.pusher.setPosition(0.5);
+        //robot.sweeper.sweeper.setPosition(0.5);
 
         while (opModeIsActive()) {
             teamGamePad.gamepadLoop();

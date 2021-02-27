@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
 import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
+import org.firstinspires.ftc.teamcode.basicLibs.RingDetector;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 public class AutoRed extends LinearOpMode {
     TeamGamepad teamGamePad;
     Robot robot;
+    RingDetector detector;
 
     public void initialize() {
 
@@ -19,6 +21,9 @@ public class AutoRed extends LinearOpMode {
         teamUtil.alliance = teamUtil.Alliance.RED;
         teamUtil.telemetry.addLine("Initializing Op Mode...please wait");
         teamUtil.telemetry.update();
+        detector = new RingDetector(telemetry, hardwareMap);
+        detector.initDetector();
+
         teamGamePad = new TeamGamepad(this);
         robot = new Robot(this);
         robot.init(true);
@@ -29,9 +34,22 @@ public class AutoRed extends LinearOpMode {
 
         initialize();
 
+        detector.activateDetector();
+        telemetry.addLine("Starting to detect rings...");
+
         teamUtil.telemetry.addLine("Ready to Ultimate");
         teamUtil.telemetry.update();
         waitForStart();
-        robot.doAuto();
+
+        //roll forward to detect rings
+        robot.drive.moveInches(180, 6, 6000);
+
+        int rings = detector.detectRings();
+        telemetry.addData("rings: ", rings);
+        telemetry.update();
+        teamUtil.log("rings: "+ rings);
+        detector.shutDownDetector();
+
+        robot.doAuto2(1);
     }
 }

@@ -22,10 +22,10 @@ public class Sweeper {
     Double EXTEND_SPEED = 2000.0; //TODO: find right number
     Double RETRACT_SPEED = -2000.0; //TODO: find right number
     int FULLY_RETRACTED = 0;
-    int RETRACTED_DOWN_THESHOLD = FULLY_RETRACTED + 200;
+    int RETRACTED_DOWN_THESHOLD = FULLY_RETRACTED + 170;
     int RETRACTED_UP_THESHOLD = FULLY_RETRACTED + 40;
 
-    public final float SWEEP = 0.2f;
+    public final float SWEEP = 0.15f;
     public final float STOWED = 0.86f;
     public final float READY = (STOWED-SWEEP)/2+SWEEP; // half way between the two
     public boolean motorRunning = false;
