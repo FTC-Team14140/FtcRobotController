@@ -21,7 +21,8 @@ public class Shooter {
     double POWERSHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
     double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
     double POWERSHOT_POSITION = 0.46;
-    double HIGH_GOAL_POSITION = 0.485;
+    double HIGH_GOAL_POSITION = 0.488;
+    double PUSHER_ALL_OUT = 1;
     double LAUNCH_POSITION = 0.7;
     double RELOAD_POSITION = 0.50;
     public boolean motorRunning = false;
@@ -90,6 +91,16 @@ public class Shooter {
             tilter.setPosition(HIGH_GOAL_POSITION);
         }
     }
+
+
+    //NOT USED
+//    public void togglePusherAllOut(){
+//        if(pusher.getPosition() != PUSHER_ALL_OUT){
+//            pusher.setPosition(PUSHER_ALL_OUT);
+//        } else {
+//            pusher.setPosition(RELOAD_POSITION);
+//        }
+//    }
 
     // StartFlyWheel at the speed needed for the current aim
     public void flywheelStart() {

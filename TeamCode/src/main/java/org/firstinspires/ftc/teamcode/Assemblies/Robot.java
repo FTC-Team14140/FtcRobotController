@@ -65,6 +65,7 @@ public class Robot {
     public void init(boolean usingDistanceSensors) {
         teamUtil.log("Initializing Robot");
         drive.initDriveMotors();
+        drive.initImu();
 
         leftIntake.init("leftPulleyServo", true,"leftRollerServo", false);
         rightIntake.init("rightPulleyServo", false,"rightRollerServo",true);
@@ -77,7 +78,7 @@ public class Robot {
         if (!justRanAuto) {
             teamUtil.log("Resetting Robot");
 
-            drive.initImu();
+
             sweeper.reset();
             grabber.reset();
         }
@@ -90,8 +91,7 @@ public class Robot {
 
     public void doAuto2(int rings){
 
-
-        //detect rings here
+        // Move straight down the right wall
         if(rings == 0 || rings == 1){
             drive.moveInches(180, 67, 9000);
 
@@ -102,7 +102,7 @@ public class Robot {
         //line up off of right wall by 16 inches
         drive.moveToDistance(drive.leftDistance, 90 , 16, 3000);
 
-
+        // for targets near wall, we can just drop and move to shooting position
         if(rings == 0 || rings == 4){
             grabber.placeAndRelease();
 
@@ -110,15 +110,12 @@ public class Robot {
                 //move diaganoally backwards
                 drive.moveInches(315, 18, 4000);
 
-            } else if(rings == 1){
-                //TODO
-
             } else if(rings == 4){
                 //move diagaonally backwards
                 drive.moveInches(340, 62, 4000);
             }
 
-        } else if(rings == 1){
+        } else if(rings == 1){ // spin and position for drop on target B
 
             drive.rotateTo(115);
             drive.moveInches(90, 10, 2000);
@@ -153,11 +150,13 @@ public class Robot {
         }
         shooter.launch();
         shooter.stopFlywheel();
+
+        // Get ready for Teleop and park on line
         blocker.extendNoWait();
         drive.moveInches(200, 32, 4000);
 
-
-
+//         record that Auto has been run so we don't reinitialize certain sensors and calibrate motor encoders
+        justRanAuto = true;
 
     }
 
@@ -225,11 +224,6 @@ public class Robot {
         //TODO: NEW STUFF HERE 2/26
         drive.moveInches(0, 5, 7000);
         grabber.moveToReadyNoWait();
-
-
-
-
-
 
 
         // record that Auto has been run so we don't reinitialize certain sensors and calibrate motor encoders

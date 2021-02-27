@@ -81,6 +81,8 @@ public class GrabberArm {
     // move the servo to the grab positionu
     // This is also the stowed position
     public void grab() {
+
+
         grabber.setPosition(GRABBER_GRAB);
         currentGrabberPosition = GRABBER_POS.CLOSE;
     }
@@ -88,6 +90,10 @@ public class GrabberArm {
     // move the servo to the release position
     // This is also the ready position
     public void release() {
+        //grabber arm was in stow, should not open the grabber
+        if(arm.getCurrentPosition() > (READY_POS + STOW_POS)/2 ){
+            return;
+        }
         grabber.setPosition(GRABBER_OPEN);
         currentGrabberPosition = GRABBER_POS.OPEN;
     }
@@ -110,9 +116,9 @@ public class GrabberArm {
 
     // Moves the arm to the place/ready position and releases the wobble goal.
     void placeAndRelease() {
+        arm.setTargetPosition(READY_POS);
         arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         arm.setVelocity(ARM_SPEED);
-        arm.setTargetPosition(READY_POS);
         while (Math.abs(arm.getCurrentPosition()-READY_POS)>50){
         }
         release();

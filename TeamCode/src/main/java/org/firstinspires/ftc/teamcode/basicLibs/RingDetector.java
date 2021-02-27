@@ -95,7 +95,7 @@ public class RingDetector {
     public void shutDownDetector() {
         teamUtil.log("Detector -- Shutting down");
         if (tfod != null) {
-            teamUtil.log("Detector -- calling activate on tfod");
+            teamUtil.log("Detector -- calling shutdown on tfod");
             tfod.shutdown();
         }
     }

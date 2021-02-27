@@ -134,6 +134,7 @@ public class RobotTeleopLinear extends LinearOpMode {
                     robot.shooter.launchNoWait();
                 }
             }
+
             // manual aiming (not sure about these controls for this...
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
                 robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()-.005);
