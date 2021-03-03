@@ -17,7 +17,7 @@ public class GrabberArm {
     final int HORIZONTAL = 0;
     final int STOW_POS = 3800;
     final int READY_POS = 2575;
-    final int TRANSPORT_POS = 600;
+    final int TRANSPORT_POS = READY_POS / 2; // Was 600
     final double ARM_SPEED = 1500;
     final float GRABBER_GRAB = .598f;
     final float GRABBER_OPEN = 1f;
