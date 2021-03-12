@@ -26,7 +26,6 @@ public class TeamGamepad {
         GAMEPAD2DPADDOWN,
         GAMEPAD2DPADLEFT,
         GAMEPAD2DPADRIGHT,
-        GAMEPAD2RIGHTBUMPPER,
         GAMEPAD2RIGHTTRIGGER,
         GAMEPAD2LEFTTRIGGER
     }
@@ -191,13 +190,7 @@ public class TeamGamepad {
             pressed[buttons.GAMEPAD2DPADRIGHT.ordinal()] = false;
 
         }
-        if(theOpMode.gamepad2.right_bumper){
-            pressed[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] = true;
-        }else if (pressed[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] && !theOpMode.gamepad2.right_bumper){
-            bounced[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] = true;
-            pressed[buttons.GAMEPAD2RIGHTBUMPPER.ordinal()] = false;
 
-        }
         if(theOpMode.gamepad2.right_trigger > 0.5){
             pressed[buttons.GAMEPAD2RIGHTTRIGGER.ordinal()] = true;
         }else if (pressed[buttons.GAMEPAD2RIGHTTRIGGER.ordinal()] && theOpMode.gamepad2.right_trigger < 0.5){

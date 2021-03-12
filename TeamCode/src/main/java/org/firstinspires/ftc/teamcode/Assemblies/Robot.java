@@ -81,6 +81,8 @@ public class Robot {
 
             sweeper.reset();
             grabber.reset();
+        } else {
+            blocker.blockerExtended = true;
         }
         drive.initSensors(usingDistanceSensors);
         drive.calibrateColorSensors(); // Color sensors should be over non taped mat when this is called
@@ -93,10 +95,10 @@ public class Robot {
 
         // Move straight down the right wall
         if(rings == 0 || rings == 1){
-            drive.moveInches(180, 67, 9000);
+            drive.moveInches(180, 61, 9000); //67
 
         } else if(rings == 4){
-            drive.moveInches(180, 115, 9000);
+            drive.moveInches(180, 109, 9000); //115
         }
 
         //line up off of right wall by 16 inches
@@ -104,7 +106,8 @@ public class Robot {
 
         // for targets near wall, we can just drop and move to shooting position
         if(rings == 0 || rings == 4){
-            grabber.placeAndRelease();
+            grabber.lift();
+            grabber.release();
 
             if(rings == 0){
                 //move diaganoally backwards
@@ -119,15 +122,17 @@ public class Robot {
 
             drive.rotateTo(115);
             drive.moveInches(90, 10, 2000);
-            grabber.placeAndRelease();
+            grabber.lift();
+            grabber.release();
             drive.moveInches(235, 21, 4000);
 
         }
 
         //ALL CODE PROCEEDS AS SAME FROM HERE
         grabber.stowNoWait();
-        drive.rotateTo(270);
         shooter.flywheelStart();
+        drive.rotateTo(270);
+
         drive.moveInches(0, 15.5, 4000);
 
         //start shooting for powershots

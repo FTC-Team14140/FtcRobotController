@@ -38,16 +38,19 @@ public class AutoRed extends LinearOpMode {
         telemetry.addLine("Starting to detect rings...");
 
         teamUtil.telemetry.addLine("Ready to Ultimate");
+        telemetry.addData("rings: ", detector.detectRings());
         teamUtil.telemetry.update();
         waitForStart();
         int rings = detector.detectRings();
 
         //roll forward to detect rings
         long DETECT_TIME_OUT = 3000; // Allow up to 3 seconds for TensorFlow to figure it out
-        robot.drive.moveInches(180, 6, 6000);
+        robot.drive.moveInches(180, 12, 6000);
         rings = detector.detectRings();
+        teamUtil.pause(3000);
         long timeOutTime = System.currentTimeMillis() + DETECT_TIME_OUT;
         // Assume NO False positives...
+
         while (rings < 1 && System.currentTimeMillis() < timeOutTime) {
             teamUtil.pause(100);
             rings = detector.detectRings();

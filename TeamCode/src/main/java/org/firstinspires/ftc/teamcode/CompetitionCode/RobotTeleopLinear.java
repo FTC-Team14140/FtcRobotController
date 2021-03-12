@@ -45,116 +45,119 @@ public class RobotTeleopLinear extends LinearOpMode {
             teamUtil.telemetry.addData("Heading:", robot.drive.getHeading());
             teamGamePad.gamepadLoop();
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //   DRIVE Control - GamePad 1
-            if (gamepad1.left_trigger > 0.5) {
-                robot.drive.universalJoystick(gamepad1.left_stick_x,
-                        gamepad1.left_stick_y,
-                        gamepad1.right_stick_x, true,
-                        robot.drive.getHeading(), storedHeading);
+            if (true  ) { // Current controls
 
-            } else {
-                robot.drive.universalJoystick(gamepad1.left_stick_x,
-                        gamepad1.left_stick_y,
-                        gamepad1.right_stick_x, false,
-                        robot.drive.getHeading(), storedHeading);
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   DRIVE Control - GamePad 1
+                if (gamepad1.left_trigger > 0.5) {
+                    robot.drive.universalJoystick(gamepad1.left_stick_x,
+                            gamepad1.left_stick_y,
+                            gamepad1.right_stick_x, true,
+                            robot.drive.getHeading(), storedHeading);
 
-            }
-
-            if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
-                robot.drive.resetHeading();
-            }
-
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //   INTAKE control - GamePad 1
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1X)) {
-                if (!robot.rightIntake.intakeRunning && !robot.leftIntake.intakeRunning) {
-                    robot.leftIntake.start();
-                    robot.rightIntake.start();
                 } else {
-                    robot.leftIntake.stop();
-                    robot.rightIntake.stop();
+                    robot.drive.universalJoystick(gamepad1.left_stick_x,
+                            gamepad1.left_stick_y,
+                            gamepad1.right_stick_x, true,
+                            robot.drive.getHeading(), storedHeading);
 
                 }
-            }
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //   BLOCKER control - GamePad 1
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RB)) {
-                if (!robot.blocker.blockerExtended) {
-                    robot.blocker.extendNoWait();
-                } else {
-                    robot.blocker.retractNoWait();
+                if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
+                    robot.drive.resetHeading();
+                }
+
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   INTAKE control - GamePad 1
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1X)) {
+                    if (!robot.rightIntake.intakeRunning && !robot.leftIntake.intakeRunning) {
+                        robot.leftIntake.start();
+                        robot.rightIntake.start();
+                    } else {
+                        robot.leftIntake.stop();
+                        robot.rightIntake.stop();
+
+                    }
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   BLOCKER control - GamePad 1
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RB)) {
+                    if (!robot.blocker.blockerExtended) {
+                        robot.blocker.extendNoWait();
+                    } else {
+                        robot.blocker.retractNoWait();
+
+                    }
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   WOBBLE GOAL GRABBER control - GamePad 1 & 2
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1B)) {
+                    robot.grabber.stowNoWait();
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
+                    robot.grabber.liftNoWait();
+                }
+                if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
+                    robot.grabber.moveToReadyNoWait();
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1LEFTTRIGGER)) {
+                    //teamUtil.log("grabber control button triggered");
+                    if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
+                        //teamUtil.log("grabber position is open ");
+                        //teamUtil.log("grabber closed on button press");
+                        robot.grabber.grab();
+                    } else {
+                        robot.grabber.release();
+                    }
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   SHOOTER control
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RB)) { // Flywheel on/off
+                    if (!robot.shooter.motorRunning) {
+                        robot.shooter.flywheelStart();
+                    } else {
+                        robot.shooter.stopFlywheel();
+                    }
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) { // Aim at powershot
+                    robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
 
                 }
-            }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2X)) { // Aim at high goal
+                    robot.shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //   WOBBLE GOAL GRABBER control - GamePad 1 & 2
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1B)) {
-                robot.grabber.stowNoWait();
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
-                robot.grabber.liftNoWait();
-            }
-            if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
-                robot.grabber.moveToReadyNoWait();
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1RIGHTTRIGGER)) {
-                //teamUtil.log("grabber control button triggered");
-                if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
-                    //teamUtil.log("grabber position is open ");
-                    //teamUtil.log("grabber closed on button press");
-                    robot.grabber.grab();
-                } else {
-                    robot.grabber.release();
                 }
-            }
+//                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1A)) {  // launch  TODO Maybe trigger this code if the button is held down?
+//                    if (robot.shooter.flywheelReady()) {
+//                        robot.shooter.launchNoWait();
+//                    }
+//                }
+                robot.shooter.pusherManualControl(gamepad1.right_trigger); // Pusher for launch and clearing jams
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //   SHOOTER control
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2RIGHTBUMPPER)) { // Flywheel on/off
-                if (!robot.shooter.motorRunning) {
-                    robot.shooter.flywheelStart();
-                } else {
-                    robot.shooter.stopFlywheel();
+                // manual aiming (not sure about these controls for this...
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
+                    robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()-.005);
                 }
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2Y)) { // Aim at powershot
-                robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
-
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2X)) { // Aim at high goal
-                robot.shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
-
-            }
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1A)) {  // launch  TODO Maybe trigger this code if the button is held down?
-                if (robot.shooter.flywheelReady()) {
-                    robot.shooter.launchNoWait();
+                if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+                    robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()+.005);
                 }
-            }
 
-            // manual aiming (not sure about these controls for this...
-            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
-                robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()-.005);
-            }
-            if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
-                robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()+.005);
-            }
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //   SWEEPER control
-            if(gamepad2.left_stick_y > 0.1){
-                //robot.sweeper.retract();
-                robot.sweeper.retract2(gamepad2.left_stick_y);
-            } else if(gamepad2.left_stick_y < -0.1){
-                //robot.sweeper.extend();
-                robot.sweeper.extend2(-gamepad2.left_stick_y);
-            }  else {
-                robot.sweeper.stop();
-            }
-            robot.sweeper.manualControl(gamepad2.right_trigger);
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   SWEEPER control
+                if(gamepad2.left_stick_y > 0.1){
+                    //robot.sweeper.retract();
+                    robot.sweeper.retract2(gamepad2.left_stick_y);
+                } else if(gamepad2.left_stick_y < -0.1){
+                    //robot.sweeper.extend();
+                    robot.sweeper.extend2(-gamepad2.left_stick_y);
+                }  else {
+                    robot.sweeper.stop();
+                }
+                robot.sweeper.manualControl(gamepad2.right_trigger);
 
             /*  WARNING These Methods are not tested and maybe don't work...
             if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT)) {
@@ -168,9 +171,111 @@ public class RobotTeleopLinear extends LinearOpMode {
             }
             */
 
+            } else { // New Controls
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   DRIVE Control - GamePad 1
+                robot.drive.universalJoystick(gamepad1.left_stick_x,
+                        gamepad1.left_stick_y,
+                        gamepad1.right_stick_x, !gamepad1.right_bumper,
+                        robot.drive.getHeading(), storedHeading);
+
+                if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
+                    robot.drive.resetHeading();
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   SHOOTER control
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1B)) { // Flywheel on/off
+                    if (!robot.shooter.motorRunning) {
+                        robot.shooter.flywheelStart();
+                    } else {
+                        robot.shooter.stopFlywheel();
+                    }
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1A)) { // Aim at powershot
+                    robot.shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1Y)) { // Aim at high goal
+                    robot.shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
+
+                }
+                robot.shooter.pusherManualControl(gamepad1.right_trigger); // Pusher for launch and clearing jams
+
+                // manual aiming
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1DPADUP)) {
+                    robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()+.005);
+                }
+                if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1DPADDOWN)) {
+                    robot.shooter.tilter.setPosition(robot.shooter.tilter.getPosition()-.005);
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   INTAKE control - GamePad 1
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1DPADRIGHT)) {
+                    if (!robot.leftIntake.intakeRunning) {
+                        robot.leftIntake.start();
+                    } else {
+                        robot.leftIntake.stop();
+                    }
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1DPADLEFT)) {
+                    if (!robot.rightIntake.intakeRunning) {
+                        robot.rightIntake.start();
+                    } else {
+                        robot.rightIntake.stop();
+                    }
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   WOBBLE GOAL GRABBER control - GamePad 1 for grabber & 2 for arm
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
+                    robot.grabber.stowNoWait();
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
+                    robot.grabber.liftNoWait();
+                }
+                if  (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADLEFT) || teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADRIGHT)) {
+                    robot.grabber.moveToReadyNoWait();
+                }
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1LEFTTRIGGER)) {
+                    //teamUtil.log("grabber control button triggered");
+                    if (robot.grabber.currentGrabberPosition == GrabberArm.GRABBER_POS.OPEN) {
+                        //teamUtil.log("grabber position is open ");
+                        //teamUtil.log("grabber closed on button press");
+                        robot.grabber.grab();
+                    } else {
+                        robot.grabber.release();
+                    }
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   SWEEPER control GamePad 2
+                if(gamepad2.left_stick_y > 0.1){
+                    robot.sweeper.retract2(gamepad2.left_stick_y);
+                } else if(gamepad2.left_stick_y < -0.1){
+                    robot.sweeper.extend2(-gamepad2.left_stick_y);
+                }  else {
+                    robot.sweeper.stop();
+                }
+                robot.sweeper.manualControl(gamepad2.right_trigger);
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //   BLOCKER control - GamePad 2
+                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2LB)) {
+                    if (!robot.blocker.blockerExtended) {
+                        robot.blocker.extendNoWait();
+                    } else {
+                        robot.blocker.retractNoWait();
+
+                    }
+                }
+            }
+
 
             //this code is the telemetry
-            //robot.shooter.shooterTelemetry();
+            robot.shooter.shooterTelemetry();
             //robot.sweeper.sweeperTelemetry();
             teamUtil.telemetry.update();
 

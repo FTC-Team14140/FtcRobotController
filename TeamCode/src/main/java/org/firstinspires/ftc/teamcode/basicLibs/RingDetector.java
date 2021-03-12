@@ -58,7 +58,7 @@ public class RingDetector {
     private static final String LABEL_ONE_RING = "Single";
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
-
+    private runningVoteCount ringElection;
 
     private static final String VUFORIA_KEY = "AQfNUG7/////AAABmUE+GcnGE0LEkw6V6sBYnPdv0drO1QVLisryY2Kp9RhXImHEPLJJuIQaWyj3TKOYDB9P82rUavLg/jTofMcts0xLv8L5R4YfYDSZA4eJJMyEDPZxz6MSUXIpxhs7pof23wYX49SR5f/mvVq/qNOYb2DkpNSjTrMLTmyj0quYsA2LKS6C4zqbTr9XMQLGgmI9dYHV6Nk7HMcltcyB2ETUXPMew+bsp+UugBpt0VPjc9kW09Vy9ZGo9UncX7B/Gw73Kua6lUqqHvtfXpi3Sn2xJMcqWLHn5bxzr1xOwk9Co2kr8A3rU2gxpVzWMAnWHiWGWw9MY6GcIz6rJk+mu/e5jQeTTF08EK6ZXnzITpZQElx0";
 
@@ -69,11 +69,13 @@ public class RingDetector {
         teamUtil.log("Constructing Detector");
         this.telemetry = theTelemetry;
         this.hardwareMap = theHardwareMap;
+        ringElection = new runningVoteCount(3000);  // track readings for the last 3 seconds
 
     }
 
     public void initDetector() {
         teamUtil.log("Initializing Detector");
+        ringElection.clearVote();
         initVuforia();
 
         if (true /*ClassFactory.getInstance().canCreateTFObjectDetector()*/) { // TODO: Seem like 5.5 changed someething here...
@@ -115,16 +117,26 @@ public class RingDetector {
 
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
-            teamUtil.log("Detector -- Getting List");
+            //teamUtil.log("Detector -- Getting List");
 
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-                teamUtil.log("Detector -- Change Found "+updatedRecognitions.size()+" Object(s)");
+                //teamUtil.log("Detector -- Change Found "+updatedRecognitions.size()+" Object(s)");
                 //telemetry.addData("# Object Detected", updatedRecognitions.size());
 
                 for (Recognition recognition : updatedRecognitions) {
-                    teamUtil.log("Found: " + recognition.getLabel());
-                    if (recognition.getLabel() == LABEL_FOUR_RINGS) {
+                    /*
+                    teamUtil.log("Found: " + recognition.getLabel()
+                            + "Conf: " + recognition.getConfidence()
+                            + " L: " + recognition.getLeft()
+                            + " R: " + recognition.getRight()
+                            + " T: " + recognition.getTop()
+                            + " B: " + recognition.getBottom());
+
+                     */
+                    if (recognition.getLeft()<375 || recognition.getRight() > 900 || recognition.getTop() < 230 || recognition.getBottom() > 510){
+                        return 0; // ghost recognition outside zooom box
+                    } else if (recognition.getLabel() == LABEL_FOUR_RINGS) {
                         return 4;
                     } else if (recognition.getLabel() == LABEL_ONE_RING) {
                         return 1;
@@ -133,7 +145,7 @@ public class RingDetector {
                         return 0;
                     }
                 }
-                teamUtil.log("Empty list, returning 0");
+                //teamUtil.log("Empty list, returning 0");
                 return 0;
 
             } else {
@@ -146,6 +158,24 @@ public class RingDetector {
         return -1;
     }
 
+    public void castVote(int vote) {
+        if (vote==0){
+            ringElection.vote(1);
+        } else if (vote==1) {
+            ringElection.vote(2);
+        } else
+            ringElection.vote(3);
+    }
+
+    public void detectAndVote() {
+        castVote(detectRings());
+    }
+
+    public int getPath() {
+        return ringElection.getWinner(1); //
+    }
+
+    public int[] getTotals () { return ringElection.getTotals();}
 
     public void reportRingInformation(){
         if (tfod != null) {
@@ -199,6 +229,8 @@ public class RingDetector {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.8f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.setZoom(2.5, 16.0/9.0); // zoom in for better detection from the wall
+
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FOUR_RINGS, LABEL_ONE_RING);
     }
 

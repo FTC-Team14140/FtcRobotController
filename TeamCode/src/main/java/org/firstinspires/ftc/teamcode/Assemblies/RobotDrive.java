@@ -843,7 +843,11 @@ public class RobotDrive {
         } else {
             leftY = (leftJoyStickY / 3 - 1 / 6) * scaleAmount;
         }
-        rotationAdjustment = (float) (rightJoyStickX * 0.37 * scaleAmount);
+        if(Math.abs(rightJoyStickX) == 1){
+            rotationAdjustment = (float) (rightJoyStickX * 0.37 * 2);
+        } else {
+            rotationAdjustment = (float) (rightJoyStickX * 0.37 * 1); //1 was originally scaleAmount
+        }
 
         float frontLeft = -(leftY - leftX - rotationAdjustment);
         float frontRight = (-leftY - leftX - rotationAdjustment);
