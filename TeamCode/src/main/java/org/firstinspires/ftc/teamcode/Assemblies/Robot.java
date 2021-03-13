@@ -91,6 +91,60 @@ public class Robot {
         teamUtil.log("Initializing Robot - Finished");
     }
 
+    public void doAuto3(int path){
+
+
+        shooter.flywheelStart();
+        drive.moveInches(270, 44, 3000);
+
+        if(path == 3){
+            drive.rotateTo(7.5);
+            shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
+            while (!shooter.flywheelReady()) {
+
+            }
+            grabber.liftNoWait();
+            shooter.launch();
+            shooter.launch();
+            shooter.launch();
+            drive.rotateTo(0);
+            leftIntake.start();
+            drive.moveInches(0, 10, 5000);
+            drive.moveInches(0, 5, 5000);
+            drive.moveInches(0, 5, 5000);
+            teamUtil.pause(1000);
+            drive.rotateTo(357);
+            shooter.launch();
+            shooter.launch();
+            drive.moveInches(0, 5, 5000);
+            drive.moveInches(250, 24, 5000);
+            shooter.launch();
+            shooter.launch();
+            shooter.launch();
+
+            drive.moveInches(250, 55, 5000);
+            drive.rotateTo(135);
+            grabber.release();
+            drive.moveInches(300, 24, 4000, drive.DRIVE_MAX_VELOCITY);
+            blocker.extendNoWait();
+            drive.moveInches(300, 24, 5000);
+            drive.rotateTo(0);
+
+
+
+
+
+//            drive.moveInches(315, 35, 7000, drive.FIND_LINE_SPEED); // go fast then slow down to find tape
+//            drive.moveToLine(drive.frontRightColor, teamColorSensor.TapeColor.RED, 315, 7000);
+//
+//            drive.moveInches(145 , 22 - drive.frontDistance.getDistanceInches() , 3000);
+//            shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
+//            shooter.launch();
+
+        }
+
+    }
+
     public void doAuto2(int rings){
 
         // Move straight down the right wall

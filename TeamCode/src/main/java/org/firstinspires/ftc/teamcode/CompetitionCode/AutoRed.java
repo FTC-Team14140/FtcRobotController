@@ -44,22 +44,22 @@ public class AutoRed extends LinearOpMode {
         int rings = detector.detectRings();
 
         //roll forward to detect rings
-        long DETECT_TIME_OUT = 3000; // Allow up to 3 seconds for TensorFlow to figure it out
-        robot.drive.moveInches(180, 12, 6000);
-        rings = detector.detectRings();
-        teamUtil.pause(3000);
-        long timeOutTime = System.currentTimeMillis() + DETECT_TIME_OUT;
-        // Assume NO False positives...
+//        long DETECT_TIME_OUT = 3000; // Allow up to 3 seconds for TensorFlow to figure it out
+//        robot.drive.moveInches(180, 12, 6000);
+//        rings = detector.detectRings();
+//        teamUtil.pause(3000);
+//        long timeOutTime = System.currentTimeMillis() + DETECT_TIME_OUT;
+//        // Assume NO False positives...
+//
+//        while (rings < 1 && System.currentTimeMillis() < timeOutTime) {
+//            teamUtil.pause(100);
+//            rings = detector.detectRings();
+//        }
+//        telemetry.addData("rings: ", rings);
+//        telemetry.update();
+//        teamUtil.log("Found "+ rings + " rings in msecs:"+(DETECT_TIME_OUT - (timeOutTime -System.currentTimeMillis())));
+//        detector.shutDownDetector();
 
-        while (rings < 1 && System.currentTimeMillis() < timeOutTime) {
-            teamUtil.pause(100);
-            rings = detector.detectRings();
-        }
-        telemetry.addData("rings: ", rings);
-        telemetry.update();
-        teamUtil.log("Found "+ rings + " rings in msecs:"+(DETECT_TIME_OUT - (timeOutTime -System.currentTimeMillis())));
-        detector.shutDownDetector();
-
-        robot.doAuto2(rings);
+        robot.doAuto3(3);
     }
 }

@@ -206,8 +206,10 @@ public class CalibrateDriveSystem extends LinearOpMode {
 
             // HOLD the GP2 left TRIGGER to adjust the movement parameters
             if (gamepad2.left_trigger > 0.5) {
-                adjustBasicMovementParams();
-            }
+                adjustSpinThresholds();
+                //adjustBasicMovementParams();
+            } else
+                testSpins();
 
             teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
             robot.drive.distanceTelemetry();
@@ -218,7 +220,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
 
             //robot.drive.telemetryDriveEncoders();
             telemetry.addLine("Start:"+ robot.drive.MIN_START_SPEED +" End:"+robot.drive.MIN_END_SPEED +" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
-            //telemetry.addLine("SpinSLOW:"+ robot.drive.DRIVE_SLOW_SPIN_VELOCITY+" SpinMAX:"+robot.drive.DRIVE_MAX_SPIN_VELOCITY+" SlowThreshold:"+robot.drive.SPIN_SLOW_THRESHOLD+" Dec:"+robot.drive.SPIN_DECEL_THRESHOLD);
+            telemetry.addLine("SpinSLOW:"+ robot.drive.DRIVE_SLOW_SPIN_VELOCITY+" SpinMAX:"+robot.drive.DRIVE_MAX_SPIN_VELOCITY+" SlowThreshold:"+robot.drive.SPIN_SLOW_THRESHOLD+" Dec:"+robot.drive.SPIN_DECEL_THRESHOLD);
             //telemetry.addLine("Heading:"+ HEADING+" TIME:"+TIME);
             teamUtil.telemetry.update();
 
