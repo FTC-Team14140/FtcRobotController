@@ -33,7 +33,7 @@ public class TestRingDetector extends LinearOpMode {
         telemetry.update();
 
 
-        // Start looking at Skystones before the start...
+        // Start looking at Rings before the start...
         detector.activateDetector();
         telemetry.addLine("Starting to Detect");
         telemetry.update();

@@ -130,12 +130,17 @@ public class Shooter {
 
     // Launch a ring
     public void launch() {
+        pusher.setPosition(LAUNCH_POSITION);
+        teamUtil.pause(350);
+        pusher.setPosition(RELOAD_POSITION);
+        teamUtil.pause(350);
+    }
+    public void launchAndClear() {
         pusher.setPosition(PUSHER_ALL_OUT);
         teamUtil.pause(500);
         pusher.setPosition(RELOAD_POSITION);
         teamUtil.pause(500);
     }
-
     public void pusherManualControl(float triggerPosition) {
         double slope = (PUSHER_ALL_OUT - RELOAD_POSITION) ;
         pusher.setPosition(RELOAD_POSITION + (triggerPosition * slope));

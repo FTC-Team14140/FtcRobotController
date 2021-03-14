@@ -132,9 +132,8 @@ public class RingDetector {
                             + " R: " + recognition.getRight()
                             + " T: " + recognition.getTop()
                             + " B: " + recognition.getBottom());
-
-                     */
-                    if (recognition.getLeft()<375 || recognition.getRight() > 900 || recognition.getTop() < 230 || recognition.getBottom() > 510){
+*/
+                    if (recognition.getLeft()<370 || recognition.getRight() > 900 || recognition.getTop() < 225 || recognition.getBottom() > 510){
                         return 0; // ghost recognition outside zooom box
                     } else if (recognition.getLabel() == LABEL_FOUR_RINGS) {
                         return 4;

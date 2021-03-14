@@ -52,7 +52,7 @@ public class Blocker {
         driveServo.setPower(STOP);
     }
 
-    void extendFully () {
+    public void extendFully () {
         driveServo.setPower(FORWARD_FULL_POWER);
         teamUtil.pause(EXTEND_TIME);
         driveServo.setPower(STOP);

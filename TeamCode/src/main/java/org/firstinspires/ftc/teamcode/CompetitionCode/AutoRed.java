@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
-import org.firstinspires.ftc.teamcode.basicLibs.Blinkin;
 import org.firstinspires.ftc.teamcode.basicLibs.RingDetector;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
@@ -33,33 +32,26 @@ public class AutoRed extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         initialize();
-
+        // Start looking at Rings before the start...
         detector.activateDetector();
-        telemetry.addLine("Starting to detect rings...");
+        telemetry.addLine("Starting to Detect");
+        telemetry.update();
 
-        teamUtil.telemetry.addLine("Ready to Ultimate");
-        telemetry.addData("rings: ", detector.detectRings());
-        teamUtil.telemetry.update();
+        // use the ring detector to detect and vote 4 times a second
+        while (!opModeIsActive()) {
+            teamUtil.pause(250);
+            detector.detectAndVote();
+            int[] totals = detector.getTotals();
+            //teamUtil.log("1:"+ totals[1]+ " 2:"+ totals[2]+ " 3:"+ totals[3]);
+            telemetry.addData("Path: ", detector.getPath());
+            telemetry.update();
+        }
+
         waitForStart();
-        int rings = detector.detectRings();
+        int path = detector.getPath(); // Result of voting: 1 2 or 3
+        teamUtil.log("Path: "+ path);
+        detector.shutDownDetector();
 
-        //roll forward to detect rings
-//        long DETECT_TIME_OUT = 3000; // Allow up to 3 seconds for TensorFlow to figure it out
-//        robot.drive.moveInches(180, 12, 6000);
-//        rings = detector.detectRings();
-//        teamUtil.pause(3000);
-//        long timeOutTime = System.currentTimeMillis() + DETECT_TIME_OUT;
-//        // Assume NO False positives...
-//
-//        while (rings < 1 && System.currentTimeMillis() < timeOutTime) {
-//            teamUtil.pause(100);
-//            rings = detector.detectRings();
-//        }
-//        telemetry.addData("rings: ", rings);
-//        telemetry.update();
-//        teamUtil.log("Found "+ rings + " rings in msecs:"+(DETECT_TIME_OUT - (timeOutTime -System.currentTimeMillis())));
-//        detector.shutDownDetector();
-
-        robot.doAuto3(3);
+        robot.doAutoV3(path);
     }
 }
