@@ -19,6 +19,7 @@ public class GrabberArm {
     final int READY_POS = 2575;
     final int TRANSPORT_POS = READY_POS / 2; // Was 600
     final int AUTO_DROP = READY_POS - 250;
+    final int TELEOP_UP = (TRANSPORT_POS)/2;
     final double ARM_SPEED = 1500;
     final float GRABBER_GRAB = .598f;
     final float GRABBER_OPEN = 1f;
@@ -153,6 +154,15 @@ public class GrabberArm {
         }
     }
 
+    void liftToTeleopUp () {
+        teamUtil.pause(1000);
+        arm.setTargetPosition(TELEOP_UP);
+        arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        arm.setVelocity(ARM_SPEED);
+        while (Math.abs(arm.getCurrentPosition()-TELEOP_UP)>50){
+        }
+    }
+
     // Launches a new thread to Grab a wobble goal and lift it up for transport
     public void grabAndLiftNoWait () {
         if (isBusy) {
@@ -194,6 +204,21 @@ public class GrabberArm {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 liftToAutoDrop();
+                isBusy = false;
+            }
+        });
+        thread.start();
+    }
+
+    public void liftToTeleopUpNoWait() {
+        if (isBusy) {
+            teamUtil.log("called LiftNoWait while grabber busy");
+            return;
+        }
+        isBusy = true;
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                liftToTeleopUp();
                 isBusy = false;
             }
         });

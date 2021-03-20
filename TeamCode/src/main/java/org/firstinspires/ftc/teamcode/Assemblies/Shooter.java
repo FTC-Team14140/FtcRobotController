@@ -19,9 +19,13 @@ public class Shooter {
     double currentTargetVelocity = 0;
     double FLYWHEEL_MAX_VELOCITY = 2620;
     double POWERSHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
-    double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
-    double POWERSHOT_POSITION = 0.46;
+    double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY; //no longer times 0.9
+    double POWERSHOT_POSITION = 0.463888; //0.46; before more ring compression
     double HIGH_GOAL_POSITION = 0.488;
+    public double AUTO_VELOCITY = FLYWHEEL_MAX_VELOCITY*1;
+    public double AUTO_POS_1 = HIGH_GOAL_POSITION;//0.47833; //0.47222;
+    public double AUTO_POS_2 = HIGH_GOAL_POSITION;//0.47833; //0.47222;
+    public double AUTO_POS_3 = HIGH_GOAL_POSITION; //0.47722;
     double PUSHER_ALL_OUT = .85;
     double LAUNCH_POSITION = 0.7;
     double RELOAD_POSITION = 0.50;
@@ -52,7 +56,8 @@ public class Shooter {
         tilter = hardwareMap.servo.get("tilterServo");
         motorRunning = false;
         pusher.setPosition(RELOAD_POSITION);
-        aimAt(ShooterTarget.HIGH_GOAL);
+        aimAt(ShooterTarget.POWERSHOT);
+        aimAt(ShooterTarget.HIGH_GOAL); // force reset to known position
     }
 
     public void shooterTelemetry() {
@@ -69,7 +74,15 @@ public class Shooter {
             changeSpeed();
             changeAngle();
         }
+    }
 
+    public void manualTilt(double tilt) {
+        tilter.setPosition(tilt);
+    }
+
+    public void manualFlyWheelSpeed(double velocity) {
+        currentTargetVelocity = velocity;
+        flywheel.setVelocity(currentTargetVelocity);
     }
 
     public void changeSpeed() {

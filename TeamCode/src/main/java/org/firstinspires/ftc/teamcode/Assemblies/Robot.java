@@ -14,10 +14,10 @@ public class Robot {
     Robot robot;
     int path;
     public boolean hasBeenInitialized = false;
-    private static boolean justRanAuto;
+    private static int justRanAuto;
 
     static {
-        justRanAuto = false;
+        justRanAuto = 0;
     }
 
     HardwareMap hardwareMap;
@@ -71,14 +71,20 @@ public class Robot {
         shooter.init();
 
         // reset mechanisms and initialize sensors if we did NOT just run auto
-        if (!justRanAuto) {
+        if (justRanAuto==0) {
             teamUtil.log("Resetting Robot");
 
 
             sweeper.reset();
             grabber.reset();
-        } else {
+
+        }else if(justRanAuto == 1){
             blocker.blockerExtended = true;
+        }  else if(justRanAuto == 2){
+            grabber.grab();
+            grabber.liftToTeleopUp();
+        } else if(justRanAuto == 3){
+//            blocker.blockerExtended = true;
         }
         drive.initSensors(usingDistanceSensors);
         drive.calibrateColorSensors(); // Color sensors should be over non taped mat when this is called
@@ -91,6 +97,7 @@ public class Robot {
 
         //start flywheel and drive forward a bit
         shooter.flywheelStart();
+        shooter.manualFlyWheelSpeed(shooter.FLYWHEEL_MAX_VELOCITY);
 
 
         if(path == 1){
@@ -176,29 +183,34 @@ public class Robot {
             drive.rotateTo(180);
 
         } else if(path == 3){
+            shooter.manualTilt(shooter.AUTO_POS_1);
             drive.moveInches(270, 44, 3000);
             //Assuming there are FOUR rings on the field
             //rotate a little and shoot twice at high goal
-            drive.rotateTo(7.5);
-            shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
+            drive.rotateTo(8.5);
+//            shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
             grabber.liftToAutoDropNoWait();
             while (!shooter.flywheelReady()) {
             }
             shooter.launchAndClear();
             shooter.launchAndClear();
             drive.rotateTo(0);
+            shooter.manualTilt(shooter.AUTO_POS_2);
             leftIntake.start();
             //move to suck up more rings and shoot twice
             drive.moveInches(0, 10, 5000);
             drive.moveInches(0, 5, 5000);
-            teamUtil.pause(1000);
+//            drive.moveInches(180, 5, 5000); drive backwards commented out
+            teamUtil.pause(1600);
 //            drive.rotateTo(357);
             shooter.launchAndClear();
             shooter.launchAndClear();
+            shooter.launchAndClear();
             //move to suck up more rings again)
+            shooter.manualTilt(shooter.AUTO_POS_3);
+            drive.moveInches(0, 5, 5000); //originally 10 when drive backwards was there
             drive.moveInches(0, 5, 5000);
-            drive.moveInches(0, 5, 5000);
-            drive.moveInches(250, 24, 5000);
+            drive.moveInches(245, 24, 5000);
             //shoot 4 times(one extra to make sure it's not stuck)
             shooter.launchAndClear();
             shooter.launchAndClear();
@@ -209,10 +221,10 @@ public class Robot {
             drive.rotateTo(135);
             grabber.release();
             //move diagonally back to get to white line(and extend blocker)
-            drive.moveInches(300, 24, 4000, drive.DRIVE_MAX_VELOCITY);
-            blocker.extendNoWait();
-            drive.moveInches(300, 24, 5000);
-            drive.rotateTo(0);
+//            drive.moveInches(300, 24, 4000, drive.DRIVE_MAX_VELOCITY);
+//            blocker.extendNoWait();
+//            drive.moveInches(300, 24, 5000);
+//            drive.rotateTo(0);
 
 
 
@@ -226,9 +238,10 @@ public class Robot {
 //            shooter.launch();
 
         }
-
+        justRanAuto = path;
     }
 
+    /*
     public void doAuto2(int rings){
 
         // Move straight down the right wall
@@ -372,6 +385,7 @@ public class Robot {
         // record that Auto has been run so we don't reinitialize certain sensors and calibrate motor encoders
         justRanAuto = true;
     }
+     */
 }
 
 
