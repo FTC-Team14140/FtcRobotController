@@ -84,6 +84,7 @@ public class Robot {
             grabber.grab();
             grabber.liftToTeleopUp();
         } else if(justRanAuto == 3){
+//            grabber.stow();
 //            blocker.blockerExtended = true;
         }
         drive.initSensors(usingDistanceSensors);
@@ -97,129 +98,168 @@ public class Robot {
 
         //start flywheel and drive forward a bit
         shooter.flywheelStart();
-        shooter.manualFlyWheelSpeed(shooter.FLYWHEEL_MAX_VELOCITY);
 
 
         if(path == 1){
-            drive.moveInches(295, 70, 5000);
             shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
-            grabber.liftToAutoDropNoWait();
-            while (!shooter.flywheelReady()) {
-            }
-            shooter.launchAndClear();
-            teamUtil.pause(150);
-            shooter.launchAndClear();
-            teamUtil.pause(150);
-            shooter.launchAndClear();
+            drive.moveInches(290, 70, 5000);
 
-            drive.rotateTo(120);
+            // Launch 3 rings
+            shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
+            shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
+            shooter.launchAndClear();
+            shooter.stopFlywheel();
+
+            // prepare to drop wobble goal
+            grabber.liftToAutoDropNoWait();
+
+            // position for drop
+            drive.rotateTo(110);
             drive.moveInches(90, 10, 2000);
             grabber.release();
+
+            // Move clear of dropped wobble goal
             teamUtil.pause(800);
             drive.moveInches(270, 10, 2000);
 
+            // adjust heading and arm to get 2nd wobble goal
             drive.rotateTo(270);
-
-            drive.moveInches(205, 30, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
             grabber.moveToReadyNoWait();
-            drive.moveToDistance(drive.backDistance, 205, 13, 4000);
-            drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
 
-            drive.moveInches(90, 4, 2000);
+            // use sensors to position on 2nd goal
+            drive.moveInches(197, 33, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
+            grabber.moveToReadyNoWait();
+            drive.moveToDistance(drive.backDistance, 205, 13.8, 4000);
+            drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
+            drive.moveInches(90, 2.5, 2000);
+
+            // grab it
             grabber.grab();
             teamUtil.pause(750);
             grabber.liftToAutoDropNoWait();
 
-
+            // move back to target and drop
             drive.moveInches(345, 64, 6000);
             drive.rotateTo(92);
             grabber.release();
             teamUtil.pause(750);
+
+            // park and get ready to block rings
             drive.moveInches(270, 5, 3000);;
             drive.rotateTo(0);
             blocker.extendFully();
 
 
+        } else if(path == 2){ //Assuming there is ONE ring on the field
+            // get shooter ready to take a shot from position 1
+            shooter.manualFlyWheelSpeed(shooter.FAR_SHOT_VELOCITY);
+            shooter.manualTilt(shooter.AUTO_POS_1);
 
-
-        } else if(path == 2){
+            // Move to position 1 and shoot
             drive.moveInches(270, 44, 3000);
-            //Assuming there is ONE ring on the field
             drive.rotateTo(7.5);
-            shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
-            grabber.liftToAutoDropNoWait();
-            while (!shooter.flywheelReady()) {
-            }
-            shooter.launchAndClear();
+            shooter.launch();
+
+            // get shooter ready for position 3 (normal shooting position)
+            shooter.manualFlyWheelSpeed(shooter.HIGH_GOAL_VELOCITY);
+            shooter.manualTilt(shooter.AUTO_POS_3);
+
+            grabber.liftToAutoDropNoWait(); // get arm out of the way of intake
 
             drive.rotateTo(0);
             leftIntake.start();
-            //move to suck up more rings and shoot twice
+            //move to grab last ring
             drive.moveInches(0, 14, 5000);
 
             //drive up to the white line and shoot 3 times
             drive.moveInches(270, 22, 3000);
             shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
-            shooter.launchAndClear();
+            //teamUtil.pause(500); // let flywheel get back up to speed
+            //shooter.launchAndClear();
+            shooter.stopFlywheel();
+            leftIntake.stop();
 
+            //Position to drop first wobble goal and drop
             drive.rotateTo(180);
-            drive.moveInches(90, 25, 2000);
+            drive.moveInches(88, 25, 2000);
             grabber.release();
-            drive.moveInches(270, 5, 2000);;
+            drive.moveInches(268, 5, 2000);;
 
+            // Position to grab second wobble goal
             drive.rotateTo(270);
             drive.moveInches(195, 48, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
             grabber.moveToReadyNoWait();
-            drive.moveToDistance(drive.backDistance, 195, 13, 4000);
-            drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
+            drive.moveToDistance(drive.backDistance, 195, 13.8, 4000);
+            drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, drive.FIND_LINE_SPEED, 270, 3000);
+            drive.moveInches(90, 2.5, 2000);
 
-            drive.moveInches(90, 4, 2000);
+
+            // grab 2nd wobble goal
             grabber.grab();
             teamUtil.pause(750);
-            grabber.liftNoWait();
+            grabber.liftToAutoDropNoWait();
+
             drive.moveInches(0, 63, 6000);
             drive.rotateTo(180);
 
-        } else if(path == 3){
+        } else if(path == 3){ //Assuming there are FOUR rings on the field
+            // get shooter ready to take a shot from position 1
+            shooter.manualFlyWheelSpeed(shooter.FAR_SHOT_VELOCITY);
             shooter.manualTilt(shooter.AUTO_POS_1);
+
+            // move to position 1
             drive.moveInches(270, 44, 3000);
-            //Assuming there are FOUR rings on the field
+
             //rotate a little and shoot twice at high goal
-            drive.rotateTo(8.5);
-//            shooter.aimAt(Shooter.ShooterTarget.HIGH_GOAL);
-            grabber.liftToAutoDropNoWait();
-            while (!shooter.flywheelReady()) {
-            }
+            drive.rotateTo(7.5);
             shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
-            drive.rotateTo(0);
+
+            // get shooter ready to shoot from position 2
             shooter.manualTilt(shooter.AUTO_POS_2);
+            drive.rotateTo(359);
+            grabber.liftToAutoDropNoWait(); // get grabber out the way of intake
             leftIntake.start();
             //move to suck up more rings and shoot twice
             drive.moveInches(0, 10, 5000);
-            drive.moveInches(0, 5, 5000);
+            drive.moveInches(0, 4, 5000);
 //            drive.moveInches(180, 5, 5000); drive backwards commented out
-            teamUtil.pause(1600);
+            teamUtil.pause(1600); // let intake finish first ring
 //            drive.rotateTo(357);
             shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
-            //move to suck up more rings again)
+
+            // get shooter ready for position 3 (normal shooting position)
+            shooter.manualFlyWheelSpeed(shooter.HIGH_GOAL_VELOCITY);
             shooter.manualTilt(shooter.AUTO_POS_3);
+            //move to suck up last two rings
             drive.moveInches(0, 5, 5000); //originally 10 when drive backwards was there
             drive.moveInches(0, 5, 5000);
-            drive.moveInches(245, 24, 5000);
+
+            // drive to normal shooting position
+            drive.moveInches(240, 24, 5000);
             //shoot 4 times(one extra to make sure it's not stuck)
             shooter.launchAndClear();
             shooter.launchAndClear();
             shooter.launchAndClear();
             shooter.launchAndClear();
             //move diagonally to drop off wobble goal
-            drive.moveInches(250, 55, 5000);
+            drive.moveInches(250, 55, 7000);
             drive.rotateTo(135);
             grabber.release();
+            drive.moveInches(300, 5, 5000);
+
+
             //move diagonally back to get to white line(and extend blocker)
 //            drive.moveInches(300, 24, 4000, drive.DRIVE_MAX_VELOCITY);
 //            blocker.extendNoWait();

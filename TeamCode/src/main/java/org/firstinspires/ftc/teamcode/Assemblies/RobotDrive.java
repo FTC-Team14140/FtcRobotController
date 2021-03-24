@@ -729,7 +729,7 @@ public class RobotDrive {
     // Rotate to the desired heading at the maximum speed, slowing for accuracy at the end
     public void rotateTo(double heading) {
         teamUtil.log("Rotate To: " + heading);
-        boolean details = true;
+        boolean details = false;
 
         final double decelSlope = (DRIVE_MAX_SPIN_VELOCITY - DRIVE_SLOW_SPIN_VELOCITY) / (SPIN_DECEL_THRESHOLD - SPIN_SLOW_THRESHOLD); // + slope
         double leftRotatePower = 1; // Keep track of which way we are rotating
@@ -843,11 +843,11 @@ public class RobotDrive {
         } else {
             leftY = (leftJoyStickY / 3 - 1 / 6) * scaleAmount;
         }
-        if(Math.abs(rightJoyStickX) == 1){
-            rotationAdjustment = (float) (rightJoyStickX * 0.37 * 2);
-        } else {
-            rotationAdjustment = (float) (rightJoyStickX * 0.37 * 1); //1 was originally scaleAmount
-        }
+//        if(Math.abs(rightJoyStickX) == 1){
+//            rotationAdjustment = (float) (rightJoyStickX * 0.37 * 2);
+//        } else {
+            rotationAdjustment = (float) (rightJoyStickX * 0.37 * scaleAmount); //1 was originally scaleAmount
+//        }
 
         float frontLeft = -(leftY - leftX - rotationAdjustment);
         float frontRight = (-leftY - leftX - rotationAdjustment);

@@ -19,13 +19,13 @@ public class Shooter {
     double currentTargetVelocity = 0;
     double FLYWHEEL_MAX_VELOCITY = 2620;
     double POWERSHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.9;
-    double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY; //no longer times 0.9
+    double HIGH_GOAL_VELOCITY = FLYWHEEL_MAX_VELOCITY*0.95;
     double POWERSHOT_POSITION = 0.463888; //0.46; before more ring compression
-    double HIGH_GOAL_POSITION = 0.488;
-    public double AUTO_VELOCITY = FLYWHEEL_MAX_VELOCITY*1;
-    public double AUTO_POS_1 = HIGH_GOAL_POSITION;//0.47833; //0.47222;
-    public double AUTO_POS_2 = HIGH_GOAL_POSITION;//0.47833; //0.47222;
-    public double AUTO_POS_3 = HIGH_GOAL_POSITION; //0.47722;
+    double HIGH_GOAL_POSITION = 0.479;
+    public double FAR_SHOT_VELOCITY = FLYWHEEL_MAX_VELOCITY*.95;
+    public double AUTO_POS_1 = 0.4725;
+    public double AUTO_POS_2 = 0.4730;
+    public double AUTO_POS_3 = HIGH_GOAL_POSITION;
     double PUSHER_ALL_OUT = .85;
     double LAUNCH_POSITION = 0.7;
     double RELOAD_POSITION = 0.50;
@@ -143,12 +143,15 @@ public class Shooter {
 
     // Launch a ring
     public void launch() {
+        teamUtil.log("LAUNCH Flywheel:" + flywheel.getVelocity() + "Shooter Tilt:"+ tilter.getPosition());
+
         pusher.setPosition(LAUNCH_POSITION);
         teamUtil.pause(350);
         pusher.setPosition(RELOAD_POSITION);
         teamUtil.pause(350);
     }
     public void launchAndClear() {
+        teamUtil.log("LAUNCH Flywheel:" + flywheel.getVelocity() + "Shooter Tilt:"+ tilter.getPosition());
         pusher.setPosition(PUSHER_ALL_OUT);
         teamUtil.pause(500);
         pusher.setPosition(RELOAD_POSITION);

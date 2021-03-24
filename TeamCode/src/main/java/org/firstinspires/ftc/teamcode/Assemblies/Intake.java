@@ -47,6 +47,16 @@ public class Intake {
 
     }
 
+    // Starts the mechanisms at full speed AT REVERSE
+    public void reverse() {
+        conveyorServo.setPower(-FULL_POWER);
+        rollerServo.setPower(-FULL_POWER);
+
+        intakeRunning = true;
+
+    }
+
+
     // Stops the mechanisms
     public void stop() {
         conveyorServo.setPower(STOP);
