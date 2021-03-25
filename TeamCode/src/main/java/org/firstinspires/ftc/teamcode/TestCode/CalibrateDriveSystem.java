@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
 import org.firstinspires.ftc.teamcode.Assemblies.RobotDrive;
 import org.firstinspires.ftc.teamcode.basicLibs.TeamGamepad;
+import org.firstinspires.ftc.teamcode.basicLibs.sampleStats;
 import org.firstinspires.ftc.teamcode.basicLibs.teamColorSensor;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 
@@ -14,6 +15,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
 
     Robot robot;
     TeamGamepad teamGamePad;
+    sampleStats distanceStats;
     double testVelocity = 500;
     double HEADING = 0;
     long TIME = 3;
@@ -25,6 +27,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
         teamGamePad = new TeamGamepad(this);
         robot.init(true);
         teamUtil.initPerf();
+        distanceStats.setTimeWindow(250);
     }
 
     public void testDriveMotorWiring() {
@@ -211,16 +214,18 @@ public class CalibrateDriveSystem extends LinearOpMode {
             } else
                 testSpins();
 
-            teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
+            //teamUtil.telemetry.addData("heading:", robot.drive.getHeading());
             robot.drive.distanceTelemetry();
-            robot.drive.colorTelemetry();
-            robot.drive.rawColorTelemetry();
-            telemetry.addLine("DistNoMv:"+ robot.drive.MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD +" Drift:"+robot.drive.MOVE_TO_DISTANCE_DRIFT_DISTANCE +" Slow:"+robot.drive.MOVE_TO_DISTANCE_SLOW_DISTANCE+" Dec:"+robot.drive.MOVE_TO_DISTANCE_DECEL_DISTANCE);
-            telemetry.addLine("Velocity:"+ testVelocity);
+            distanceStats.addSample(robot.drive.backDistance.getDistanceInches());
+            telemetry.addLine("back distance RA: "+ distanceStats.getRunningAverage());
+            //robot.drive.colorTelemetry();
+            //robot.drive.rawColorTelemetry();
+            //telemetry.addLine("DistNoMv:"+ robot.drive.MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD +" Drift:"+robot.drive.MOVE_TO_DISTANCE_DRIFT_DISTANCE +" Slow:"+robot.drive.MOVE_TO_DISTANCE_SLOW_DISTANCE+" Dec:"+robot.drive.MOVE_TO_DISTANCE_DECEL_DISTANCE);
+            //telemetry.addLine("Velocity:"+ testVelocity);
 
             //robot.drive.telemetryDriveEncoders();
-            telemetry.addLine("Start:"+ robot.drive.MIN_START_SPEED +" End:"+robot.drive.MIN_END_SPEED +" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
-            telemetry.addLine("SpinSLOW:"+ robot.drive.DRIVE_SLOW_SPIN_VELOCITY+" SpinMAX:"+robot.drive.DRIVE_MAX_SPIN_VELOCITY+" SlowThreshold:"+robot.drive.SPIN_SLOW_THRESHOLD+" Dec:"+robot.drive.SPIN_DECEL_THRESHOLD);
+            //telemetry.addLine("Start:"+ robot.drive.MIN_START_SPEED +" End:"+robot.drive.MIN_END_SPEED +" Acc:"+robot.drive.MAX_ACCEL_PER_INCH+" Dec:"+robot.drive.MAX_DECEL_PER_INCH);
+            //telemetry.addLine("SpinSLOW:"+ robot.drive.DRIVE_SLOW_SPIN_VELOCITY+" SpinMAX:"+robot.drive.DRIVE_MAX_SPIN_VELOCITY+" SlowThreshold:"+robot.drive.SPIN_SLOW_THRESHOLD+" Dec:"+robot.drive.SPIN_DECEL_THRESHOLD);
             //telemetry.addLine("Heading:"+ HEADING+" TIME:"+TIME);
             teamUtil.telemetry.update();
 
