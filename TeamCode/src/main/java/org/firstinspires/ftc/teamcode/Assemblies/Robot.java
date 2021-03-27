@@ -134,9 +134,9 @@ public class Robot {
             grabber.moveToReadyNoWait();
 
             // use sensors to position on 2nd goal
-            drive.moveInches(197, 33, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
+            drive.moveInches(197, 33, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY, 270);
             grabber.moveToReadyNoWait();
-            drive.moveToDistance(drive.backDistance, 205, 14, 4000);
+            drive.moveToDistance(drive.backDistance, 205, 15.5, 4000);
             //drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
             drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, drive.FIND_LINE_SPEED, 270, 3000);
             drive.moveInches(90, 1, 2000);
@@ -199,9 +199,9 @@ public class Robot {
 
             // Position to grab second wobble goal
             drive.rotateTo(270);
-            drive.moveInches(195, 48, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
+            drive.moveInches(195, 48, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY, 270);
             grabber.moveToReadyNoWait();
-            drive.moveToDistance(drive.backDistance, 195, 14, 4000);
+            drive.moveToDistance(drive.backDistance, 195, 15.5, 4000);
             //drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
             drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, drive.FIND_LINE_SPEED, 270, 3000);
             drive.moveInches(90, 1, 2000);
@@ -211,10 +211,10 @@ public class Robot {
             teamUtil.pause(750);
             grabber.liftToAutoDropNoWait();
 
-            drive.moveInches(16, 63, 6000);
+            drive.moveInches(16, 65, 6000);
             drive.rotateTo(180);
             grabber.release();
-            drive.moveInches(270, 5, 5000);
+            drive.moveInches(270, 7, 5000);
 
         } else if(path == 3){ //Assuming there are FOUR rings on the field
             // get shooter ready to take a shot from position 1
