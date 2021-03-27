@@ -14,7 +14,7 @@ public class Robot {
     Robot robot;
     int path;
     public boolean hasBeenInitialized = false;
-    private static int justRanAuto;
+    public static int justRanAuto;
 
     static {
         justRanAuto = 0;
@@ -80,14 +80,19 @@ public class Robot {
 
         }else if(justRanAuto == 1){
             blocker.blockerExtended = true;
+
         }  else if(justRanAuto == 2){
             grabber.grab();
             grabber.liftToTeleopUp();
+
+
+
         } else if(justRanAuto == 3){
 //            grabber.stow();
 //            blocker.blockerExtended = true;
+
         }
-        drive.initSensors(usingDistanceSensors);
+        drive.initSensors(usingDistanceSensors, true);
         drive.calibrateColorSensors(); // Color sensors should be over non taped mat when this is called
 
         drive.resetHeading();
@@ -131,9 +136,10 @@ public class Robot {
             // use sensors to position on 2nd goal
             drive.moveInches(197, 33, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
             grabber.moveToReadyNoWait();
-            drive.moveToDistance(drive.backDistance, 205, 13.8, 4000);
-            drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
-            drive.moveInches(90, 2.5, 2000);
+            drive.moveToDistance(drive.backDistance, 205, 14, 4000);
+            //drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
+            drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, drive.FIND_LINE_SPEED, 270, 3000);
+            drive.moveInches(90, 1, 2000);
 
             // grab it
             grabber.grab();
@@ -195,18 +201,20 @@ public class Robot {
             drive.rotateTo(270);
             drive.moveInches(195, 48, 6500, drive.DRIVE_MAX_MOVE_TO_DISTANCE_VELOCITY);
             grabber.moveToReadyNoWait();
-            drive.moveToDistance(drive.backDistance, 195, 13.8, 4000);
+            drive.moveToDistance(drive.backDistance, 195, 14, 4000);
+            //drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, 3000);
             drive.moveToLine(drive.backRightColor, teamColorSensor.TapeColor.RED, 90, drive.FIND_LINE_SPEED, 270, 3000);
-            drive.moveInches(90, 2.5, 2000);
-
+            drive.moveInches(90, 1, 2000);
 
             // grab 2nd wobble goal
             grabber.grab();
             teamUtil.pause(750);
             grabber.liftToAutoDropNoWait();
 
-            drive.moveInches(0, 63, 6000);
+            drive.moveInches(16, 63, 6000);
             drive.rotateTo(180);
+            grabber.release();
+            drive.moveInches(270, 5, 5000);
 
         } else if(path == 3){ //Assuming there are FOUR rings on the field
             // get shooter ready to take a shot from position 1
@@ -225,19 +233,19 @@ public class Robot {
             // get shooter ready to shoot from position 2
             shooter.manualTilt(shooter.AUTO_POS_2);
             drive.rotateTo(359);
-            grabber.liftToAutoDropNoWait(); // get grabber out the way of intake
+            grabber.liftNoWait(); // get grabber out the way of intake
             leftIntake.start();
             //move to suck up more rings and shoot twice
             drive.moveInches(0, 10, 5000);
             drive.moveInches(0, 4, 5000);
 //            drive.moveInches(180, 5, 5000); drive backwards commented out
-            teamUtil.pause(1600); // let intake finish first ring
+            teamUtil.pause(2000); // let intake finish first ring
 //            drive.rotateTo(357);
             shooter.launchAndClear();
             teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
-            teamUtil.pause(500); // let flywheel get back up to speed
-            shooter.launchAndClear();
+//            teamUtil.pause(500); // let flywheel get back up to speed
+//            shooter.launchAndClear();
 
             // get shooter ready for position 3 (normal shooting position)
             shooter.manualFlyWheelSpeed(shooter.HIGH_GOAL_VELOCITY);
@@ -253,11 +261,12 @@ public class Robot {
             shooter.launchAndClear();
             shooter.launchAndClear();
             shooter.launchAndClear();
+            shooter.stopFlywheel();
             //move diagonally to drop off wobble goal
             drive.moveInches(250, 55, 7000);
             drive.rotateTo(135);
             grabber.release();
-            drive.moveInches(300, 5, 5000);
+            drive.moveInches(300, 7, 5000);
 
 
             //move diagonally back to get to white line(and extend blocker)

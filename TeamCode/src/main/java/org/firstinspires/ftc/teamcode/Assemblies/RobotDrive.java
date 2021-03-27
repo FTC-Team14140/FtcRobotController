@@ -109,14 +109,18 @@ public class RobotDrive {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void initSensors(boolean usingDistanceSensors) {
+    public void initSensors(boolean usingDistanceSensors, boolean useRunningAverage) {
 
         if (usingDistanceSensors) {
             frontDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "frontDistance"),1.4f,20,.5);
             backDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "backDistance"),1.4f,20,.5);
             leftDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "leftDistance"),0f,30,.5);
             rightDistance = new teamDistanceSensor((Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "rightDistance"),0f,30,.5);
+            if (useRunningAverage) {
+                backDistance.useRunningAverage(250);
+            }
             distanceSensorsOnline = true;
+
         }
         frontLeftColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "flColor"));
         frontRightColor = new teamColorSensor(hardwareMap.get(ColorSensor.class, "frColor"));
@@ -572,7 +576,7 @@ public class RobotDrive {
         moveToDistance(sensor, driveHeading, inches, LastEndSpeed, getHeading(), 0, timeOut);
     }
     public void moveToDistance(teamDistanceSensor sensor, double driveHeading, double inches, double startSpeed, double robotHeading, double endSpeed, long timeOut) {
-        boolean details = false;
+        boolean details = true;
         boolean stopAtEnd = false;
 
         long timeOutTime = System.currentTimeMillis() + timeOut;
@@ -636,6 +640,7 @@ public class RobotDrive {
         if (timedOut) {
             teamUtil.log("moveToDistance - TIMED OUT!");
         }
+        teamUtil.log("Final Wall Distance Reading: " + (currentDistance+inches));
         teamUtil.log("Finished moveToDistance");
     }
 

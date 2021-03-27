@@ -10,6 +10,8 @@ public class teamDistanceSensor {
     double minValidReading, maxValidReading;
     private float offset;
     public boolean lastReadingValid = false; // True if last reading was valid and was not clipped
+    sampleStats stats = null;
+
 
     public teamDistanceSensor(Rev2mDistanceSensor theSensor, float theOffset, double maxDistance, double minDistance) {
         sensor = theSensor;
@@ -17,7 +19,10 @@ public class teamDistanceSensor {
         minValidReading = minDistance;
         maxValidReading = maxDistance;
     }
-
+    public void useRunningAverage(int milliSeconds){
+        stats = new sampleStats();
+        stats.setTimeWindow(milliSeconds);
+    }
     private double adjustDistance(double distance) {
         if (distance < minValidReading) {
             lastReadingValid = false;
@@ -32,11 +37,23 @@ public class teamDistanceSensor {
     }
     // Return the current reading constrained to the min and max settings
     public double getDistanceInches() {
-        return adjustDistance( sensor.getDistance(DistanceUnit.INCH) + offset);
+        double d = adjustDistance( sensor.getDistance(DistanceUnit.INCH) + offset);
+        if (stats != null) {
+            stats.addSample(d);
+            return stats.getRunningAverage();
+        } else {
+            return d;
+        }
     }
 
     // Return the current reading constrainted to the min and max settings
     public double getDistanceCms() {
-        return adjustDistance(sensor.getDistance(DistanceUnit.CM) + offset);
+        double d = adjustDistance( sensor.getDistance(DistanceUnit.CM) + offset);
+        if (stats != null) {
+            stats.addSample(d);
+            return stats.getRunningAverage();
+        } else {
+            return d;
+        }
     }
 }

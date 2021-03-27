@@ -18,7 +18,7 @@ public class GrabberArm {
     final int STOW_POS = 3800;
     final int READY_POS = 2575;
     final int TRANSPORT_POS = READY_POS / 2; // Was 600
-    final int AUTO_DROP = READY_POS - 300;
+    final int AUTO_DROP = READY_POS - 400;
     final int TELEOP_UP = (TRANSPORT_POS)/2;
     final double ARM_SPEED = 1500;
     final float GRABBER_GRAB = .598f;
@@ -146,7 +146,6 @@ public class GrabberArm {
     }
 
     void liftToAutoDrop () {
-        teamUtil.pause(1000);
         arm.setTargetPosition(AUTO_DROP);
         arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         arm.setVelocity(ARM_SPEED);
@@ -155,7 +154,6 @@ public class GrabberArm {
     }
 
     void liftToTeleopUp () {
-        teamUtil.pause(1000);
         arm.setTargetPosition(TELEOP_UP);
         arm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         arm.setVelocity(ARM_SPEED);

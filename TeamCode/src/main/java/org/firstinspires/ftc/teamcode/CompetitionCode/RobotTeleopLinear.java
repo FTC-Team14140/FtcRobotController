@@ -40,6 +40,14 @@ public class RobotTeleopLinear extends LinearOpMode {
         teamUtil.telemetry.update();
         waitForStart();
 
+        if(robot.justRanAuto != 0){
+            robot.leftIntake.start();
+            robot.rightIntake.start();
+            robot.shooter.flywheelStart();
+        }
+        robot.justRanAuto = 0;
+
+
         while (opModeIsActive()) {
 
             teamUtil.telemetry.addData("Heading:", robot.drive.getHeading());

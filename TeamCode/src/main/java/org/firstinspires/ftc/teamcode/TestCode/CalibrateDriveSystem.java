@@ -27,6 +27,7 @@ public class CalibrateDriveSystem extends LinearOpMode {
         teamGamePad = new TeamGamepad(this);
         robot.init(true);
         teamUtil.initPerf();
+        distanceStats = new sampleStats();
         distanceStats.setTimeWindow(250);
     }
 
@@ -218,6 +219,9 @@ public class CalibrateDriveSystem extends LinearOpMode {
             robot.drive.distanceTelemetry();
             distanceStats.addSample(robot.drive.backDistance.getDistanceInches());
             telemetry.addLine("back distance RA: "+ distanceStats.getRunningAverage());
+            if (gamepad2.x) {
+                teamUtil.log("D: "+ robot.drive.backDistance.getDistanceInches()+ " RA: "+distanceStats.getRunningAverage());
+            }
             //robot.drive.colorTelemetry();
             //robot.drive.rawColorTelemetry();
             //telemetry.addLine("DistNoMv:"+ robot.drive.MOVE_TO_DISTANCE_NO_MOVEMENT_THRESHOLD +" Drift:"+robot.drive.MOVE_TO_DISTANCE_DRIFT_DISTANCE +" Slow:"+robot.drive.MOVE_TO_DISTANCE_SLOW_DISTANCE+" Dec:"+robot.drive.MOVE_TO_DISTANCE_DECEL_DISTANCE);
