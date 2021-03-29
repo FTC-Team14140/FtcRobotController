@@ -270,7 +270,7 @@ public class RobotDrive {
         double x, y, scale;
 
         // Determine how much adjustment for rotational drift
-        double headingError = Math.max(-10.0, Math.min(getHeadingError(robotHeading), 10.0)); // clip this to 10 degrees in either direction
+        double headingError = Math.max(-10.0, Math.min(getHeadingError(robotHeading), 10.0)); // clip this to 10 degrees in either direction to control rate of spin
         double rotationAdjust = headingError * ROTATION_ADJUST_FACTOR * velocity;
 
         // Covert heading to cartesian on the unit circle and scale so largest value is 1
@@ -297,6 +297,13 @@ public class RobotDrive {
         setDriveVelocities(flV, frV, blV, brV);
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Set the velocity of all 4 motors based on a driveHeading relative to FIELD and provided velocity
+    // This will rotate while translating if robotHeading != driveHeading
+    public void driveMotorsHeadingsFR(double driveHeading, double robotHeading, double velocity) {
+        double FRRobotHeading = getHeadingError(robotHeading);
+        driveMotorsHeadings(driveHeading, FRRobotHeading, velocity);
+    }
 
 
 
@@ -391,7 +398,7 @@ public class RobotDrive {
     // a specified number of inches in that direction.  Distance is based on encoder readings, so acceleration
     // slopes are used at the start and end of movements to try to avoid wheel slippage.
     // A non-zero end velocity can be used in which case the robot will remain moving when the method returns.
-    // This is intended to allow for a sequence of moves or a fast transition into a sensor driven movement.
+    //     This is intended to allow for a sequence of moves or a fast transition into a sensor driven movement.
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Return the number of encoder tics needed to ramp from start speed to end speed at the specified acceleration
@@ -468,19 +475,63 @@ public class RobotDrive {
         teamUtil.log("driveMotors - Finished");
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Drive the motors towards the specified Field heading, holding or rotating to the robotHeading, for the specified encoder count
+    // Ramp velocity from startVelocity to endVelocity linearly
+    // fieldRelative is true if the robotHeading is supplied as a field relative heading
+    public void driveMotorsForEncoderCountFR(double driveHeading, double robotHeading, double encoderCount, double startVelocity, double endVelocity, long timeOut) {
+        boolean details = false;
+        teamUtil.log("driveMotors: heading:" + driveHeading + " encoders:" + encoderCount + " StartSpeed:" + startVelocity + " EndSpeed:" + endVelocity);
+        long timeOutTime = System.currentTimeMillis() + timeOut;
+        timedOut = false;
+
+        // Figure out the distance we need to ramp in encoder tics
+        double speedChange = endVelocity - startVelocity; // + if accelerating or - if decelerating
+        double slope = speedChange / encoderCount; // slope for the velocity ramp.  + or -
+
+        // Get the encoder positions at the start of the movement
+        MotorData lastPositions = new MotorData();
+        getDriveMotorData(lastPositions);
+        int encoderTicsTraveled = 0;
+
+        while (encoderTicsTraveled < encoderCount && teamUtil.keepGoing(timeOutTime)) {
+
+            // constantly adjust the motor speeds to ramp velocity and correct rotational drift
+            driveMotorsHeadingsFR(driveHeading, robotHeading, startVelocity + slope*encoderTicsTraveled);
+            if (details)
+                teamUtil.log("Distance Traveled: " + encoderTicsTraveled);
+            encoderTicsTraveled = encoderTicsTraveled + getEncoderDistance(lastPositions);
+            getDriveMotorData(lastPositions);
+        }
+
+        timedOut = (System.currentTimeMillis() > timeOutTime);
+        if (timedOut) {
+            teamUtil.log("driveMotors - TIMED OUT!");
+        }
+        teamUtil.log("driveMotors - Finished");
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Move in any direction a specified number of inches using acceleration curves at start and end
     // Supports non-zero start and end speeds (start speed is presumed to be the last end speed.)
     public void moveInches(double driveHeading, double inches, long timeOut) {
-        moveInches(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, 0, getHeading());
+        moveInchesV2(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, 0, getHeading(), false);
     }
     public void moveInches(double driveHeading, double inches, long timeOut, double endSpeed) {
-        moveInches(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, getHeading());
+        moveInchesV2(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, getHeading(), false);
     }
     public void moveInches(double driveHeading, double inches, long timeOut, double endSpeed , double robotHeading) {
-        moveInches(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, robotHeading);
+        moveInchesV2(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, robotHeading, false);
     }
+    public void moveInchesV2(double driveHeading, double inches, long timeOut, double endSpeed , double robotHeading, boolean fieldRelative) {
+        moveInchesV2(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, robotHeading, fieldRelative);
+    }
+
     public void moveInches(double driveHeading, double inches, long timeOut, double maxVelocity, double endSpeed, double robotHeading) {
+        moveInchesV2(driveHeading, inches, timeOut, DRIVE_MAX_VELOCITY, endSpeed, robotHeading, false);
+    }
+
+    public void moveInchesV2(double driveHeading, double inches, long timeOut, double maxVelocity, double endSpeed, double robotHeading, boolean fieldRelative) {
         boolean details = false;
         boolean cruisePhase = true;
         boolean stopAtEnd = false;
@@ -535,17 +586,29 @@ public class RobotDrive {
 
         // ramp up if needed
         if (accelerationEncoderCount > 0) {
-            driveMotorsForEncoderCount(driveHeading, robotHeading,accelerationEncoderCount,startSpeed,maxVelocity, timeOut);
+            if (fieldRelative) {
+                driveMotorsForEncoderCountFR(driveHeading, robotHeading,accelerationEncoderCount,startSpeed,maxVelocity, timeOut);
+            } else {
+                driveMotorsForEncoderCount(driveHeading, robotHeading,accelerationEncoderCount,startSpeed,maxVelocity, timeOut);
+            }
         }
 
         // Cruise at Max Velocity if we have a cruise phase
         if (cruisePhase) {
-            driveMotorsForEncoderCount(driveHeading, robotHeading, decelerationStart - cruiseStart, maxVelocity, maxVelocity, timeOutTime - System.currentTimeMillis());
+            if (fieldRelative) {
+                driveMotorsForEncoderCountFR(driveHeading, robotHeading, decelerationStart - cruiseStart, maxVelocity, maxVelocity, timeOutTime - System.currentTimeMillis());
+            } else {
+                driveMotorsForEncoderCount(driveHeading, robotHeading, decelerationStart - cruiseStart, maxVelocity, maxVelocity, timeOutTime - System.currentTimeMillis());
+            }
         }
 
         // ramp down if needed
         if (decelerationEncoderCount > 0) {
-            driveMotorsForEncoderCount(driveHeading, robotHeading, totalEncoderCount - decelerationStart, maxVelocity, endSpeed, timeOutTime - System.currentTimeMillis());
+            if (fieldRelative) {
+                driveMotorsForEncoderCountFR(driveHeading, robotHeading, totalEncoderCount - decelerationStart, maxVelocity, endSpeed, timeOutTime - System.currentTimeMillis());
+            } else {
+                driveMotorsForEncoderCount(driveHeading, robotHeading, totalEncoderCount - decelerationStart, maxVelocity, endSpeed, timeOutTime - System.currentTimeMillis());
+            }
         }
 
         if (stopAtEnd) {  // stop the motors if they intend the robot to hold still
