@@ -261,20 +261,19 @@ public class RobotDrive {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Set the velocity of all 4 motors based on a driveHeading relative to robot and provided velocity
-    // Corrects for SMALL amounts of rotational drift based on robotHeading
-    // The presumption is that the current heading will be close to the robotHeading.  If that is not true, the
-    // robot will go on a loopy drive...
+    // Set the velocity of all 4 motors based on a driveHeading RELATIVE TO ROBOT and provided velocity
+    // Will rotate robot as needed to achieve and hold robotHeading RELATIVE TO FIELD
     public void driveMotorsHeadings(double driveHeading, double robotHeading, double velocity) {
         double flV, frV, blV, brV;
         double x, y, scale;
 
         // Determine how much adjustment for rotational drift
         double headingError = Math.max(-10.0, Math.min(getHeadingError(robotHeading), 10.0)); // clip this to 10 degrees in either direction to control rate of spin
-        double rotationAdjust = headingError * ROTATION_ADJUST_FACTOR * velocity;
+        double rotationAdjust = ROTATION_ADJUST_FACTOR * velocity * headingError; // scale based on velocity AND amount of rotational error
 
         // Covert heading to cartesian on the unit circle and scale so largest value is 1
         // This is essentially creating joystick values from the heading
+        // driveHeading is relative to robot at this point since the wheels are relative to robot!
         x = Math.cos(Math.toRadians(driveHeading + 90)); // + 90 cause forward is 0...
         y = Math.sin(Math.toRadians(driveHeading + 90));
         scale = 1 / Math.max(Math.abs(x), Math.abs(y));
@@ -298,11 +297,11 @@ public class RobotDrive {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Set the velocity of all 4 motors based on a driveHeading relative to FIELD and provided velocity
-    // This will rotate while translating if robotHeading != driveHeading
+    // Set the velocity of all 4 motors based on a driveHeading RELATIVE TO FIELD and provided velocity
+    // Will rotate robot as needed to achieve and hold robotHeading RELATIVE TO FIELD
     public void driveMotorsHeadingsFR(double driveHeading, double robotHeading, double velocity) {
-        double FRRobotHeading = getHeadingError(robotHeading);
-        driveMotorsHeadings(driveHeading, FRRobotHeading, velocity);
+        double RRDriveHeading = getHeadingError(driveHeading);
+        driveMotorsHeadings(RRDriveHeading, robotHeading, velocity);
     }
 
 

@@ -55,6 +55,7 @@ public class AutoRed extends LinearOpMode {
         teamUtil.log("Path: "+ path);
         detector.shutDownDetector();
 
+        robot.drive.resetHeading();
         robot.doAutoV3(path);
     }
 }

@@ -285,10 +285,12 @@ public class Robot {
 //            shooter.launch();
 
         } else if(path == 4){
-//            drive.moveInchesV2(0, 60, 5000, 0, 90, true);
+            drive.moveInchesV2(0, 60, 7000, 0, 90, true);
+/*
             drive.moveInchesV2(0, 24, 5000, drive.DRIVE_MAX_VELOCITY/2, 0, true);
             drive.moveInchesV2(0, 24, 5000, drive.DRIVE_MAX_VELOCITY/2, 90, true);
             drive.moveInchesV2(0, 24, 5000, 0, 90, true);
+ */
 
 
 
