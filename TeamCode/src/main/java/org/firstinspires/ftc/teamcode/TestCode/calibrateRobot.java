@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.TestCode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Assemblies.Robot;
@@ -15,6 +18,9 @@ import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
 public class calibrateRobot extends LinearOpMode {
     Robot robot;
     TeamGamepad teamGamePad;
+    DcMotor intakeMotor;
+
+
 
     public void initialize() {
         teamUtil.init(this);
@@ -23,6 +29,9 @@ public class calibrateRobot extends LinearOpMode {
         teamGamePad = new TeamGamepad(this);
         robot.init(true);
         teamUtil.initPerf();
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
     }
 
     public void findServoPosition (Servo servo) {
@@ -45,6 +54,7 @@ public class calibrateRobot extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        float iPower = 0.1f;
         initialize();
         waitForStart();
         robot.drive.resetHeading();
@@ -67,8 +77,15 @@ public class calibrateRobot extends LinearOpMode {
             }
             if (gamepad2.left_bumper) {
                 robot.leftIntake.start();
+                intakeMotor.setPower(iPower);
             } else {
                 robot.leftIntake.stop();
+                intakeMotor.setPower(0);
+            }
+            if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADUP)) {
+                iPower = iPower+.1f;
+            } else  if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD2DPADDOWN)) {
+                iPower = iPower-.1f;
             }
             if (gamepad2.right_bumper) {
 //                robot.rightIntake.start();
@@ -96,7 +113,10 @@ public class calibrateRobot extends LinearOpMode {
             robot.shooter.shooterTelemetry();
             robot.blocker.blockerTelemetry();
             robot.sweeper.sweeperTelemetry();
+//            telemetry.addLine("sweeper servo: " + )
+            telemetry.addLine("Intake Power: "+ iPower);
             telemetry.update();
         }
     }
 }
+

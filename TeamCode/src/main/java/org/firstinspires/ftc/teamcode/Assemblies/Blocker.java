@@ -18,6 +18,7 @@ public class Blocker {
     long RETRACT_TIME = 1900; // TODO: Find the correct time for the retract of the blocker
     boolean moving = false;
     public boolean blockerExtended = false;
+    boolean stopping = false;
 
     public Blocker() {
         teamUtil.log("Constructing Blocker");
@@ -47,10 +48,42 @@ public class Blocker {
 
     }
 
+
+
+
     // Stop the blocker from moving
     public void stop() {
         driveServo.setPower(STOP);
     }
+
+    public void stopAndUnstall() {
+        if(driveServo.getPower() > 0){
+            driveServo.setPower(BACKWARDS_FULL_POWER);
+            teamUtil.pause(100);
+
+        } else if(driveServo.getPower() < 0){
+            driveServo.setPower(FORWARD_FULL_POWER);
+            teamUtil.pause(100);
+        }
+        driveServo.setPower(STOP);
+        stopping = false;
+    }
+
+    public void stopAndUnstallNoWait(){
+        if(stopping){
+            return;
+        } else stopping = true;
+
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                stopAndUnstall();
+            }
+        });
+        thread.start();
+
+    }
+
+
 
     public void extendFully () {
         driveServo.setPower(FORWARD_FULL_POWER);

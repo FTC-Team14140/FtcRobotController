@@ -17,17 +17,18 @@ public class Sweeper {
     public Servo sweeper;
     Boolean sweeperCalibrated = false;
     Double TENSION_POWER = -0.3;
-    int FULLY_EXTENDED = 1800;
+    int FULLY_EXTENDED = 1926; //1800
     int EXTENDED_THESHOLD = (int) (FULLY_EXTENDED * .95);
-    Double EXTEND_SPEED = 2000.0; //TODO: find right number
-    Double RETRACT_SPEED = -2000.0; //TODO: find right number
+    Double EXTEND_SPEED = 2560.0*0.7; //TODO: find right number
+    Double RETRACT_SPEED = 2760.0; //TODO: find right number
     int FULLY_RETRACTED = 0;
-    int RETRACTED_DOWN_THESHOLD = FULLY_RETRACTED + 170;
+    int RETRACTED_DOWN_THESHOLD = FULLY_RETRACTED + 100; //170
     int RETRACTED_UP_THESHOLD = FULLY_RETRACTED + 40;
 
-    public final float SWEEP = 0.15f;
-    public final float STOWED = 0.86f;
-    public final float READY = (STOWED-SWEEP)/2+SWEEP; // half way between the two
+    public final float SWEEP = 0.19f; //0.15f
+    public final float STOWED = 0.84f; //0.86f
+    public final float OLD_READY = (STOWED-SWEEP)/2+SWEEP;
+    public final float READY = 0.77f;   //OLD_READY +(STOWED-OLD_READY)*5/9;   // half way between the two
     public boolean motorRunning = false;
 
 
@@ -53,6 +54,7 @@ public class Sweeper {
         else if (sweeper.getPosition() == SWEEP)
             s = "SWEEP";
         teamUtil.telemetry.addLine("Sweeper Arm:"+ motor.getCurrentPosition() + " Grabber:"+s+ " Grabber:"+sweeper.getPosition());
+        teamUtil.log("SweeperArm Velocity: " + motor.getVelocity());
     }
 
     // retracts the arm fully and resets the encoder position to 0
@@ -119,7 +121,7 @@ public class Sweeper {
             motorRunning = true;
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setTargetPosition(threshold);
-            motor.setVelocity(EXTEND_SPEED * speed);
+            motor.setVelocity(RETRACT_SPEED * speed);
         }
     }
 

@@ -115,13 +115,22 @@ public class RobotTeleopLinear extends LinearOpMode {
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 //   BLOCKER control - GamePad 1
-                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1LB)) {
-                    if (!robot.blocker.blockerExtended) {
-                        robot.blocker.extendNoWait();
-                    } else {
-                        robot.blocker.retractNoWait();
+//                if (teamGamePad.wasBounced(TeamGamepad.buttons.GAMEPAD1LB)) {
+//                    if (!robot.blocker.blockerExtended) {
+//                        robot.blocker.extendNoWait();
+//                    } else {
+//                        robot.blocker.retractNoWait();
+//
+//                    }
+//                }
 
-                    }
+                if(gamepad2.left_stick_y < -0.1){
+                    robot.blocker.extend();
+
+                } else if(gamepad2.left_stick_y > 0.1){
+                    robot.blocker.retract();
+                } else {
+                    robot.blocker.stopAndUnstallNoWait();
                 }
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,9 +307,9 @@ public class RobotTeleopLinear extends LinearOpMode {
 
 
             //this code is the telemetry
-            robot.shooter.shooterTelemetry();
-            //robot.sweeper.sweeperTelemetry();
-            teamUtil.telemetry.update();
+//            robot.shooter.shooterTelemetry();
+//            robot.sweeper.sweeperTelemetry();
+//            teamUtil.telemetry.update();
 
             // teamUtil.trackPerf();
         }

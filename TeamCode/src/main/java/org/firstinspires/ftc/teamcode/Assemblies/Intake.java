@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.Assemblies;
 
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.basicLibs.teamUtil;
@@ -14,8 +13,11 @@ public class Intake {
     HardwareMap hardwareMap;
     Telemetry telemetry;
     CRServo conveyorServo, rollerServo;
-    double FULL_POWER = 1;
-    double STOP = 0;
+    DcMotor intakeMotor;
+    boolean usesServo;
+    double SERVO_POWER = 1;
+    float INTAKE_MOTOR_POWER = 0.7f;
+    float STOP = 0f;
     public boolean intakeRunning = false;
 
 
@@ -26,22 +28,39 @@ public class Intake {
         telemetry = teamUtil.telemetry;
     }
 
-    void init(String conveyorServoName, boolean reverseConveyer, String rollerServoName, boolean reverseRoller) {
+    void init(String conveyorServoName, boolean reverseConveyer, String rollerServoName, boolean reverseRoller, boolean usesServo) {
+        this.usesServo = usesServo;
         teamUtil.log("Initializing Intake");
-        conveyorServo = hardwareMap.crservo.get(conveyorServoName);
-        if (reverseConveyer) {
-            conveyorServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        if(usesServo){
+            conveyorServo = hardwareMap.crservo.get(conveyorServoName);
+            if (reverseConveyer) {
+                conveyorServo.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+
+        } else {
+            intakeMotor = hardwareMap.get(DcMotor.class, conveyorServoName);
+            if (reverseConveyer) {
+                intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
         }
+
         rollerServo = hardwareMap.crservo.get(rollerServoName);
         if (reverseRoller) {
             rollerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         }
+
+
     }
 
     // Starts the mechanisms at full speed
     public void start() {
-        conveyorServo.setPower(FULL_POWER);
-        rollerServo.setPower(FULL_POWER);
+        if(usesServo){
+            conveyorServo.setPower(SERVO_POWER);
+        } else {
+            intakeMotor.setPower(INTAKE_MOTOR_POWER);
+        }
+
+        rollerServo.setPower(SERVO_POWER);
 
         intakeRunning = true;
 
@@ -49,8 +68,13 @@ public class Intake {
 
     // Starts the mechanisms at full speed AT REVERSE
     public void reverse() {
-        conveyorServo.setPower(-FULL_POWER);
-        rollerServo.setPower(-FULL_POWER);
+        if(usesServo){
+            conveyorServo.setPower(-SERVO_POWER);
+        } else {
+            intakeMotor.setPower(-INTAKE_MOTOR_POWER);
+        }
+
+        rollerServo.setPower(-SERVO_POWER);
 
         intakeRunning = true;
 
@@ -59,7 +83,11 @@ public class Intake {
 
     // Stops the mechanisms
     public void stop() {
-        conveyorServo.setPower(STOP);
+        if(usesServo){
+            conveyorServo.setPower(STOP);
+        } else {
+            intakeMotor.setPower(STOP);
+        }
         rollerServo.setPower(STOP);
         intakeRunning = false;
     }

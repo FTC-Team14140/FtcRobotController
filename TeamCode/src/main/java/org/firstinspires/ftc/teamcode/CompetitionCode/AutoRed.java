@@ -15,7 +15,7 @@ public class AutoRed extends LinearOpMode {
     RingDetector detector;
 
     public void initialize() {
-
+        robot.justRanAuto = 0;
         teamUtil.init(this);
         teamUtil.alliance = teamUtil.Alliance.RED;
         teamUtil.telemetry.addLine("Initializing Op Mode...please wait");
@@ -26,6 +26,8 @@ public class AutoRed extends LinearOpMode {
         teamGamePad = new TeamGamepad(this);
         robot = new Robot(this);
         robot.init(true);
+
+
     }
 
     @Override
@@ -49,6 +51,7 @@ public class AutoRed extends LinearOpMode {
 
         waitForStart();
         int path = detector.getPath(); // Result of voting: 1 2 or 3
+
         teamUtil.log("Path: "+ path);
         detector.shutDownDetector();
 

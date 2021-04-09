@@ -63,8 +63,8 @@ public class Robot {
         drive.initDriveMotors();
         drive.initImu();
 
-        leftIntake.init("leftPulleyServo", true,"leftRollerServo", false);
-        rightIntake.init("rightPulleyServo", false,"rightRollerServo",true);
+        leftIntake.init("intakeMotor", true,"leftRollerServo", false, false);
+        rightIntake.init("rightPulleyServo", false,"rightRollerServo",true, true);
         blocker.init();
         sweeper.init();
         grabber.init();
@@ -238,14 +238,12 @@ public class Robot {
             //move to suck up more rings and shoot twice
             drive.moveInches(0, 10, 5000);
             drive.moveInches(0, 4, 5000);
-//            drive.moveInches(180, 5, 5000); drive backwards commented out
-            teamUtil.pause(2000); // let intake finish first ring
-//            drive.rotateTo(357);
+            teamUtil.pause(500); // let intake finish first ring
             shooter.launchAndClear();
             teamUtil.pause(500); // let flywheel get back up to speed
             shooter.launchAndClear();
-//            teamUtil.pause(500); // let flywheel get back up to speed
-//            shooter.launchAndClear();
+            teamUtil.pause(500); // let flywheel get back up to speed
+            shooter.launchAndClear();
 
             // get shooter ready for position 3 (normal shooting position)
             shooter.manualFlyWheelSpeed(shooter.HIGH_GOAL_VELOCITY);
@@ -260,20 +258,20 @@ public class Robot {
             shooter.launchAndClear();
             shooter.launchAndClear();
             shooter.launchAndClear();
-            shooter.launchAndClear();
+
             shooter.stopFlywheel();
             //move diagonally to drop off wobble goal
             drive.moveInches(250, 55, 7000);
             drive.rotateTo(135);
             grabber.release();
-            drive.moveInches(300, 7, 5000);
+//            drive.moveInches(300, 7, 5000);
 
 
-            //move diagonally back to get to white line(and extend blocker)
-//            drive.moveInches(300, 24, 4000, drive.DRIVE_MAX_VELOCITY);
-//            blocker.extendNoWait();
-//            drive.moveInches(300, 24, 5000);
-//            drive.rotateTo(0);
+//            move diagonally back to get to white line(and extend blocker)
+            drive.moveInches(300, 24, 4000, drive.DRIVE_MAX_VELOCITY);
+            blocker.extendNoWait();
+            drive.moveInches(300, 12, 5000);
+            drive.rotateTo(0);
 
 
 
@@ -285,6 +283,14 @@ public class Robot {
 //            drive.moveInches(145 , 22 - drive.frontDistance.getDistanceInches() , 3000);
 //            shooter.aimAt(Shooter.ShooterTarget.POWERSHOT);
 //            shooter.launch();
+
+        } else if(path == 4){
+//            drive.moveInchesV2(0, 60, 5000, 0, 90, true);
+            drive.moveInchesV2(0, 24, 5000, drive.DRIVE_MAX_VELOCITY/2, 0, true);
+            drive.moveInchesV2(0, 24, 5000, drive.DRIVE_MAX_VELOCITY/2, 90, true);
+            drive.moveInchesV2(0, 24, 5000, 0, 90, true);
+
+
 
         }
         justRanAuto = path;

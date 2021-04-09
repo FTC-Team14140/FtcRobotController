@@ -7,6 +7,8 @@
             <goBILDA5202SeriesMotor name="sweeperMotor" port="0" />
             <goBILDA5202SeriesMotor name="armMotor" port="1" />
             <Matrix12vMotor name="flywheel" port="2" />
+            <goBILDA5202SeriesMotor name="intakeMotor" port="3" />
+
             <!-- IMU (built in) -->
             <LynxEmbeddedIMU name="imu2" port="0" bus="0" />
             <!-- Servos -->
